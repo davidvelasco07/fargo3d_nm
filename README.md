@@ -14,7 +14,8 @@
 ##### Clone
 
 ```
-git clone git@bitbucket.org:fargo3d/fargo3d.git
+git clone git@bitbucket.org:fargo3d/fargo3d_develop.git (bitbucket user required)
+git clone https://bitbucket.org/fargo3d/fargo3d.git (no user required)
 ```
 
 ##### Fork & Sync:

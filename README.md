@@ -35,8 +35,6 @@ git checkout -b v1.3 1.3
 [Pull requests](https://www.atlassian.com/git/tutorials/making-a-pull-request) are available to the branch ``release/public``. 
 
 
-------------------------
-
 ### First run
 
 #### Sequential CPU

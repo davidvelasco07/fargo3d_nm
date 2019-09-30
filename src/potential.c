@@ -9,7 +9,7 @@
 
 void compute_potential(real dt) {
 
-  real OmegaNew, domega;
+  real omeganew;
   int i;
   int subcycling = 5;
   static int alreadycalculated = -1;
@@ -40,10 +40,9 @@ void compute_potential(real dt) {
   alreadycalculated = Timestepcount;
   
   if (Corotating) {
-    OmegaNew = GetPsysInfo(GET)/dt;
-    domega = OmegaNew-OMEGAFRAME;
-    FARGO_SAFE(CorrectVtheta(domega));
-    OMEGAFRAME = OmegaNew;
+    omeganew = GetPsysInfo(GET)/dt;
+    Domega = omeganew-OMEGAFRAME;
+    OMEGAFRAME = omeganew;
   }
   RotatePsys(OMEGAFRAME*dt);
   }
@@ -132,6 +131,14 @@ void Potential_cpu() {
 	pot[l] = 0.0; // No default star
 #endif
 
+
+
+#ifdef GASINDIRECTTERM
+	if (indirect_term == YES) {
+		pot[l] -= indirectx*XC + indirecty*YC + indirectz*ZC; /* Indirect term due to gas */
+	}
+#endif
+
 	for(n=0; n<nb; n++) {
 	  mp = mplanet[n]*taper;
 	  
@@ -159,9 +166,6 @@ void Potential_cpu() {
 	    pot[l] += G*mp*(XC*xplanet[n]+YC*yplanet[n]+ZC*zplanet[n])/(planetdistance*
 										planetdistance*
 										planetdistance);
-#ifdef GASINDIRECTTERM
-	    pot[l] -= indirectx*XC + indirecty*YC + indirectz*ZC; /* Indirect term due to gas */
-#endif
 	  }
 #endif
 #ifdef NODEFAULTSTAR

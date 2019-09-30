@@ -57,6 +57,8 @@ int     StretchNumber = 0;
 int     BinaryStar1 = 0;
 int     BinaryStar2 = 0;
 
+real Domega;
+
 real InnerBorder;
 real OuterBorder;
 
@@ -115,6 +117,12 @@ Field *Total_Density;
 Field *QL;
 Field *QR;
 Field *LapPPA;
+
+Field *Sdiffyczc;
+Field *Sdiffyfzc;
+Field *Sdiffyczf;
+Field *Sdiffyfzf;
+
 
 // Below: fields specific to FARGO algorithms
 Field2D *VxMed;
@@ -328,6 +336,10 @@ void (*mon_bxflux)();
 void (*comm)();
 void (*Reset_field)(Field*);
 void (*ComputeTotalDensity)();
+void (*copy_field)(Field*,Field*);
+//DUST DIFFUSION
+void (*DustDiffusion_Core)(real);
+void (*DustDiffusion_Coefficients)();
 //MHD..........................................
 void (*ComputeSlopes)(int,int,int,Field*,Field*);
 void (*_ComputeStar)(real,int,int,int,int,int,int,int,int,int,Field*,Field*,Field*,Field*,Field*,Field*,Field*,Field*,Field*,Field*);

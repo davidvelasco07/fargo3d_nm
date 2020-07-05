@@ -21,9 +21,6 @@ void OhmicDiffusion_coeff_cpu() {
   int size_x = Nx+2*NGHX;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
-  real width = (YMAX-YMIN)/7.;
-  real rsup = YMAX-width;
-  real rinf = YMIN+width;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -32,8 +29,6 @@ void OhmicDiffusion_coeff_cpu() {
   int k;
 //<\INTERNAL>
 
-
-  
 //<MAIN_LOOP>
   i = j = k = 0;
 

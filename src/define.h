@@ -604,7 +604,7 @@ a bug and obtain hints about its origin. */
 
 #define DUMP_PPVAR( var) {fprintf (sum, "%s = %s = %g\n", #var, xstr(var), (double)var);} // To be used in summary.c only
 #define MULTIFLUID( call)						\
-  for (FluidIndex=0;FluidIndex<NFLUIDS;FluidIndex++) {			\
+  for (FluidIndex=0;FluidIndex<NFluids_per_rank;FluidIndex++) {		\
     SelectFluid(FluidIndex);						\
     call;}
 

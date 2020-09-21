@@ -111,7 +111,7 @@ endif
 #LINUX PLATFORM (GENERIC, default)
 #FARGO_ARCH must be set to LINUX
 CC_LINUX      = gcc 
-SEQOPT_LINUX  = -O3
+SEQOPT_LINUX  = -O3 -Wformat-overflow=0
 PARAOPT_LINUX = ${SEQOPT_LINUX}
 PARACC_LINUX  = mpicc
 LIBS_LINUX    = -lm

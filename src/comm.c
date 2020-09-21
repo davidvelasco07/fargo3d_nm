@@ -293,10 +293,10 @@ void comm_cpu (int options) {
 	    if (comm->src != comm->dst) {
 #ifdef FLOAT
 	      MPI_Isend (comm->buffer, comm->size*nvar*(Nx+2*NGHX), MPI_FLOAT, comm->dst, comm->direction, \
-			 MPI_COMM_WORLD, reqs+nbreqs++);
+			 DomainComm, reqs+nbreqs++);
 #else
 	      MPI_Isend (comm->buffer, comm->size*nvar*(Nx+2*NGHX), MPI_DOUBLE, comm->dst, comm->direction, \
-			 MPI_COMM_WORLD, reqs+nbreqs++);
+			 DomainComm, reqs+nbreqs++);
 #endif
 	    }
 	  }
@@ -304,10 +304,10 @@ void comm_cpu (int options) {
 	    if (comm->dst != comm->src) {
 #ifdef FLOAT
 	      MPI_Irecv (comm->buffer, comm->size*nvar*(Nx+2*NGHX), MPI_FLOAT, comm->src, comm->direction, \
-			 MPI_COMM_WORLD, reqr+nbreqr);
+			 DomainComm, reqr+nbreqr);
 #else
 	      MPI_Irecv (comm->buffer, comm->size*nvar*(Nx+2*NGHX), MPI_DOUBLE, comm->src, comm->direction, \
-			 MPI_COMM_WORLD, reqr+nbreqr);
+			 DomainComm, reqr+nbreqr);
 #endif
 	      MPI_Wait (reqr+nbreqr++, MPI_STATUS_IGNORE);
 	      /* This WAIT instruction must be here, as we have to
@@ -356,7 +356,7 @@ void comm_cpu (int options) {
   }
   for (n = 0; n < nbreqs; n++)
     MPI_Wait (reqs+n, MPI_STATUS_IGNORE);
-  MPI_Barrier (MPI_COMM_WORLD);
+  MPI_Barrier (DomainComm);
 #ifdef SHEARINGBC
   FARGO_SAFE(ShearBC (options));
 #endif  

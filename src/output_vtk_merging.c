@@ -50,7 +50,7 @@ void WriteVTKMerging(Field *f, int n) {
       }
     }
     fflush(ofile);
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(DomainComm);
   }
   if (CPU_Master)
     fprintf(ofile, "\n");
@@ -70,7 +70,7 @@ void WriteVTKMerging(Field *f, int n) {
     fprintf(ofile, "\n");
   }
   fflush(ofile);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
   
   if (CPU_Master)
 #ifdef FLOAT
@@ -79,7 +79,7 @@ void WriteVTKMerging(Field *f, int n) {
     fprintf(ofile, "Z_COORDINATES %d DOUBLE\n", NZ);
 #endif  
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
   
   for (i=0;i<NZ;i++) {
     for (j = 0; j<Ncpu_y; j++) {
@@ -89,7 +89,7 @@ void WriteVTKMerging(Field *f, int n) {
       }
     }
     fflush(ofile);
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(DomainComm);
   }
   if (CPU_Master)
     fprintf(ofile, "\n");
@@ -104,7 +104,7 @@ void WriteVTKMerging(Field *f, int n) {
 #endif
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
   
   for (i=0;i<NZ;i++) {
     for (j = 0; j<Ncpu_y; j++) {
@@ -114,7 +114,7 @@ void WriteVTKMerging(Field *f, int n) {
       }
     }
     fflush(ofile);
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(DomainComm);
   }
   if (CPU_Master)
     fprintf(ofile, "\n");
@@ -134,7 +134,7 @@ void WriteVTKMerging(Field *f, int n) {
     fprintf(ofile, "\n");
   }
   fflush(ofile);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
 #endif
   
   fflush(stdout);
@@ -153,7 +153,7 @@ void WriteVTKMerging(Field *f, int n) {
   }
 
   fflush(ofile);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
 
   i = j = k = 0;
   
@@ -168,7 +168,7 @@ void WriteVTKMerging(Field *f, int n) {
 	  }
 	}
 	fflush(ofile);
-	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Barrier(DomainComm);
       }
     }
   }
@@ -183,11 +183,11 @@ void WriteVTKMerging(Field *f, int n) {
 	  }
 	}
 	fflush(ofile);
-	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Barrier(DomainComm);
       }
     }
   }
 #endif
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
   fclose(ofile);
 }

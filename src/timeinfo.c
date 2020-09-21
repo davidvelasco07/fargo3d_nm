@@ -23,7 +23,7 @@ void InitSpecificTime (process_name, title)
   wcticks = times (&buffer);
   process_name->clicks = TIMETICKS;
   strcpy (process_name->name, title);
-  MPI_Barrier (MPI_COMM_WORLD);
+  MPI_Barrier (DomainComm);
 #endif
 }
 
@@ -35,7 +35,7 @@ real GiveSpecificTime (process_name)
   struct tms buffer;
   clock_t wcticks;
   long ticks;
-  MPI_Barrier (MPI_COMM_WORLD);
+  MPI_Barrier (DomainComm);
   Ticks = sysconf (_SC_CLK_TCK);
   wcticks = times (&buffer);
   ticks = TIMETICKS - process_name.clicks;

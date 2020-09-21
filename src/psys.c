@@ -130,9 +130,9 @@ real ComputeInnerMass(real r) {
     }
   }
 #ifdef FLOAT
-  MPI_Allreduce (&mass, &innermass, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce (&mass, &innermass, 1, MPI_FLOAT, MPI_SUM, DomainComm);
 #else
-  MPI_Allreduce (&mass, &innermass, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce (&mass, &innermass, 1, MPI_DOUBLE, MPI_SUM, DomainComm);
 #endif
   // printf("InnerMass=%lf\n", innermass);
   return innermass;

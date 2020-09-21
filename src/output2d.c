@@ -45,9 +45,9 @@ void Write2D (Field2D *f, char *filename, char *dir, int kind) {
       }
     }
 #ifndef FLOAT
-    MPI_Reduce (profile, gprofile, NY+2*NGHY, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce (profile, gprofile, NY+2*NGHY, MPI_DOUBLE, MPI_SUM, 0, DomainComm);
 #else
-    MPI_Reduce (profile, gprofile, NY+2*NGHY, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce (profile, gprofile, NY+2*NGHY, MPI_FLOAT, MPI_SUM, 0, DomainComm);
 #endif
     if (CPU_Rank == 0) {
       if (kind == NOGHOSTINC)
@@ -74,7 +74,7 @@ boolean Read2D (Field2D *f, char *filename, char *dir, int kind) {
     filesize = NZ*NY*sizeof(real);
   sprintf (name, "%s/%s", dir, filename);
   if (CPU_Rank > 0) { // Force sequential read
-    MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
   }
   in = fopen (name, "r");
   if (in == NULL) {
@@ -106,7 +106,7 @@ boolean Read2D (Field2D *f, char *filename, char *dir, int kind) {
     fclose (in);
   }
   if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-    MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, MPI_COMM_WORLD);
+    MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
   }
 
   if (error_occured == FALSE) {
@@ -121,6 +121,6 @@ boolean Read2D (Field2D *f, char *filename, char *dir, int kind) {
      trying to read another one, which may result in race
      condition. Another solution could be to have an MPI tag that is a
      hash of the filename, but using the barrier is much simpler. */
-  MPI_Barrier (MPI_COMM_WORLD);
+  MPI_Barrier (DomainComm);
   return error_occured;
 }

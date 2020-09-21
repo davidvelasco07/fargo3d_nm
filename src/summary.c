@@ -121,7 +121,7 @@ void GetHostsList () {
 #endif
   if (SpaceReservedForHostnames == NO) {
     if (CPU_Master) {
-      HostsList = (char *)malloc(1024*CPU_Number);
+      HostsList = (char *)malloc(1024*CPU_World_Number);
       if (HostsList == NULL) {
 	mastererr ("Out of memory in 'summary.c::GetHostsList()'\n");
 	prs_exit (1);
@@ -183,9 +183,9 @@ void Summary (int nout) {
     fprintf (sum, "Current Working Directory is %s\n", CurrentWorkingDirectory);
     fprintf (sum, "Command line: %s\n", CommandLine);
     fprintf (sum, "Parameter file: %s\n", ParameterFile);
-    fprintf (sum, "Run on %d process%s\nHosts:\n", CPU_Number,\
-	     (CPU_Number > 1 ? "es" : ""));
-    for (i = 0; i < CPU_Number; i++) {
+    fprintf (sum, "Run on %d process%s\nHosts:\n", CPU_World_Number,\
+	     (CPU_World_Number > 1 ? "es" : ""));
+    for (i = 0; i < CPU_World_Number; i++) {
       fprintf (sum, "   Rank %d on %s\n", i, HostsList+i*1024);
     }
     fprintf (sum, "\n%sOUTPUT SPECIFIC SECTION:\n%s",sep,sep);

@@ -327,11 +327,11 @@ void comm_gpu (int options) {
 #ifdef FLOAT
 	      MPI_Isend (comm->buffer.ptr, comm->size*nvar*comm->buffer.pitch/sizeof(real), \
 			 MPI_FLOAT, comm->dst, comm->direction,		\
-			 MPI_COMM_WORLD, reqs+nbreqs++);
+			 DomainComm, reqs+nbreqs++);
 #else
 	      MPI_Isend (comm->buffer.ptr, comm->size*nvar*comm->buffer.pitch/sizeof(real), \
 			 MPI_DOUBLE, comm->dst, comm->direction,	\
-			 MPI_COMM_WORLD, reqs+nbreqs++);
+			 DomainComm, reqs+nbreqs++);
 #endif
 	    }
 	  }
@@ -340,11 +340,11 @@ void comm_gpu (int options) {
 #ifdef FLOAT
 	      MPI_Irecv (comm->buffer.ptr, comm->size*nvar*comm->buffer.pitch/sizeof(real),\
 			 MPI_FLOAT, comm->src, comm->direction,		\
-			 MPI_COMM_WORLD, reqr+nbreqr);
+			 DomainComm, reqr+nbreqr);
 #else
 	      MPI_Irecv (comm->buffer.ptr, comm->size*nvar*comm->buffer.pitch/sizeof(real), \
 			 MPI_DOUBLE, comm->src, comm->direction,	\
-			 MPI_COMM_WORLD, reqr+nbreqr);
+			 DomainComm, reqr+nbreqr);
 #endif
 	      MPI_Wait (reqr+nbreqr++, MPI_STATUS_IGNORE);
 	      /* This WAIT instruction must be here, as we have to
@@ -376,7 +376,7 @@ void comm_gpu (int options) {
 
   for (n = 0; n < nbreqs; n++)
     MPI_Wait (reqs+n, MPI_STATUS_IGNORE);
-  MPI_Barrier (MPI_COMM_WORLD);
+  MPI_Barrier (DomainComm);
 #ifdef SHEARINGBC
   FARGO_SAFE(ShearBC (options));
 #endif  

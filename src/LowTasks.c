@@ -118,7 +118,7 @@ void MakeDir (char *string) {
      many directories as necessary. For instance, if we have say 4 PEs per node
      and each node sees its own scratchdir, nbprocesses/4 
      mkdir() commands will be issued */
-  if (CPU_Rank) MPI_Recv (&foo, 1, MPI_INT, CPU_Rank-1, 53, MPI_COMM_WORLD, &fargostat);
+  if (CPU_Rank) MPI_Recv (&foo, 1, MPI_INT, CPU_Rank-1, 53, DomainComm, &fargostat);
   dir = opendir (string);
   if (dir) {
     closedir (dir);
@@ -127,7 +127,7 @@ void MakeDir (char *string) {
     sprintf (command, "mkdir -p %s", string);
     temp = system (command);
   }
-  if (CPU_Rank < CPU_Number-1) MPI_Send (&foo, 1, MPI_INT, CPU_Rank+1, 53, MPI_COMM_WORLD);
+  if (CPU_Rank < CPU_Number-1) MPI_Send (&foo, 1, MPI_INT, CPU_Rank+1, 53, DomainComm);
 }
 
 FILE *fopen_prs (char *string, char *mode) {
@@ -346,7 +346,7 @@ void InitSpace() {
   }
 #endif
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
   
   if (!already_x) {
     if(CPU_Master) {
@@ -361,7 +361,7 @@ void InitSpace() {
   
   if (!already_y) {
     if (CPU_Rank > 0) { // Force sequential read
-      MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
     }
     
     sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_y.dat");
@@ -386,15 +386,15 @@ void InitSpace() {
       fclose(domain);
     }
     if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-      MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, MPI_COMM_WORLD);
+      MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
     }
   }
 
-  MPI_Barrier (MPI_COMM_WORLD);
+  MPI_Barrier (DomainComm);
   
   if (!already_z) {
     if (CPU_Rank > 0) { // Force sequential read
-      MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 43, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 43, DomainComm, MPI_STATUS_IGNORE);
     }
     sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_z.dat");
     if(CPU_Master)  {
@@ -418,10 +418,10 @@ void InitSpace() {
       fclose(domain);
     }
     if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-      MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 43, MPI_COMM_WORLD);
+      MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 43, DomainComm);
     }
     
-    MPI_Barrier (MPI_COMM_WORLD);
+    MPI_Barrier (DomainComm);
   }
 }
 
@@ -704,10 +704,10 @@ real ComputeMass() {
   }
 #endif
 #ifdef FLOAT
-  MPI_Allreduce(&mass, &totalmass, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&mass, &totalmass, 1, MPI_FLOAT, MPI_SUM, DomainComm);
   masterprint("TotalMass = %3.10f \n", totalmass );
 #else
-  MPI_Allreduce(&mass, &totalmass, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&mass, &totalmass, 1, MPI_DOUBLE, MPI_SUM, DomainComm);
   masterprint("TotalMass = %3.10lf \n", totalmass );
 #endif
   return totalmass;
@@ -995,7 +995,7 @@ void RestartDat(Field *field, int n) {
     }
   }
   
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(DomainComm);
   if(Restart_Full == YES) {
     sprintf(filename, "%s%s%d.dat", OUTPUTDIR, name, n);
     fi = fopen(filename, "r");

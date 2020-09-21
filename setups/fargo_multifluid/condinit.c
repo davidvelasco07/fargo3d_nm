@@ -47,37 +47,29 @@ void _CondInit() {
 }
 
 void CondInit() {
-  
-  int id_gas = 0;
+
   int feedback = YES;
-  //We first create the gaseous fluid and store it in the array Fluids[]
-  Fluids[id_gas] = CreateFluid("gas",GAS);
-
-  //We now select the fluid
-  SelectFluid(id_gas);
-
-  //and fill its fields
-  _CondInit();
-
-  //We repeat the process for the dust fluids
   char dust_name[MAXNAMELENGTH];
-  int id_dust;
-
-  for(id_dust = 1; id_dust<NFLUIDS; id_dust++) {
-    sprintf(dust_name,"dust%d",id_dust); //We assign different names to the dust fluids
-
-    Fluids[id_dust]  = CreateFluid(dust_name, DUST);
-    SelectFluid(id_dust);
-    _CondInit();
-
+  int global_index = FluidColor*NFluids_per_rank;
+  
+  for(int id = 0; id<NFluids_per_rank; id++) {
+    if (global_index == 0) {
+      Fluids[id] = CreateFluid("gas",GAS);
+      SelectFluid(id);
+      _CondInit();
+    }
+    else {
+      sprintf(dust_name,"dust%d",global_index+id);
+      Fluids[id]  = CreateFluid(dust_name, DUST);
+      SelectFluid(id);
+      _CondInit();
+      Alpha[id] = 1.0;
+    }
   }
 
-  /*We now fill the collision matrix (Feedback from dust included)
-   Note: ColRate() moves the collision matrix to the device.
-   If feedback=NO, gas does not feel the drag force.*/
   
-  ColRate(INVSTOKES1, id_gas, 1, feedback);
-  ColRate(INVSTOKES2, id_gas, 2, feedback);
-  ColRate(INVSTOKES3, id_gas, 3, feedback);
+#ifdef GPU
+  DevMemcpyH2D(Alpha_d,Alpha,sizeof(real)*NFluids_per_rank*NFluids_per_rank);
+#endif
 
 }

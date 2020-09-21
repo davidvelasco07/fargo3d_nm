@@ -1,11 +1,31 @@
 //MPI global variables
 
-int CPU_Rank;
-int CPU_Number;
+int NCPUS_per_domain;
+int NFluids_per_rank;
+
+int CPU_World_Rank;
+int CPU_World_Number;
+
+int CPU_Rank;    //For each fluid (rows)
+int CPU_Number;  //For each fluid (rows)
+
+int CPU_RowRank;   //For each fluid (rows)
+int CPU_RowNumber; //For each fluid (rows)
+
+int CPU_ColumnRank;    //For each domain (columns)
+int CPU_ColumnNumber;  //For each domain (columns)
+
+MPI_Comm DomainComm; //Intra communicator for each fluid
+MPI_Comm FluidsComm; //Intra communicator for each domain
+
+MPI_Request RequestTotalDensity;
+
+int FluidColor;   //Rows
+int DomainColor;  //Columns
+
 boolean CPU_Master = YES;
 
 //Global variables
-
 
 boolean Resistivity_Profiles_Filled = NO;
 boolean VxIsResidual = NO;
@@ -286,8 +306,8 @@ long VtkPosition = 0;
 int Timestepcount = 0;
 int Fluidtype;
 int FluidIndex;
-real Min[NFLUIDS];
-Fluid *Fluids[NFLUIDS];
+real Min[NFLUIDS];      //Comment: NFLUIDS is the upper bound for the size of the array.
+Fluid *Fluids[NFLUIDS]; //Comment: NFLUIDS is the upper bound for the size of the array.
 
 //Pointers to functions
 //WARNING!!! FUNCTIONS' ARGUMENTS MUST NOT CONTAIN BLANK SPACES
@@ -396,6 +416,7 @@ void (*Floor)();
 void (*__WriteField)();
 void (*__Restart)(Field*,int);
 
+//Comment: NFLUIDS is the upper bound for the size of the array.
 void (*boundary_ymin[NFLUIDS])();
 void (*boundary_ymax[NFLUIDS])();
 void (*boundary_zmin[NFLUIDS])();

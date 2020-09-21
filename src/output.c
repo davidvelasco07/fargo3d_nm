@@ -286,6 +286,7 @@ void WriteFieldGhost(Field *f, int n) { // Diagnostic function
 }
 
 void WriteMerging(Field *f, int n) {
+
   INPUT(f);
 
   FILE *fo;
@@ -297,7 +298,7 @@ void WriteMerging(Field *f, int n) {
   sprintf(outname, "%s%s%d.dat", OUTPUTDIR, f->name, n);
 
   if (CPU_Rank > 0) { // Force sequential read
-    MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
   }
 
   if (CPU_Master){ //An inefficient way to delete a file...
@@ -309,7 +310,7 @@ void WriteMerging(Field *f, int n) {
     fo = fopen(outname, "a+");
 
   if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-    MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, MPI_COMM_WORLD);
+    MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
   }
 
 
@@ -320,7 +321,7 @@ void WriteMerging(Field *f, int n) {
 	  fwrite(f->field_cpu+(k-Z0+NGHZ)*Stride+jj*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
       }
       fflush(fo);
-      MPI_Barrier(MPI_COMM_WORLD);
+      MPI_Barrier(DomainComm);
     }
   }
   fclose(fo);
@@ -426,7 +427,7 @@ MPI_Offset ParallelIO(Field *field, int n, int mode, MPI_Offset file_offset, int
 
   
   //Writing.....
-  MPI_File_open(MPI_COMM_WORLD, filename, mode, MPI_INFO_NULL, &mpi_file);
+  MPI_File_open(DomainComm, filename, mode, MPI_INFO_NULL, &mpi_file);
   
   //We write the only at the begining of the file
   if (file_offset == 0) {
@@ -565,7 +566,7 @@ void WriteOutputs(int type) {
      style). If type=SPECIFIC, this routine only dumps specific
      fields, given by the .par variables WRITE+FIELD. By default all
      WRITE parameters are NO. */ 
-  
+    
   boolean writedensity;
   boolean writeenergy;
   boolean writedivergence;

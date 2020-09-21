@@ -43,9 +43,9 @@ Force ComputeForce(real x, real y, real z,
 
   
 #ifdef FLOAT
-  MPI_Allreduce (&localforce, &globalforce, 12, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce (&localforce, &globalforce, 12, MPI_FLOAT, MPI_SUM, DomainComm);
 #else
-  MPI_Allreduce (&localforce, &globalforce, 12, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce (&localforce, &globalforce, 12, MPI_DOUBLE, MPI_SUM, DomainComm);
 #endif
   
   Force.fx_inner    = globalforce[0];

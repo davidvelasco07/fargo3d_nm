@@ -205,6 +205,10 @@ void split(Grid *g) {
 #endif
   
   //We allocate and initialize the memory of the collision matrix
-  Alpha = (real*) calloc(NFLUIDS*NFLUIDS,sizeof(real));
+  //Alpha = (real*) calloc(NFLUIDS*NFLUIDS,sizeof(real));
+  
+  //valid for gas/dust
+  Alpha = (real*) calloc(NFluids_per_rank,sizeof(real));
+  
 
 }

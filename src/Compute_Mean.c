@@ -37,11 +37,11 @@ real ComputeMean(Field *F) {
   }
 #endif
 #ifdef FLOAT
-  MPI_Allreduce(&total, &grandtotal, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce(&volume, &grandvolume, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&total, &grandtotal, 1, MPI_FLOAT, MPI_SUM, DomainComm);
+  MPI_Allreduce(&volume, &grandvolume, 1, MPI_FLOAT, MPI_SUM, DomainComm);
 #else
-  MPI_Allreduce(&total, &grandtotal, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce(&volume, &grandvolume, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&total, &grandtotal, 1, MPI_DOUBLE, MPI_SUM, DomainComm);
+  MPI_Allreduce(&volume, &grandvolume, 1, MPI_DOUBLE, MPI_SUM, DomainComm);
 #endif
   return grandtotal/grandvolume;
 }

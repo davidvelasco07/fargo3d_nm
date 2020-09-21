@@ -115,11 +115,11 @@ void MonitorFunction (int idx, int r, char *CurrentFineGrainDir, int plnb) {
     }
     
 #ifndef FLOAT
-    MPI_Reduce (Profile, GProfile, NY, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce (Coord,   GCoord,   NY, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (Profile, GProfile, NY, MPI_DOUBLE, MPI_SUM, 0, DomainComm);
+    MPI_Reduce (Coord,   GCoord,   NY, MPI_DOUBLE, MPI_MAX, 0, DomainComm);
 #else
-    MPI_Reduce (Profile, GProfile, NY, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce (Coord,   GCoord,   NY, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (Profile, GProfile, NY, MPI_FLOAT, MPI_SUM, 0, DomainComm);
+    MPI_Reduce (Coord,   GCoord,   NY, MPI_FLOAT, MPI_MAX, 0, DomainComm);
 #endif
 
     // Now GProfile contains the intended 1D profile
@@ -162,11 +162,11 @@ void MonitorFunction (int idx, int r, char *CurrentFineGrainDir, int plnb) {
     }
     
 #ifndef FLOAT 
-    MPI_Reduce (Profile, GProfile, NZ, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce (Coord,   GCoord,   NZ, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (Profile, GProfile, NZ, MPI_DOUBLE, MPI_SUM, 0, DomainComm);
+    MPI_Reduce (Coord,   GCoord,   NZ, MPI_DOUBLE, MPI_MAX, 0, DomainComm);
 #else
-    MPI_Reduce (Profile, GProfile, NZ, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce (Coord,   GCoord,   NZ, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce (Profile, GProfile, NZ, MPI_FLOAT, MPI_SUM, 0, DomainComm);
+    MPI_Reduce (Coord,   GCoord,   NZ, MPI_FLOAT, MPI_MAX, 0, DomainComm);
 #endif
     
     // Now GProfile contains the intended 1D profile
@@ -195,9 +195,9 @@ void MonitorFunction (int idx, int r, char *CurrentFineGrainDir, int plnb) {
     }
     
 #ifndef FLOAT
-    MPI_Reduce(&lsum, &gsum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&lsum, &gsum, 1, MPI_DOUBLE, MPI_SUM, 0, DomainComm);
 #else
-    MPI_Reduce(&lsum, &gsum, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&lsum, &gsum, 1, MPI_FLOAT, MPI_SUM, 0, DomainComm);
 #endif
     
     sprintf (filename, "%smonitor/%s/%s%s.dat", OUTPUTDIR, Fluids[FluidIndex]->name,mon_name[idx], planet_number);

@@ -157,8 +157,34 @@ int main(int argc, char *argv[]) {
   EarlyDeviceSelection();
 #endif
   MPI_Init (&argc, &argv);
-  MPI_Comm_rank (MPI_COMM_WORLD, &CPU_Rank);
-  MPI_Comm_size (MPI_COMM_WORLD, &CPU_Number);
+
+  MPI_Comm_rank (MPI_COMM_WORLD, &CPU_World_Rank);
+  MPI_Comm_size (MPI_COMM_WORLD, &CPU_World_Number);
+
+  NCPUS_per_domain = CPU_World_Number/NDOMAINS;
+  NFluids_per_rank = NFLUIDS/NCPUS_per_domain;
+  
+  if (CPU_World_Number%NDOMAINS != 0) {
+    printf("Error!!! The total number of Ranks (%d) must be divisible by the number of domains (%d).", CPU_World_Number, NDOMAINS);
+    MPI_Abort(MPI_COMM_WORLD, 1);
+  }
+  
+  DomainColor = CPU_World_Rank%NDOMAINS;
+  FluidColor  = CPU_World_Rank/NDOMAINS;
+  
+  MPI_Comm_split(MPI_COMM_WORLD, FluidColor, CPU_World_Rank, &DomainComm);
+  MPI_Comm_rank(DomainComm, &CPU_RowRank  );
+  MPI_Comm_size(DomainComm, &CPU_RowNumber);
+  
+  MPI_Comm_split(MPI_COMM_WORLD, DomainColor, CPU_World_Rank, &FluidsComm);
+  MPI_Comm_rank(FluidsComm, &CPU_ColumnRank  );
+  MPI_Comm_size(FluidsComm, &CPU_ColumnNumber);
+  
+  printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
+  
+  CPU_Rank   = CPU_RowRank;
+  CPU_Number = CPU_RowNumber;
+  
   CPU_Master = (CPU_Rank == 0 ? 1 : 0);
 
   if (strlen(xstr(VERSION)) < 2)
@@ -298,6 +324,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   MULTIFLUID(FillGhosts(PrimitiveVariables()));
 
   
+  
 #ifdef STOCKHOLM 
   FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
 #endif
@@ -400,7 +427,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #ifdef DRAGFORCE
       FARGO_SAFE(Collisions(dt, 1)); // 1 --> V_temp is used.
 #endif
-
+      
 #ifdef DUSTDIFFUSION
       FARGO_SAFE(DustDiffusion_Main(dt));
 #endif

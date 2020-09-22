@@ -320,11 +320,10 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #ifdef LONGSUMMARY
   ExtractFromExecutable (NO, ArchFile, 2);
 #endif
+
   
   MULTIFLUID(FillGhosts(PrimitiveVariables()));
 
-  
-  
 #ifdef STOCKHOLM 
   FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
 #endif
@@ -334,7 +333,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #else
   masterprint ("Standard version with no ghost zones in X\n");
 #endif
-  
+
   for (i = begin_i; i<=NTOT; i++) { // MAIN LOOP
     if (NINTERM * (TimeStep = (i / NINTERM)) == i) {
 
@@ -343,6 +342,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #endif
       if (ThereArePlanets)
 	WritePlanetSystemFile(TimeStep, NO);
+
       
 #ifndef NOOUTPUTS
       MULTIFLUID(WriteOutputs(ALL));
@@ -350,8 +350,11 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #ifdef MATPLOTLIB
       Display();
 #endif
-      
-      if(CPU_Master) printf("OUTPUTS %d at date t = %f OK\n", TimeStep, PhysicalTime);
+
+      if (FluidColor == 0) {
+	if(CPU_Master)
+	  printf("OUTPUTS %d at date t = %f OK\n", TimeStep, PhysicalTime);
+      }
 #endif
       
       if (TimeInfo == YES) GiveTimeInfo (TimeStep);
@@ -381,7 +384,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #endif
 #endif
       /// NOW THE 2D MESH VxMed CONTAINS THE AZIMUTHAL AVERAGE OF Vx in X
-      
+
 #ifdef FLOOR
       MULTIFLUID(Floor());
 #endif
@@ -413,11 +416,13 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       /* We now compute the total density of the mesh. We need first
 	 reset an array and then fill it by adding the density of each
 	 fluid */
-      Reset_field(Total_Density);
-      MPI_Iallreduce(Density->field_cpu, Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
-                    MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
+#ifdef POTENTIAL
+      FARGO_SAFE(Reset_field(Total_Density)); 
+      MULTIFLUID(ComputeTotalDensity());      
+      MPI_Iallreduce(MPI_IN_PLACE, Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+		     MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
+#endif
       //------------------------------------------------------------------------
-
       
 #ifdef COLLISIONPREDICTOR
       FARGO_SAFE(Collisions(0.5*dt, 0)); // 0 --> V is used and we update v_half.
@@ -445,24 +450,30 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       //We apply comms and boundaries at the end of the step
       MULTIFLUID(FillGhosts(PrimitiveVariables()));
 
-      if(CPU_Master) {
-	if (FullArrayComms)
-	  printf("%s", "!");
-	else {
-	  if (ContourComms)
-	    printf("%s", ":");
-	  else
-	    printf("%s", ".");
+
+      if (FluidColor == 0) {
+	if(CPU_Master) {
+	  if (FullArrayComms)
+	    printf("%s", "!");
+	  else {
+	    if (ContourComms)
+	      printf("%s", ":");
+	    else
+	      printf("%s", ".");
+	  }
 	}
-#ifndef NOFLUSH
-	fflush(stdout);
-#endif
       }
+#ifndef NOFLUSH
+      fflush(stdout);
+#endif
       FullArrayComms = 0;
       ContourComms = 0;
     }
-    
-    if(CPU_Master) printf("%s", "\n");
+
+    if (FluidColor == 0) {
+      if(CPU_Master)
+	printf("%s", "\n");
+    }
     
     MULTIFLUID(MonitorGlobal (MONITOR2D      |	\
 			      MONITORY       |	\

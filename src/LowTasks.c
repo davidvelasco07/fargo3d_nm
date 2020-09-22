@@ -346,10 +346,8 @@ void InitSpace() {
   }
 #endif
 
-  MPI_Barrier(DomainComm);
-  
   if (!already_x) {
-    if(CPU_Master) {
+    if(CPU_Master && FluidColor == 0) {
       sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_x.dat");
       domain = fopen(domain_out, "w");
       for (i=0; i<Nx+2*NGHX+1; i++) {
@@ -358,70 +356,68 @@ void InitSpace() {
       }
     }
   }
-  
-  if (!already_y) {
-    if (CPU_Rank > 0) { // Force sequential read
-      MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
-    }
-    
-    sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_y.dat");
-    if(CPU_Master)  {
-      domain = fopen(domain_out, "w");
-      jmin = 0;
-      jmax = Ny+NGHY+1; 
-    }
-    else {
-      if (CPU_Rank < Ncpu_x) {
-	domain = fopen(domain_out, "a");
-	jmin = NGHY+1;
-	jmax = Ny+NGHY+1;
-      }
-    }
-    if(CPU_Rank == Ncpu_x-1)
-      jmax = Ny+2*NGHY+1;
-    if (CPU_Rank < Ncpu_x) {
-      for (j=jmin; j<jmax; j++) {
-	fprintf(domain, "%#.18lf\n",Ymin(j));
-      }
-      fclose(domain);
-    }
-    if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-      MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
-    }
-  }
 
-  MPI_Barrier (DomainComm);
+  if (FluidColor == 0) {  
+    if (!already_y) {
+      if (CPU_Rank > 0) { // Force sequential read
+	MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
+      }
+      
+      sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_y.dat");
+      if(CPU_Master)  {
+	domain = fopen(domain_out, "w");
+	jmin = 0;
+	jmax = Ny+NGHY+1; 
+      }
+      else {
+	if (CPU_Rank < Ncpu_x) {
+	  domain = fopen(domain_out, "a");
+	  jmin = NGHY+1;
+	  jmax = Ny+NGHY+1;
+	}
+      }
+      if(CPU_Rank == Ncpu_x-1)
+	jmax = Ny+2*NGHY+1;
+      if (CPU_Rank < Ncpu_x) {
+	for (j=jmin; j<jmax; j++) {
+	  fprintf(domain, "%#.18lf\n",Ymin(j));
+	}
+	fclose(domain);
+      }
+      if (CPU_Rank < CPU_Number-1) {  // Force sequential read
+	MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
+      }
+    }
   
-  if (!already_z) {
-    if (CPU_Rank > 0) { // Force sequential read
-      MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 43, DomainComm, MPI_STATUS_IGNORE);
-    }
-    sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_z.dat");
-    if(CPU_Master)  {
-      domain = fopen(domain_out, "w");
-      jmin = 0;
-      jmax = Nz+NGHZ+1;
-    } 
-    else {
-      if (J == 0) {
-	domain = fopen(domain_out, "a");
-	jmin = NGHZ+1;
+    if (!already_z) {
+      if (CPU_Rank > 0) { // Force sequential read
+	MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 43, DomainComm, MPI_STATUS_IGNORE);
+      }
+      sprintf(domain_out, "%s%s", OUTPUTDIR, "domain_z.dat");
+      if(CPU_Master)  {
+	domain = fopen(domain_out, "w");
+	jmin = 0;
 	jmax = Nz+NGHZ+1;
+      } 
+      else {
+	if (J == 0) {
+	  domain = fopen(domain_out, "a");
+	  jmin = NGHZ+1;
+	  jmax = Nz+NGHZ+1;
+	}
       }
-    }
-    if ((K == Ncpu_y-1) && (J == 0))
-      jmax = Nz+2*NGHZ+1;
-    if (J == 0) {
-      for (j=jmin; j<jmax; j++) {
-	fprintf(domain, "%#.18lf\n",Zmin(j));
+      if ((K == Ncpu_y-1) && (J == 0))
+	jmax = Nz+2*NGHZ+1;
+      if (J == 0) {
+	for (j=jmin; j<jmax; j++) {
+	  fprintf(domain, "%#.18lf\n",Zmin(j));
+	}
+	fclose(domain);
       }
-      fclose(domain);
+      if (CPU_Rank < CPU_Number-1) {  // Force sequential read
+	MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 43, DomainComm);
+      }      
     }
-    if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-      MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 43, DomainComm);
-    }
-    
-    MPI_Barrier (DomainComm);
   }
 }
 

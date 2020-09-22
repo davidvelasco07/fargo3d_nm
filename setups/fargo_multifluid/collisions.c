@@ -18,6 +18,7 @@ void ComputeCBcollisions_cz_cpu(real);
 void UpdateVelcollisions_x_cpu(real);
 void UpdateVelcollisions_y_cpu(real);
 void UpdateVelcollisions_z_cpu(real);
+void ComputeDragCoeff_cpu();
 // -----------------------------------
 
 
@@ -34,12 +35,14 @@ void Collisions(real dt, int option) {
      of the time step so we hide its communication time.
   */
 
-  MULTIFLUID(if(Fluidtype == GAS) copy_field(Total_Density, Density));
-  
+ 
+  MULTIFLUID(if(Fluidtype == GAS) copy_field(Total_Density, Density));    
   MPI_Bcast(Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ), MPI_DOUBLE, 0, FluidsComm);
-  
-  //--------------------------------------------------------------------------------------
 
+  // Centered drag coefficient pre-factor
+  FARGO_SAFE(ComputeDragCoeff_cpu());
+  //--------------------------------------------------------------------------------------
+  
   Reset_field_cpu (Slope);
   //First step: Compute the constant C and B for each fluids  
   MULTIFLUID(ComputeCBcollisions_c_cpu(dt)); // local C and local B (x, y, z)

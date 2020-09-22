@@ -11,18 +11,16 @@ void UpdateVelcollisions_y_cpu (real dt) {
 
 //<USER_DEFINED>
   INPUT(Slope);
-#ifdef Y
+  INPUT(Qs);
   INPUT(Vy_temp);
   INPUT(Mpy);
   OUTPUT(Vy_temp);
-#endif
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-#ifdef Y
   real* vy = Vy_temp->field_cpu;
   real* cy = Mpy->field_cpu;
-#endif
+  real* pref = Qs->field_cpu;
   real* c    = Slope->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
@@ -60,20 +58,11 @@ void UpdateVelcollisions_y_cpu (real dt) {
 //<#>
 	ll = l;
 
-	gamma_k = alpha[n];
+	gamma_k = 0.5*(pref[ll]+pref[lym]);
 	s_k     = dt*gamma_k/(1+dt*gamma_k);
-
 	
-	if (fluidtype == GAS) {
-#ifdef Y
-	  vy[ll] = cy[ll]/( 1. + dt*0.5*(c[ll]+c[lym]) );
-#endif
-	}
-	else{
-#ifdef Y
-	  vy[ll] = s_k*cy[ll]/(1. + dt*0.5*(c[ll]+c[lym]) ) + vy[ll]/(1.+ dt*gamma_k);
-#endif
-	}
+	if (fluidtype == GAS)  vy[ll] = cy[ll]/( 1. + 0.5*(c[ll]+c[lym]) );
+	else                   vy[ll] = s_k*cy[ll]/(1. + 0.5*(c[ll]+c[lym]) ) + vy[ll]/(1.+ dt*gamma_k);
 	
 //<\#>
 #ifdef X

@@ -413,8 +413,9 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       /* We now compute the total density of the mesh. We need first
 	 reset an array and then fill it by adding the density of each
 	 fluid */
-      FARGO_SAFE(Reset_field(Total_Density)); 
-      MULTIFLUID(ComputeTotalDensity()); 
+      Reset_field(Total_Density);
+      MPI_Iallreduce(Density->field_cpu, Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+                    MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
       //------------------------------------------------------------------------
 
       

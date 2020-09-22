@@ -11,19 +11,17 @@ void UpdateVelcollisions_z_cpu (real dt) {
 
 //<USER_DEFINED>
   INPUT(Slope);
-#ifdef Z
+  INPUT(Qs);
   INPUT(Vz_temp);
   INPUT(Mpz);
   OUTPUT(Vz_temp);
-#endif
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-#ifdef Z
   real* vz = Vz_temp->field_cpu;
   real* cz = Mpz->field_cpu;
-#endif
   real* c    = Slope->field_cpu;
+  real* pref = Qs->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
@@ -60,20 +58,12 @@ void UpdateVelcollisions_z_cpu (real dt) {
 //<#>
 	ll = l;
 
-	gamma_k = alpha[n];
+	gamma_k = 0.5*(pref[ll]+pref[lym]);
 	s_k     = dt*gamma_k/(1+dt*gamma_k);
 
 	
-	if (fluidtype == GAS) {
-#ifdef Z
-	  vz[ll] = cz[ll]/( 1. + dt*0.5*(c[ll]+c[lzm]) ) ;
-#endif
-	}
-	else{
-#ifdef Z
-	  vz[ll] = s_k*cz[ll]/(1. + dt*0.5*(c[ll]+c[lzm]) ) + vz[ll]/(1.+ dt*gamma_k);
-#endif
-	}
+	if (fluidtype == GAS) vz[ll] = cz[ll]/( 1. + 0.5*(c[ll]+c[lzm]) ) ;
+	else   	              vz[ll] = s_k*cz[ll]/(1. + 0.5*(c[ll]+c[lzm]) ) + vz[ll]/(1.+ dt*gamma_k);
 	
 //<\#>
 #ifdef X

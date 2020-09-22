@@ -11,18 +11,16 @@ void UpdateVelcollisions_x_cpu (real dt) {
 
 //<USER_DEFINED>
   INPUT(Slope);
-#ifdef X
   INPUT(Mpx);
+  INPUT(Qs);
   INPUT(Vx_temp);
   OUTPUT(Vx_temp);
-#endif
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-#ifdef X
   real* vx = Vx_temp->field_cpu;
   real* cx = Mpx->field_cpu;
-#endif
+  real* pref = Qs->field_cpu;
   real* c    = Slope->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
@@ -41,7 +39,6 @@ void UpdateVelcollisions_x_cpu (real dt) {
   int ll;
   real gamma_k;
   real s_k;
-  real dst;
 //<\INTERNAL>
   
 //<MAIN_LOOP>
@@ -60,20 +57,11 @@ void UpdateVelcollisions_x_cpu (real dt) {
 //<#>
 	ll = l;
 
-	
-	gamma_k = alpha[n]*dt;
+	gamma_k = 0.5*(pref[ll]+pref[lxm]);
+	s_k     = dt*gamma_k/(1+dt*gamma_k);
 
-	if (fluidtype == GAS) {
-#ifdef X
-	  vx[ll] = vx[ll] + cx[ll]/( 1. + c[ll] );
-#endif
-	}
-	else{
-#ifdef X
-	  //Warning, we need also the velocity of the gas here....
-	  vx[ll] = s_k*cx[ll]/(1. + dt*0.5*(c[ll]+c[lxm]) ) + vx[ll]/(1.+ dt*gamma_k);
-#endif
-	}
+	if (fluidtype == GAS)  vx[ll] = cx[ll]/( 1. + 0.5*(c[ll]+c[lxm]) );
+	else                   vx[ll] = s_k*cx[ll]/(1. + 0.5*(c[ll]+c[lxm]) ) + vx[ll]/(1.+ dt*gamma_k);
 	
 //<\#>
 #ifdef X

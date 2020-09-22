@@ -46,7 +46,9 @@ void Sources(real dt) {
   InitSpecificTime (&t_Hydro, "Eulerian Hydro (no transport) algorithms");
   
   // REGARDLESS OF WHETHER WE USE FARGO, Vx IS ALWAYS THE TOTAL VELOCITY IN X
-  
+#ifdef POTENTIAL
+  MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
+#endif
 #ifdef POTENTIAL
   FARGO_SAFE(compute_potential(dt));
   if (Corotating) {

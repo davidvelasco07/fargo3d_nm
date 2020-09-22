@@ -1,3 +1,4 @@
+MAINOBJ += computedragcoeff.o
 MAINOBJ += computeCBcollisions_c.o
 MAINOBJ += computeCBcollisions_cx.o
 MAINOBJ += computeCBcollisions_cy.o

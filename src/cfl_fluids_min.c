@@ -4,12 +4,15 @@ void CflFluidsMin() {
   int i;
   real step = 1e30;
   real min;
-  
-  for (i=0;i<NFluids_per_rank;i++) {
-    if (step > Min[i])
-      step = Min[i];
-  }
-  
+
+#ifdef FLOAT
+  MPI_Allreduce(MPI_IN_PLACE, Min, 1, MPI_FLOAT, MPI_MIN, FluidsComm);
+#else
+  MPI_Allreduce(MPI_IN_PLACE, Min, 1, MPI_DOUBLE, MPI_MIN, FluidsComm);
+#endif
+
+  step = Min[0];
+
 #ifdef FLOAT
   MPI_Allreduce(&step, &StepTime, 1, MPI_FLOAT, MPI_MIN, DomainComm);
 #else

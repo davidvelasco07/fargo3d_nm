@@ -51,6 +51,8 @@ void CondInit() {
   int feedback = YES;
   char dust_name[MAXNAMELENGTH];
   int global_index = FluidColor*NFluids_per_rank;
+
+  printf("fluid index = %d \n", FluidColor);
   
   for(int id = 0; id<NFluids_per_rank; id++) {
     if (global_index == 0) {
@@ -63,13 +65,8 @@ void CondInit() {
       Fluids[id]  = CreateFluid(dust_name, DUST);
       SelectFluid(id);
       _CondInit();
-      Alpha[id] = 1.0;
     }
   }
 
-  
-#ifdef GPU
-  DevMemcpyH2D(Alpha_d,Alpha,sizeof(real)*NFluids_per_rank*NFluids_per_rank);
-#endif
 
 }

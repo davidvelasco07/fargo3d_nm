@@ -16,14 +16,14 @@ FLUIDS := 0 1 2
 NFLUIDS = 3
 
 # Parallel fluids flags
-NDOMAINS = 2
+NDOMAINS = 1
 
 FARGO_OPT += -DNFLUIDS=${NFLUIDS}
 FARGO_OPT += -DNDOMAINS=${NDOMAINS}
 #-----------------------------------------------------------
 
-MONITOR_SCALAR = MASS | MOM_X | TORQ
-MONITOR_Y_RAW  = TORQ
+#MONITOR_SCALAR = MASS | MOM_X | TORQ
+#MONITOR_Y_RAW  = TORQ
 
 FARGO_OPT +=  -DX
 FARGO_OPT +=  -DY
@@ -41,7 +41,6 @@ FARGO_OPT += -DVISCOSITY
 #Drag force between species
 FARGO_OPT += -DDRAGFORCE
 FARGO_OPT += -DSTOKESNUMBER
-#FARGO_OPT += -DDUSTDIFFUSION
 
 #Damping conditions
 FARGO_OPT += -DSTOCKHOLM

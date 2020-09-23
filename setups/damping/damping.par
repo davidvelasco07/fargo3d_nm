@@ -1,0 +1,26 @@
+Setup			damping
+
+Nx			16
+Ny			16
+Nz			16
+
+Xmin			0.0
+Xmax			1.0
+Ymin			0.0
+Ymax			1.0
+Zmin			0.0
+Zmax			1.0
+
+PeriodicY		Yes
+PeriodicZ		Yes
+
+Cs			1.0
+
+Ntot			20000
+Ninterm	 		1
+DT			0.1
+OutputDir		@outputs/damping
+
+### ColRate values
+
+ColRate 		1.0

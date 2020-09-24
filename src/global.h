@@ -410,7 +410,13 @@ void (*CheckMuteZ)();
 
 void (*SetupHook1)();
 
+// Collisions
 void (*_collisions)(real,int,int,int,int);
+void (*ComputeDragCoeff)();
+void (*ComputeCBcollisions_c)(real);
+void (*_ComputeCBcollisions_cv)(real,int,int,int,Field*,Field*);
+void (*_UpdateVelcollisions)(real,int,int,int,Field*,Field*);
+
 void (*Floor)();
 
 void (*__WriteField)();

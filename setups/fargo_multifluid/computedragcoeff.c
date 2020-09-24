@@ -34,6 +34,9 @@ void ComputeDragCoeff_cpu () {
   real omega;
 //<\INTERNAL>
 
+//<CONSTANT>
+// real ymin(Ny+2*NGHY+1);
+//<\CONSTANT>
   
 //<MAIN_LOOP>
 

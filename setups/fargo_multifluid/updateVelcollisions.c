@@ -7,28 +7,38 @@
 #include "fargo3d.h"
 //<\INCLUDES>
 
-void UpdateVelcollisions_y_cpu (real dt) {
+void UpdateVelcollisions(real dt, int option) {
+
+  if (option == 0)
+    _UpdateVelcollisions(dt, 1, 0, 0, Vx_temp, Mpx);
+  if (option == 1)
+    _UpdateVelcollisions(dt, 0, 1, 0, Vy_temp, Mpy);
+  if (option == 2)
+    _UpdateVelcollisions(dt, 0, 0, 1, Vz_temp, Mpz);
+  
+}
+
+void _UpdateVelcollisions_cpu(real dt, int idx, int idy, int idz, Field *V, Field *Cv) {
 
 //<USER_DEFINED>
   INPUT(Slope);
+  INPUT(Cv);
   INPUT(Qs);
-  INPUT(Vy_temp);
-  INPUT(Mpy);
-  OUTPUT(Vy_temp);
+  INPUT(V);
+  OUTPUT(V);
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-  real* vy   = Vy_temp->field_cpu;
-  real* cy   = Mpy->field_cpu;
-  real* pref = Qs->field_cpu;
+  real* v    = V->field_cpu;
+  real* cv   = Cv->field_cpu;
   real* c    = Slope->field_cpu;
+  real* pref = Qs->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
   int fluidtype = Fluidtype;
-  real *alpha = Alpha;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -36,6 +46,7 @@ void UpdateVelcollisions_y_cpu (real dt) {
   int j;
   int k;
   int ll;
+  int lm;
   real gamma_k;
   real s_k;
   real dst;
@@ -57,11 +68,13 @@ void UpdateVelcollisions_y_cpu (real dt) {
 //<#>
 	ll = l;
 
-	gamma_k = 0.5*(pref[ll]+pref[lym]);
+	lm = idx*lxm + idy*lym + idz*lzm;
+	
+	gamma_k = 0.5*(pref[ll]+pref[lm]);
 	s_k     = dt*gamma_k/(1+dt*gamma_k);
 	
-	if (fluidtype == GAS)  vy[ll] = cy[ll]/( 1. + 0.5*(c[ll]+c[lym]) );
-	else                   vy[ll] = s_k*cy[ll]/(1. + 0.5*(c[ll]+c[lym]) ) + vy[ll]/(1.+ dt*gamma_k);
+	if (fluidtype == GAS)  v[ll] = cv[ll]/( 1. + 0.5*(c[ll]+c[lm]) );
+	else                   v[ll] = s_k*cv[ll]/(1. + 0.5*(c[ll]+c[lm]) ) + v[ll]/(1.+ dt*gamma_k);
 	
 //<\#>
 #ifdef X

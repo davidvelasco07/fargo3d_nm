@@ -124,8 +124,15 @@ void ChangeArch() {
   AmbipolarDiffusion_emfz  = AmbipolarDiffusion_emfz_cpu;
   AmbipolarDiffusion_coeff = AmbipolarDiffusion_coeff_cpu;
   // ------------------------------------------------------
-  
+
+  // COLLISIONS
   _collisions = _collisions_cpu;
+  ComputeDragCoeff        = ComputeDragCoeff_cpu;
+  ComputeCBcollisions_c   = ComputeCBcollisions_c_cpu;
+  _ComputeCBcollisions_cv = _ComputeCBcollisions_cv_cpu;
+  _UpdateVelcollisions    = _UpdateVelcollisions_cpu;
+  // ------------------------------------------------------
+  
   ComputeTotalDensity = ComputeTotalDensity_cpu;
   Floor = Floor_cpu; 
   Reset_field = Reset_field_cpu; 
@@ -512,6 +519,10 @@ void ChangeArch() {
       if (strcmp(name, "collisions") == 0) {
 	if(strval[0] == 'g'){
 	  _collisions = _collisions_gpu;
+	  ComputeDragCoeff        = ComputeDragCoeff_gpu;
+	  ComputeCBcollisions_c   = ComputeCBcollisions_c_gpu;
+	  _ComputeCBcollisions_cv = _ComputeCBcollisions_cv_gpu;
+	  _UpdateVelcollisions    = _UpdateVelcollisions_gpu;
 	  printf("collisions runs on the GPU\n");
 	}
       }

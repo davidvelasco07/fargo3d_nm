@@ -58,7 +58,7 @@ void UpdateVelcollisions_z_cpu (real dt) {
 //<#>
 	ll = l;
 
-	gamma_k = 0.5*(pref[ll]+pref[lym]);
+	gamma_k = 0.5*(pref[ll]+pref[lzm]);
 	s_k     = dt*gamma_k/(1+dt*gamma_k);
 
 	

@@ -18,8 +18,8 @@ void UpdateVelcollisions_y_cpu (real dt) {
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-  real* vy = Vy_temp->field_cpu;
-  real* cy = Mpy->field_cpu;
+  real* vy   = Vy_temp->field_cpu;
+  real* cy   = Mpy->field_cpu;
   real* pref = Qs->field_cpu;
   real* c    = Slope->field_cpu;
   int pitch  = Pitch_cpu;
@@ -27,7 +27,6 @@ void UpdateVelcollisions_y_cpu (real dt) {
   int size_x = Nx;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
-  int  n     = FluidIndex;
   int fluidtype = Fluidtype;
   real *alpha = Alpha;
 //<\EXTERNAL>

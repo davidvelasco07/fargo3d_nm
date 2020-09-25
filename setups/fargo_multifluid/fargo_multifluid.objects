@@ -1,9 +1,0 @@
-MAINOBJ += computedragcoeff.o
-MAINOBJ += computeCBcollisions_c.o
-MAINOBJ += computeCBcollisions_cv.o
-MAINOBJ += updateVelcollisions.o
-
-GPUOBJ += computedragcoeff_gpu.o
-GPUOBJ += computeCBcollisions_c_gpu.o
-GPUOBJ += computeCBcollisions_cv_gpu.o
-GPUOBJ += updateVelcollisions_gpu.o

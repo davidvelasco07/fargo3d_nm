@@ -69,7 +69,7 @@ void DragForce(real dt) {
 #endif
 #endif
 #ifdef Z  
-  Reset_field_cpu (Mpz);
+  Reset_field(Mpz);
   MULTIFLUID(DragForce_SumCV(dt,2)); 
 #ifdef MPICUDA
   MPI_Iallreduce(MPI_IN_PLACE, Mpz->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),

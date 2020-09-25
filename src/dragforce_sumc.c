@@ -27,7 +27,6 @@ void DragForce_SumC_cpu (real dt) {
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
   int fluidtype = Fluidtype;
-  real* alpha = Alpha;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -35,17 +34,11 @@ void DragForce_SumC_cpu (real dt) {
   int j;
   int k;
   int ll;
-  real gamma_k;
-  real s_k;
-  real dst;
+  real alphak;
+  real sk;
   real _c;
   real epsilon;
 //<\INTERNAL>
-
-
-//<CONSTANT>
-// real Alpha(NFLUIDS*NFLUIDS);
-//<\CONSTANT>
 
 //<MAIN_LOOP>
 
@@ -64,10 +57,11 @@ void DragForce_SumC_cpu (real dt) {
 	ll = l;
 
 	epsilon = dens[ll]/dens_gas[ll];
-	gamma_k = pref[ll]*dt;	
+	alphak  = pref[ll];	
+	sk      = dt*alphak/(1+dt*alphak);
 
 	if (fluidtype == GAS)  _c = 0.;
-	else _c  = epsilon*gamma_k/(1+gamma_k);
+	else _c  = epsilon*sk;
 
 	c[ll] += _c;
 //<\#>

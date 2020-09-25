@@ -48,15 +48,12 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
   int k;
   int ll;
   int lm;
-  real gamma_k;
-  real s_k;
+  real alphak;
+  real sk;
   real _cv;
   real epsilon;
 //<\INTERNAL>
 
-//<CONSTANT>
-// real Alpha(NFLUIDS*NFLUIDS);
-//<\CONSTANT>
 
 //<MAIN_LOOP>
 
@@ -76,11 +73,11 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
 	lm = idx*lxm + idy*lym + idz*lzm;
 	
 	epsilon = (dens[ll]+dens[lm])/(dens_gas[ll]+dens_gas[lm]);
-	gamma_k = 0.5*(pref[ll]+pref[lm]);
-	s_k     = dt*gamma_k/(1+dt*gamma_k);
+	alphak  = 0.5*(pref[ll]+pref[lm]);
+	sk      = dt*alphak/(1+dt*alphak);
 
 	if (fluidtype == GAS)  _cv = v[ll];
-	else _cv  = s_k*epsilon*v[ll];
+	else _cv  = sk*epsilon*v[ll];
 	
 	cv[ll] += _cv;
 //<\#>

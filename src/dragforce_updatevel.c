@@ -47,9 +47,8 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
   int k;
   int ll;
   int lm;
-  real gamma_k;
-  real s_k;
-  real dst;
+  real alphak;
+  real sk;
 //<\INTERNAL>
   
 //<MAIN_LOOP>
@@ -70,11 +69,11 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
 
 	lm = idx*lxm + idy*lym + idz*lzm;
 	
-	gamma_k = 0.5*(pref[ll]+pref[lm]);
-	s_k     = dt*gamma_k/(1+dt*gamma_k);
+	alphak = 0.5*(pref[ll]+pref[lm]);
+	sk     = dt*alphak/(1+dt*alphak);
 	
-	if (fluidtype == GAS)  v[ll] = cv[ll]/( 1. + 0.5*(c[ll]+c[lm]) );
-	else                   v[ll] = s_k*cv[ll]/(1. + 0.5*(c[ll]+c[lm]) ) + v[ll]/(1.+ dt*gamma_k);
+	if (fluidtype == GAS)  v[ll] =    cv[ll]/(1. + 0.5*(c[ll]+c[lm]) );
+	else                   v[ll] = sk*cv[ll]/(1. + 0.5*(c[ll]+c[lm]) ) + v[ll]/(1.+ dt*alphak);
 	
 //<\#>
 #ifdef X

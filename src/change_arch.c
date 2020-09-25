@@ -529,7 +529,7 @@ void ChangeArch() {
       
       if (strcmp(name, "dragforce") == 0) {
 	if(strval[0] == 'g'){
-	  DragForce_Coeff =  DragForce_Coeff_gpu;
+	  DragForce_Coeff      =  DragForce_Coeff_gpu;
 	  DragForce_SumC       = DragForce_SumC_gpu;
 	  _DragForce_SumCV     = _DragForce_SumCV_gpu;
 	  _DragForce_UpdateVel = _DragForce_UpdateVel_gpu;
@@ -537,7 +537,7 @@ void ChangeArch() {
 	}
       }
 
-if (strcmp(name, "computetotaldensity") == 0) {
+      if (strcmp(name, "computetotaldensity") == 0) {
 	if(strval[0] == 'g'){
 	  ComputeTotalDensity = ComputeTotalDensity_gpu;
 	  printf("ComputeTotalDensity runs on the GPU\n");

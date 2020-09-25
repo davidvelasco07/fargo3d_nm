@@ -417,6 +417,13 @@ void (*ComputeCBcollisions_c)(real);
 void (*_ComputeCBcollisions_cv)(real,int,int,int,Field*,Field*);
 void (*_UpdateVelcollisions)(real,int,int,int,Field*,Field*);
 
+//DragForce
+void (*DragForce_Coeff)();
+void (*DragForce_SumC)(real);
+void (*_DragForce_SumCV)(real,int,int,int,Field*,Field*);
+void (*_DragForce_UpdateVel)(real,int,int,int,Field*,Field*);
+
+
 void (*Floor)();
 
 void (*__WriteField)();

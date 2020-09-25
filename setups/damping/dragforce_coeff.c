@@ -7,27 +7,23 @@
 #include "fargo3d.h"
 //<\INCLUDES>
 
-void ComputeCBcollisions_c_cpu (real dt) {
- 
+void DragForce_Coeff_cpu () {
+
+  /*This function reutns the prefactor of the drag coeffcient which
+    is independent of the fluid type. The Stokes number or particle size
+    and solid density are added through alpha[n] in each source file */
+  
 //<USER_DEFINED>
-  INPUT(Density);
-  INPUT(Total_Density);
-  INPUT(Qs);
-  OUTPUT(Slope);
+  OUTPUT(Qs);
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-  real* dens     = Density->field_cpu;
-  real* dens_gas = Total_Density->field_cpu;
-  real* c        = Slope->field_cpu;
-  real* pref     = Qs->field_cpu;
+  real* coef = Qs->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
-  int fluidtype = Fluidtype;
-  real* alpha = Alpha;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -35,18 +31,13 @@ void ComputeCBcollisions_c_cpu (real dt) {
   int j;
   int k;
   int ll;
-  real gamma_k;
-  real s_k;
-  real dst;
-  real _c;
-  real epsilon;
+  real omega;
 //<\INTERNAL>
 
-
 //<CONSTANT>
-// real Alpha(NFLUIDS*NFLUIDS);
+// real ymin(Ny+2*NGHY+1);
 //<\CONSTANT>
-
+  
 //<MAIN_LOOP>
 
   i = j = k = 0;
@@ -63,13 +54,8 @@ void ComputeCBcollisions_c_cpu (real dt) {
 //<#>
 	ll = l;
 
-	epsilon = dens[ll]/dens_gas[ll];
-	gamma_k = pref[ll]*dt;	
+	coef[ll] = 0.5;
 
-	if (fluidtype == GAS)  _c = 0.;
-	else _c  = epsilon*gamma_k/(1+gamma_k);
-
-	c[ll] += _c;
 //<\#>
 #ifdef X
       }

@@ -38,13 +38,13 @@ void CondInit() {
     if (global_index == 0) {
       Fluids[id] = CreateFluid("gas",GAS);
       SelectFluid(id);
-      _CondInit(1.0e3, 0.0,2.0,0.0);
+      _CondInit(1.0e3, 2.0,2.0,2.0);
     }
     else {
       sprintf(dust_name,"dust%d",global_index);
       Fluids[id]  = CreateFluid(dust_name, DUST);
       SelectFluid(id);
-      _CondInit(1.0e-3,0.0,-3.0*global_index,0.0);
+      _CondInit(1.0e-3,-3.0*global_index,-3.0*global_index,-3.0*global_index);
     }
   }
 

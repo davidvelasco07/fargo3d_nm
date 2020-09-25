@@ -127,10 +127,13 @@ void ChangeArch() {
 
   // COLLISIONS
   _collisions = _collisions_cpu;
-  ComputeDragCoeff        = ComputeDragCoeff_cpu;
-  ComputeCBcollisions_c   = ComputeCBcollisions_c_cpu;
-  _ComputeCBcollisions_cv = _ComputeCBcollisions_cv_cpu;
-  _UpdateVelcollisions    = _UpdateVelcollisions_cpu;
+ 
+  // DRAGFORCE
+  DragForce_Coeff      = DragForce_Coeff_cpu;
+  DragForce_SumC       = DragForce_SumC_cpu;
+  _DragForce_SumCV     = _DragForce_SumCV_cpu;
+  _DragForce_UpdateVel = _DragForce_UpdateVel_cpu;
+
   // ------------------------------------------------------
   
   ComputeTotalDensity = ComputeTotalDensity_cpu;
@@ -519,11 +522,18 @@ void ChangeArch() {
       if (strcmp(name, "collisions") == 0) {
 	if(strval[0] == 'g'){
 	  _collisions = _collisions_gpu;
-	  ComputeDragCoeff        = ComputeDragCoeff_gpu;
-	  ComputeCBcollisions_c   = ComputeCBcollisions_c_gpu;
-	  _ComputeCBcollisions_cv = _ComputeCBcollisions_cv_gpu;
-	  _UpdateVelcollisions    = _UpdateVelcollisions_gpu;
 	  printf("collisions runs on the GPU\n");
+	}
+      }
+
+      
+      if (strcmp(name, "dragforce") == 0) {
+	if(strval[0] == 'g'){
+	  DragForce_Coeff =  DragForce_Coeff_gpu;
+	  DragForce_SumC       = DragForce_SumC_gpu;
+	  _DragForce_SumCV     = _DragForce_SumCV_gpu;
+	  _DragForce_UpdateVel = _DragForce_UpdateVel_gpu;
+	  printf("dragforce runs on the GPU\n");
 	}
       }
 

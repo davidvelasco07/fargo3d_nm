@@ -7,30 +7,39 @@
 #include "fargo3d.h"
 //<\INCLUDES>
 
-void ComputeCBcollisions_cz_cpu (real dt) {
- 
+void DragForce_SumCV(real dt, int option) {
+
+  if (option == 0)
+    _DragForce_SumCV(dt, 1, 0, 0, Vx_temp, Mpx);
+  if (option == 1)
+    _DragForce_SumCV(dt, 0, 1, 0, Vy_temp, Mpy);
+  if (option == 2)
+    _DragForce_SumCV(dt, 0, 0, 1, Vz_temp, Mpz);
+  
+}
+
+void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *Cv) {
+
 //<USER_DEFINED>
   INPUT(Density);
   INPUT(Total_Density);
   INPUT(Qs);
-  INPUT(Vz_temp);
-  OUTPUT(Mpz);
+  INPUT(V);
+  OUTPUT(Cv);
 //<\USER_DEFINED>
 
 //<EXTERNAL>
   real* dens     = Density->field_cpu;
   real* dens_gas = Total_Density->field_cpu;
   real* pref     = Qs->field_cpu;
-  real* vz       = Vz_temp->field_cpu;
-  real* cz       = Mpz->field_cpu;
+  real* v        = V->field_cpu;
+  real* cv       = Cv->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
-  int n     = FluidIndex;
   int fluidtype = Fluidtype;
-  real* alpha = Alpha;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -38,12 +47,17 @@ void ComputeCBcollisions_cz_cpu (real dt) {
   int j;
   int k;
   int ll;
+  int lm;
   real gamma_k;
   real s_k;
+  real _cv;
   real epsilon;
-  real _cz;
 //<\INTERNAL>
-  
+
+//<CONSTANT>
+// real Alpha(NFLUIDS*NFLUIDS);
+//<\CONSTANT>
+
 //<MAIN_LOOP>
 
   i = j = k = 0;
@@ -59,16 +73,16 @@ void ComputeCBcollisions_cz_cpu (real dt) {
 #endif
 //<#>
 	ll = l;
-
-	epsilon = (dens[ll]+dens[lzm])/(dens_gas[ll]+dens_gas[lzm]);
-
-	gamma_k = 0.5*(pref[ll]+pref[lzm]);
+	lm = idx*lxm + idy*lym + idz*lzm;
+	
+	epsilon = (dens[ll]+dens[lm])/(dens_gas[ll]+dens_gas[lm]);
+	gamma_k = 0.5*(pref[ll]+pref[lm]);
 	s_k     = dt*gamma_k/(1+dt*gamma_k);
 
-	if (fluidtype == GAS)  _cz = vz[ll];
-	else _cz = s_k*epsilon*vz[ll];
-	cz[ll] += _cz;
+	if (fluidtype == GAS)  _cv = v[ll];
+	else _cv  = s_k*epsilon*v[ll];
 	
+	cv[ll] += _cv;
 //<\#>
 #ifdef X
       }

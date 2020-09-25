@@ -7,7 +7,7 @@
 #include "fargo3d.h"
 //<\INCLUDES>
 
-void ComputeDragCoeff_cpu () {
+void DragForce_Coeff_cpu () {
 
   /*This function reutns the prefactor of the drag coeffcient which
     is independent of the fluid type. The Stokes number or particle size
@@ -34,6 +34,9 @@ void ComputeDragCoeff_cpu () {
   real omega;
 //<\INTERNAL>
 
+//<CONSTANT>
+// real ymin(Ny+2*NGHY+1);
+//<\CONSTANT>
   
 //<MAIN_LOOP>
 
@@ -51,7 +54,8 @@ void ComputeDragCoeff_cpu () {
 //<#>
 	ll = l;
 
-	coef[ll] = 0.005;
+	omega    = sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)));
+	coef[ll] = omega;
 
 //<\#>
 #ifdef X

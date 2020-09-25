@@ -16,11 +16,7 @@ PeriodicZ		Yes
 
 Cs			1.0
 
-Ntot			20000
+Ntot			200
 Ninterm	 		1
 DT			0.1
 OutputDir		@outputs/damping
-
-### ColRate values
-
-ColRate 		1.0

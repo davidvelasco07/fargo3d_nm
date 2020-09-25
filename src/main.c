@@ -168,6 +168,12 @@ int main(int argc, char *argv[]) {
     printf("Error!!! The total number of Ranks (%d) must be divisible by the number of domains (%d).", CPU_World_Number, NDOMAINS);
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
+  if (CPU_World_Number > NDOMAINS*NFLUIDS) {
+    printf("Error!!! The total number of Ranks (%d) can not exeed NDOMAINSxNFLUIDS (%d).", CPU_World_Number, NDOMAINS*NFLUIDS);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Abort(MPI_COMM_WORLD, 1);
+  }
+
   
   DomainColor = CPU_World_Rank%NDOMAINS;
   FluidColor  = CPU_World_Rank/NDOMAINS;
@@ -407,7 +413,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       CflFluidsMin(); /*Fills StepTime with the " global min " of the
 			cfl, computed from each fluid.*/
       dt = StepTime; //cfl works with the 'StepTime' global variable.
-
+      
       dtemp+=dt;
       if(dtemp>DT)  dt = DT - (dtemp-dt); //updating dt
       //------------------------------------------------------------------------
@@ -431,7 +437,10 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       MULTIFLUID(Sources(dt)); //v_half is used in the R.H.S
 
 #ifdef DRAGFORCE
-      FARGO_SAFE(Collisions(dt, 1)); // 1 --> V_temp is used.
+      FARGO_SAFE(DragForce(dt));
+#endif
+#ifdef DRAGFORCEALL
+      FARGO_SAFE(Collisions(dt, 1));
 #endif
       
 #ifdef DUSTDIFFUSION

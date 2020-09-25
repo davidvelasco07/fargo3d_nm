@@ -351,6 +351,8 @@ MAINOBJ  = LowTasks.o psys.o main.o param.o var.o usage.o   	    \
 	   nimhd_ohmic_diffusion.o				\
 	   nimhd_ohmic_diffusion_coeff.o			\
 	   compute_jx.o compute_jy.o compute_jz.o		\
+	   dragforce.o dragforce_sumc.o dragforce_sumcv.o       \
+	   dragforce_updatevel.o dragforce_coeff.o
 
 #-----------------------#Cuda objects---------------------------------
 GPU_OBJ  =  reduction_sum_device.o reduction_min_device.o	\
@@ -403,7 +405,9 @@ GPU_OBJBLOCKS =  CompPresIso_gpu.o CompPresAd_gpu.o 		\
 	   nimhd_ambipolar_diffusion_coeff_gpu.o		\
 	   nimhd_ohmic_diffusion_gpu.o				\
 	   nimhd_ohmic_diffusion_coeff_gpu.o			\
-	   compute_jx_gpu.o compute_jy_gpu.o compute_jz_gpu.o
+	   compute_jx_gpu.o compute_jy_gpu.o compute_jz_gpu.o   \
+           dragforce_sumc_gpu.o dragforce_sumcv_gpu.o           \
+           dragforce_updatevel_gpu.o dragforce_coeff_gpu.o 
 #</CUDA OBJECTS>
 #---------------------------------------------------------------------
 

@@ -151,11 +151,16 @@ ex void SendRecv(int);
 ex void comm_cpu(int);
 ex void comm_gpu(int);
 
+// DragForce Prototypes
+ex void DragForce(real);
+ex void DragForce_Coeff_cpu();
+ex void DragForce_SumC_cpu(real);
+ex void DragForce_SumCV(real,int);
+ex void _DragForce_SumCV_cpu(real,int,int,int,Field*,Field*);
+ex void DragForce_UpdateVel(real,int); 
+ex void _DragForce_UpdateVel_cpu(real,int,int,int,Field*,Field*);
+
 ex void _collisions_gpu(real,int,int,int,int);
-ex void ComputeDragCoeff_gpu(void);
-ex void ComputeCBcollisions_c_gpu(real);
-ex void _ComputeCBcollisions_cv_gpu(real,int,int,int,Field*,Field*);
-ex void _UpdateVelcollisions_gpu(real,int,int,int,Field*,Field*);
 
 //Monitoring Prototypes
 ex void mon_dens_cpu(void);
@@ -639,11 +644,14 @@ ex void SelectFluid(int);
 ex void ColRate(real,int,int,int);
 ex void Collisions(real,int);
 
+
+// DragForce Prototypes
+ex void DragForce_Coeff_gpu();
+ex void DragForce_SumC_gpu(real);
+ex void _DragForce_SumCV_gpu(real,int,int,int,Field*,Field*);
+ex void _DragForce_UpdateVel_gpu(real,int,int,int,Field*,Field*);
+
 ex void (_collisions_cpu)(real,int,int,int,int);
-ex void ComputeDragCoeff_cpu(void);
-ex void ComputeCBcollisions_c_cpu(real);
-ex void _ComputeCBcollisions_cv_cpu(real,int,int,int,Field*,Field*);
-ex void _UpdateVelcollisions_cpu(real,int,int,int,Field*,Field*);
 
 ex void ComputeTotalDensity_cpu(void);
 ex void Floor_cpu(void);

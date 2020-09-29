@@ -4,9 +4,11 @@ Field *CreateFieldEmpty(char *name) {
   field = (Field *) malloc(sizeof(Field));
   if (field == NULL) 
     prs_error("Insufficient memory for Field cloning");
+  
   field->field_cpu = NULL;
   field->backup = NULL;
   field->secondary_backup = NULL;
+  field->name = (char *) malloc(sizeof(char) * 80);
   sprintf(field->name, "%s", name);
   field->next = ListOfGrids;     //Linkedlist
   ListOfGrids = field;
@@ -24,6 +26,7 @@ Field2D *CreateFieldEmpty2D(char *name, int dim) {
   field->backup = NULL;
   field->secondary_backup = NULL;
   field->kind=dim;
+  field->name = (char *) malloc(sizeof(char) * 80);
   sprintf(field->name, "%s", name);
   field->desc = Current_Jupiter_Patch;
   return field;
@@ -85,11 +88,9 @@ Fluid *CreateFluid(char *name, int fluidtype) {
 
   sprintf(fieldname,"%s%s",name,"dens");
   f->Density = CreateFieldEmpty(fieldname);
-
   sprintf(fieldname,"%s%s",name,"energy");
   f->Energy  = CreateFieldEmpty(fieldname);  
-  CreateField2D (&(f->VxMed),"VxMed", YZ, 0);
-
+  CreateField2D (&(f->VxMed),"VxMed", YZ, 0);  
 #ifdef X
   sprintf(fieldname,"%s%s",name,"vx");
   f->Vx      = CreateFieldEmpty(fieldname);
@@ -122,14 +123,12 @@ Fluid *CreateFluid(char *name, int fluidtype) {
   f->Vy0  = CreateFieldEmpty2D ("vy0", YZ);
   f->Vz0  = CreateFieldEmpty2D ("vz0", YZ);
 #endif
-
   return f;
 }
 
 void CreateField(Field **ptr, char *name, int type, boolean sx, boolean sy, boolean sz) {
   /*sx = YES ==> Field is staggered in X. Useful for determining the
     domain of each field.*/
- 
   Field *field;
   real *array;
   boolean *barray;
@@ -140,6 +139,7 @@ void CreateField(Field **ptr, char *name, int type, boolean sx, boolean sy, bool
     *ptr = field = (Field *) malloc(sizeof(Field));
     if (field == NULL) 
       prs_error("Insufficient memory for Field creation-step1.");
+    field->name = (char *) malloc(sizeof(char) * 80);
     sprintf(field->name, "%s", name);
     field->field_cpu = NULL;
     field->field_gpu = NULL;
@@ -242,7 +242,8 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
     field->fresh_cpu = (boolean *) malloc(sizeof(boolean));
     field->fresh_gpu = (boolean *) malloc(sizeof(boolean));
     field->size = 0;
-     sprintf(field->name, "%s", name);
+    field->name = (char *) malloc(sizeof(char) * 80);
+    sprintf(field->name, "%s", name);
   } else
     field = *ptr;
 
@@ -312,6 +313,7 @@ void CreateFieldInt2D(FieldInt2D** ptr, char *name) {
     field->field_cpu = NULL;
     field->fresh_cpu = (boolean *) malloc(sizeof(boolean));
     field->fresh_gpu = (boolean *) malloc(sizeof(boolean));
+    field->name = (char *) malloc(sizeof(char) * 80);
     sprintf(field->name, "%s", name);
   } else
     field = *ptr;

@@ -180,16 +180,16 @@ int main(int argc, char *argv[]) {
   FluidColor  = CPU_World_Rank/NDOMAINS;
   
   MPI_Comm_split(MPI_COMM_WORLD, FluidColor, CPU_World_Rank, &DomainComm);
-  //MPI_Comm_rank(DomainComm, &CPU_RowRank  );
-  //MPI_Comm_size(DomainComm, &CPU_RowNumber);
-  printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
-  exit(1);
+  MPI_Comm_rank(DomainComm, &CPU_RowRank  );
+  MPI_Comm_size(DomainComm, &CPU_RowNumber);
+  
+  
   MPI_Comm_split(MPI_COMM_WORLD, DomainColor, CPU_World_Rank, &FluidsComm);
   MPI_Comm_rank(FluidsComm, &CPU_ColumnRank  );
   MPI_Comm_size(FluidsComm, &CPU_ColumnNumber);
   
   printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
-  exit(1);
+  
   CPU_Rank   = CPU_RowRank;
   CPU_Number = CPU_RowNumber;
   
@@ -262,10 +262,9 @@ int main(int argc, char *argv[]) {
   ListVariablesIDL ("IDL.var");
   ChangeArch(); /*Changes the name of the main functions
 		  ChangeArch adds _cpu or _gpu if GPU is activated.*/
-  printf("Before J Bs\n");
-  exit(1);
+  
   Adapt_for_JUPITER (ParameterFile);
-
+  
   //split(&Gridd); /*Split mesh over PEs*/
   //InitSpace();
   //WriteDim();
@@ -300,18 +299,17 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   else {
     if (ThereArePlanets)
       EmptyPlanetSystemFiles ();
-      NESTEDMESHES(CondInit);
+      NESTEDMESHES(CondInit(););
     //CondInit(); // Initialize set up
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }
-  tGrid *parent_grids = GridList;
-  while (parent_grids != NULL) {Ngrids++; parent_grids = parent_grids->next;}
-
+ 
   for(i=0;i<Ngrids;i++){
     Grid_item = Grid_CPU_list; 
     do {   
       if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { 
+        printf("Grid %d\n",Grid_item->parent);
         AdaptFieldsFromJ (Grid_item);
         SelectFluid(0);
        __WriteField(Density,0);
@@ -319,7 +317,8 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       Grid_item= Grid_item->next;
     } while (Grid_item != NULL); 
   }
-  exit(1);
+  
+  exit(0);
 
   if (StretchOldOutput == YES) {
     StretchOutput (StretchNumber);

@@ -318,15 +318,7 @@ of Metric.
       sprintf(dust_name,"dust%d",global_fluid_id);
       desc->fluid = CreateFluidPatch (desc, dust_name, DUST);
     }
-    
-    desc->fluid->next = previousFluid;
-    if (previousFluid != NULL)
-      previousFluid->prev = desc->fluid;
-    previousFluid = desc->fluid;
-  }
-  fluid = desc->fluid;
-  count = 0;
-  while (fluid != NULL) {
+    fluid = desc->fluid;
     F3Dfluid = CreateFluid(fluid->Name,fluid->Fluidtype);
     F3Dfluid->Density->field_cpu = fluid->Density->Field;
     F3Dfluid->Energy->field_cpu = fluid->Energy->Field;
@@ -417,9 +409,14 @@ of Metric.
 #endif
 
 #endif
-    desc->Fluids[count] = F3Dfluid;
-    fluid->FluidRank = count+FluidColor*NFluids_per_rank;
-    count++;
-    fluid = fluid->next;
+    desc->Fluids[i] = F3Dfluid;
+    fluid->FluidRank = global_fluid_id;
+    printf("Fluid %d\n",fluid->FluidRank);
+    printf("%s\n",F3Dfluid->Density->name);
+    
+    desc->fluid->next = previousFluid;
+    if (previousFluid != NULL)
+      previousFluid->prev = desc->fluid;
+    previousFluid = desc->fluid;
   }
 }

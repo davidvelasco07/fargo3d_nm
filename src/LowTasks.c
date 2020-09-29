@@ -562,47 +562,47 @@ void SelectFluid(int n) {
 
 void CreateFields() {
 
-  Reduction2D = CreateField2D ("Reduction2D", YZ);
+  CreateField2D (&Reduction2D,"Reduction2D", YZ, 1);
 
 #if (defined(X) || defined(MHD))
   
-  Mpx              = CreateField   ("Moment_Plus_X" , 0, 1,0,0);
-  Mmx              = CreateField   ("Moment_Minus_X", 0, 1,0,0);
+  CreateField   (&Mpx,"Moment_Plus_X" , 0, 1,0,0);
+  CreateField   (&Mmx,"Moment_Minus_X", 0, 1,0,0);
   
-  Vxhy             = CreateField2D ("Vxhy"    , YZ);
-  Vxhyr            = CreateField2D ("Vxhyr"   , YZ);
-  Vxhz             = CreateField2D ("Vxhz"    , YZ);
-  Vxhzr            = CreateField2D ("Vxhzr"   , YZ);
+  CreateField2D (&Vxhy ,"Vxhy"    , YZ,1);
+  CreateField2D (&Vxhyr,"Vxhyr"   , YZ,1);
+  CreateField2D (&Vxhz ,"Vxhz"    , YZ,1);
+  CreateField2D (&Vxhzr,"Vxhzr"   , YZ,1);
 
-  Nshift = CreateFieldInt2D ("Nshift");
-  Nxhy   = CreateFieldInt2D ("Nxhy");
-  Nxhz   = CreateFieldInt2D ("Nxhz");
+  CreateFieldInt2D (&Nshift,"Nshift");
+  CreateFieldInt2D (&Nxhy  ,"Nxhy");
+  CreateFieldInt2D (&Nxhz  ,"Nxhz");
 #endif
 
 #if (defined(Y) || defined(MHD))
-  Mpy     = CreateField("Moment_Plus_Y" , 0,0,1,0);
-  Mmy     = CreateField("Moment_Minus_Y", 0,0,1,0);
+  CreateField(&Mpy   ,"Moment_Plus_Y" , 0,0,1,0);
+  CreateField(&Mmy   ,"Moment_Minus_Y", 0,0,1,0);
 #endif
   
 #if (defined(Z) || defined(MHD))
-  Mpz     = CreateField("Moment_Plus_Z" , 0,0,0,1);
-  Mmz     = CreateField("Moment_Minus_Z", 0,0,0,1);
+  CreateField(&Mpz   ,"Moment_Plus_Z" , 0,0,0,1);
+  CreateField(&Mmz   ,"Moment_Minus_Z", 0,0,0,1);
 #endif
-
-  Pot     = CreateField("potential", 0,0,0,0);
-  Slope   = CreateField("Slope"    , 0,0,0,0);
-  DivRho  = CreateField("DivRho"   , 0,0,0,0);  // This field cannot
+  CreateField(&Flux, "Flux"      , 0,0,0,0);
+  CreateField(&Pot   ,"potential", 0,0,0,0);
+  CreateField(&Slope ,"Slope"    , 0,0,0,0);
+  CreateField(&DivRho,"DivRho"   , 0,0,0,0);  // This field cannot
 						// be aliased wherever
 						// reductions are
 						// needed
   
-  DensStar      = CreateField("DensStar"     , 0,0,0,0);
-  Qs            = CreateField("Qs"           , 0,0,0,0);
-  Pressure      = CreateField("Pressure"     , 0,0,0,0);
-  Total_Density = CreateField("Total_Density", 0,0,0,0);
+  CreateField(&DensStar     ,"DensStar"     , 0,0,0,0);
+  CreateField(&Qs           ,"Qs"           , 0,0,0,0);
+  CreateField(&Pressure     ,"Pressure"     , 0,0,0,0);
+  CreateField(&Total_Density,"Total_Density", 0,0,0,0);
   
-  QL      = CREATEFIELDALIAS("QLeft", Pressure, 0);
-  QR      = CreateField("QRight", 0,0,0,0);
+  //QL      = CREATEFIELDALIAS("QLeft", Pressure, 0);
+  //QR      = CreateField("QRight", 0,0,0,0);
   
 #ifdef PPA_STEEPENER
   LapPPA  = CreateField("LapPPA", 0,0,0,0);

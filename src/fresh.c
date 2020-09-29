@@ -41,7 +41,7 @@ void send2gpu() {
 void Input2D_CPU(Field2D *field, int line, const char *string){
   int status;
 #ifdef GPU
-  if(!field->fresh_cpu) {
+  if(!(*(field->fresh_cpu))) {
     status = Dev2Host2D(field);
     //    printf("%d\n",status);
     //    printf("Copying %s from Dev to Host\n",field->name);
@@ -54,7 +54,7 @@ void Input2D_CPU(Field2D *field, int line, const char *string){
 //  else {
 //    printf("Field %s is up to date on Host.\n",field->name);
 //  }
-  field->fresh_cpu = YES;
+  *(field->fresh_cpu) = YES;
 #endif
   return;
 }
@@ -62,7 +62,7 @@ void Input2D_CPU(Field2D *field, int line, const char *string){
 void Input2D_GPU(Field2D *field, int line, const char *string){
   int status;
 #ifdef GPU
-  if(!field->fresh_gpu) {
+  if(!(*(field->fresh_gpu))) {
     status = Host2Dev2D(field);
     //    printf("%d\n",status);
     //    printf("Copying %s from Dev to Host\n",field->name);
@@ -75,7 +75,7 @@ void Input2D_GPU(Field2D *field, int line, const char *string){
 //  else {
 //    printf("Field %s is up to date on Host.\n",field->name);
 //  }
-  field->fresh_gpu = YES;
+  *(field->fresh_gpu) = YES;
 #endif
   return;
 }
@@ -83,7 +83,7 @@ void Input2D_GPU(Field2D *field, int line, const char *string){
 void Input2DInt_CPU(FieldInt2D *field, int line, const char *string){
   int status;
 #ifdef GPU
-  if(!field->fresh_cpu) {
+  if(!(*(field->fresh_cpu))) {
     status = Dev2Host2DInt(field);
     //    printf("%d\n",status);
     //    printf("Copying %s from Dev to Host\n",field->name);
@@ -96,7 +96,7 @@ void Input2DInt_CPU(FieldInt2D *field, int line, const char *string){
 //  else {
 //    printf("Field %s is up to date on Host.\n",field->name);
 //  }
-  field->fresh_cpu = YES;
+  *(field->fresh_cpu) = YES;
 #endif
   return;
 }
@@ -104,7 +104,7 @@ void Input2DInt_CPU(FieldInt2D *field, int line, const char *string){
 void Input2DInt_GPU(FieldInt2D *field, int line, const char *string){
   int status;
 #ifdef GPU
-  if(!field->fresh_gpu) {
+  if(!(*(field->fresh_gpu))) {
     status = Host2Dev2DInt(field);
     //    printf("%d\n",status);
     //    printf("Copying %s from Dev to Host\n",field->name);
@@ -117,7 +117,7 @@ void Input2DInt_GPU(FieldInt2D *field, int line, const char *string){
 //  else {
 //    printf("Field %s is up to date on Host.\n",field->name);
 //  }
-  field->fresh_gpu = YES;
+  *(field->fresh_gpu) = YES;
 #endif
   return;
 }
@@ -125,7 +125,7 @@ void Input2DInt_GPU(FieldInt2D *field, int line, const char *string){
 void Input_CPU(Field *field, int line, const char *string){
   int status, i;
   boolean problem = NO, take_action = NO;
-  if (*(field->owner) == NULL) {
+  /*if (*(field->owner) == NULL) {
     printf ("Error ! You pretend to use as an input\n");
     printf ("the field %s, at line %d of file %s.\n", field->name, line, string);
     printf ("However, this storage has been altered and used as a temporary field\n");
@@ -138,36 +138,36 @@ void Input_CPU(Field *field, int line, const char *string){
     printf ("However, its storage area is presently used by %s\n", (*(field->owner))->name);
     printf ("Since the line %d of file %s\n", (*(field->owner))->line_origin, (*(field->owner))->file_origin);
     prs_exit (EXIT_FAILURE);
-  }
+  }*/
 #ifdef GPU
   if (!field->fresh_cpu) take_action = YES;
-  for (i = 0; i < 4; i++) {
+  /*for (i = 0; i < 4; i++) {
     if (field->fresh_inside_contour_cpu[i] == NO) take_action = YES;
     if (field->fresh_outside_contour_cpu[i] == NO) take_action = YES;
-  }
+  }*/
   if(take_action) {
     if (field->fresh_gpu == NO) problem = YES;
-    for (i = 0; i < 4; i++) {
+    /*for (i = 0; i < 4; i++) {
       if (field->fresh_inside_contour_gpu[i] == NO) problem = YES;
       if (field->fresh_outside_contour_gpu[i] == NO) problem = YES;
-    }
+    }*/
     if (problem) {
       printf ("Problem on CPU %d: you want to transfer the field %s\n", CPU_Rank, field->name);
       printf ("From device to host in file %s at line %d, but the\n", string, line);
       printf ("field is not fresh everywhere. Here are the values of\n");
       printf ("'fresh' on the mesh, on the inside contour, and outside contour\n");
-      INSPECT_INT (field->fresh_gpu);
-      for (i = 0; i < 4; i++)
+      INSPECT_INT (*(field->fresh_gpu));
+      /*for (i = 0; i < 4; i++)
 	INSPECT_INT(field->fresh_inside_contour_gpu[i]);
       for (i = 0; i < 4; i++)
-	INSPECT_INT(field->fresh_outside_contour_gpu[i]);
+	INSPECT_INT(field->fresh_outside_contour_gpu[i]);*/
     }
     status = Dev2Host3D(field);
     FullArrayComms++;
     //    printf("%d\n",status);
-    //    printf("D==>H: %s\n",field->name);
+    //printf("D==>H: %s Level: %d Nx %d Ny %d Pitch_gpu %d\n",field->name,field->level,field->desc->gncell[0],field->desc->gncell[1],field->desc->Pitch_gpu);
     if(status!=0) {
-      printf("Error %d in Dev2Host3D()! Field: %s\n",status,field->name);
+      printf("Error %d in Dev2Host3D()! Field: %s Level: %d\n",status,field->name,Current_Level);
       printf("called from line %d of file %s\n", line, string);
       exit(0);
     }
@@ -175,11 +175,11 @@ void Input_CPU(Field *field, int line, const char *string){
 //  else {
 //    printf("Field %s is up to date on Host.\n",field->name);
 //  }
-  field->fresh_cpu = YES;
-  for (i = 0; i < 4; i++) {
+  *(field->fresh_cpu) = YES;
+  /*for (i = 0; i < 4; i++) {
     field->fresh_inside_contour_cpu[i] = YES;
     field->fresh_outside_contour_cpu[i] = YES;
-  }
+  }*/
 #endif
   return;
 }
@@ -187,7 +187,7 @@ void Input_CPU(Field *field, int line, const char *string){
 void Input_GPU(Field *field, int line, const char *string){
   int i, status;
   boolean problem=NO, take_action=NO;
-  if (*(field->owner) == NULL) {
+  /*if (*(field->owner) == NULL) {
     printf ("Error ! You pretend to use as an input\n");
     printf ("the field %s, at line %d of file %s.\n", field->name, line, string);
     printf ("However, its storage area has been altered and used as a temporary field\n");
@@ -200,35 +200,35 @@ void Input_GPU(Field *field, int line, const char *string){
     printf ("However, its storage area is presently used by %s\n", (*(field->owner))->name);
     printf ("Since the line %d of file %s\n", (*(field->owner))->line_origin, (*(field->owner))->file_origin);
     prs_exit (EXIT_FAILURE);
-  }
+  }*/
 #ifdef GPU
-  if (!field->fresh_gpu) take_action = YES;
-  for (i = 0; i < 4; i++) {
+  if (!(*(field->fresh_gpu))) take_action = YES;
+  /*for (i = 0; i < 4; i++) {
     if (field->fresh_inside_contour_gpu[i] == NO) take_action = YES;
     if (field->fresh_outside_contour_gpu[i] == NO) take_action = YES;
-  }
+  }*/
   if(take_action) {
-    if (field->fresh_cpu == NO) problem = YES;
-    for (i = 0; i < 4; i++) {
+    if (*(field->fresh_cpu) == NO) problem = YES;
+    /*for (i = 0; i < 4; i++) {
       if (field->fresh_inside_contour_cpu[i] == NO) problem = YES;
       if (field->fresh_outside_contour_cpu[i] == NO) problem = YES;
-    }
+    }*/
     if (problem) {
       printf ("Problem on CPU %d: you want to transfer the field %s\n", CPU_Rank, field->name);
       printf ("From host to device in file %s at line %d, but the\n", string, line);
       printf ("field is not fresh everywhere. Here are the values of\n");
       printf ("'fresh' on the mesh, on the inside contour, and outside contour\n");
-      INSPECT_INT (field->fresh_cpu);
-      for (i = 0; i < 4; i++)
+      INSPECT_INT (*(field->fresh_cpu));
+      /*for (i = 0; i < 4; i++)
 	INSPECT_INT(field->fresh_inside_contour_cpu[i]);
       for (i = 0; i < 4; i++)
-	INSPECT_INT(field->fresh_outside_contour_cpu[i]);
+	INSPECT_INT(field->fresh_outside_contour_cpu[i]);*/
     }
     status = Host2Dev3D(field);
     FullArrayComms++;
-    //    printf("H==>D: %s\n",field->name);
+    //printf("H==>D: %s Level: %d Nx %d Ny %d Pitch_gpu %d\n",field->name,field->level,field->desc->gncell[0],field->desc->gncell[1],field->desc->Pitch_gpu);
     if(status!=0) {
-      printf("Error %d in Host2Dev3D()! Field: %s\n",status,field->name);
+      printf("Error %d in Host2Dev3D()! Field: %s Level: %d\n",status,field->name,Current_Level);
       printf("called from line %d of file %s\n", line, string);
       exit(0);
     }
@@ -236,67 +236,73 @@ void Input_GPU(Field *field, int line, const char *string){
 //  else {
 //    printf("Field %s is up to date on Device.\n",field->name);
 //  }
-  field->fresh_gpu = YES;
-  for (i = 0; i < 4; i++) {
+  *(field->fresh_gpu) = YES;
+  /*for (i = 0; i < 4; i++) {
     field->fresh_inside_contour_gpu[i] = YES;
     field->fresh_outside_contour_gpu[i] = YES;
-  }
+  }*/
 #endif
   return;
 }
 
 void Output_CPU(Field *field, int line, const char *string){
+  #ifdef GPU
   int i;
   field->line_origin = line;
   strncpy(field->file_origin, string, MAXLINELENGTH-1);
-  field->fresh_cpu = YES;
-  field->fresh_gpu = NO;
-  for (i = 0; i < 4; i++) {
+  *(field->fresh_cpu) = YES;
+  *(field->fresh_gpu) = NO;
+  //printf("field %s level %d fresh on CPU\n",field->name,field->level);
+  #endif
+  /*for (i = 0; i < 4; i++) {
     field->fresh_inside_contour_cpu[i] = YES;
     field->fresh_outside_contour_cpu[i] = YES;
     field->fresh_inside_contour_gpu[i] = NO;
     field->fresh_outside_contour_gpu[i] = NO;
   }
-  *(field->owner) = field;
+  *(field->owner) = field;*/
 }
 
-void Output_GPU(Field *field, int line, const char *string){
+void Output_GPU(Field *field, int line, const char *string){ 
+  #ifdef GPU
   int i;
   field->line_origin = line;
   strncpy(field->file_origin, string, MAXLINELENGTH-1);
-  field->fresh_cpu = NO;
-  field->fresh_gpu = YES;
-  for (i = 0; i < 4; i++) {
+  *(field->fresh_cpu) = NO;
+  *(field->fresh_gpu) = YES;
+  //printf("field %s level %d fresh on GPU\n",field->name,field->level);
+  #endif
+  /*for (i = 0; i < 4; i++) {
     field->fresh_inside_contour_cpu[i] = NO;
     field->fresh_outside_contour_cpu[i] = NO;
     field->fresh_inside_contour_gpu[i] = YES;
     field->fresh_outside_contour_gpu[i] = YES;
   }
-  *(field->owner) = field;
+  *(field->owner) = field;*/
 }
 
 void Output2D_CPU(Field2D *field, int line, const char *string){
-  field->fresh_cpu = YES;
-  field->fresh_gpu = NO;
+  *(field->fresh_cpu) = YES;
+  *(field->fresh_gpu) = NO;
 }
 
 void Output2D_GPU(Field2D *field, int line, const char *string){
-  field->fresh_gpu = YES;
-  field->fresh_cpu = NO;
+  *(field->fresh_gpu) = YES;
+  *(field->fresh_cpu) = NO;
 }
 
 void Output2DInt_CPU(FieldInt2D *field, int line, const char *string){
-  field->fresh_cpu = YES;
-  field->fresh_gpu = NO;
+  *(field->fresh_cpu) = YES;
+  *(field->fresh_gpu) = NO;
 }
 
 void Output2DInt_GPU(FieldInt2D *field, int line, const char *string){
-  field->fresh_gpu = YES;
-  field->fresh_cpu = NO;
+  *(field->fresh_gpu) = YES;
+  *(field->fresh_cpu) = NO;
 }
 
 void Draft (Field *field, int line, const char *string) {
-  *(field->owner) = NULL;
+  //*(field->owner) = NULL;
   strncpy (field->file_origin, string, MAXLINELENGTH-1);
   field->line_origin = line;
 }
@@ -304,45 +310,43 @@ void Draft (Field *field, int line, const char *string) {
 void WhereIsField(Field *field) {
   int id=0;
 
-  if(field->fresh_cpu){
+  if(*(field->fresh_cpu)){
     printf("Field %s is fresh on the CPU %d\n",field->name,id);
     id=1;
   }
-  if(field->fresh_gpu)
+  if(*(field->fresh_gpu))
     printf("Field %s is fresh on the GPU %d\n",field->name,id);
 }
 
 void WhereIsFieldInt2D(FieldInt2D *field) {
   int id=0;
 
-  if(field->fresh_cpu){
+  if(*(field->fresh_cpu)){
     printf("Field %s is fresh on the CPU %d\n",field->name,id);
     id=1;
   }
-  if(field->fresh_gpu)
+  if(*(field->fresh_gpu))
     printf("Field %s is fresh on the GPU %d\n",field->name,id);
 }
 
-void WhoOwns (Field *field) {
+/*void WhoOwns (Field *field) {
   printf ("Field %s is currently storing %s\n", field->name, (*(field->owner))->name);
-}
+}*/
 
 void SynchronizeHD () {
 #ifdef GPU
   Field *current;
   current = ListOfGrids;
   while (current != NULL) {
-    if (*(current->owner) == current) {
-      if ((current->fresh_cpu == YES) && (current->fresh_gpu == NO)) {
-	Host2Dev3D (current);
-	//      printf ("Sending %s to device\n", current->name);
-	current->fresh_gpu = YES;
-      }
-      if ((current->fresh_cpu == NO) && (current->fresh_gpu == YES)) {
-	Dev2Host3D (current);
-	//printf ("Sending %s to host\n", current->name);
-	current->fresh_cpu = YES;
-      }
+    if ((*(current->fresh_cpu) == YES) && (*(current->fresh_gpu) == NO)) {
+      Host2Dev3D (current);
+      //      printf ("Sending %s to device\n", current->name);
+      *(current->fresh_gpu) = YES;
+    }
+    if ((*(current->fresh_cpu) == NO) && (*(current->fresh_gpu) == YES)) {
+      Dev2Host3D (current);
+      //printf ("Sending %s to host\n", current->name);
+      *(current->fresh_cpu) = YES;
     }
     current = current->next;
   }
@@ -356,18 +360,168 @@ void WhereIsWho () {
   current = ListOfGrids;
   loc[1]=0;
   while (current != NULL) {
-    if (*(current->owner) == current) {
-      if ((current->fresh_cpu == YES) && (current->fresh_gpu == YES))
-	loc[0] = 'B';
-      if ((current->fresh_cpu == NO) && (current->fresh_gpu == YES))
-	loc[0] = 'G';
-      if ((current->fresh_cpu == YES) && (current->fresh_gpu == NO))
-	loc[0] = 'C';
-      if ((current->fresh_cpu == NO) && (current->fresh_gpu == NO))
-	loc[0] = '?';
-      printf ("%-20s%s\n",current->name, loc);
-    }
+    if ((*(current->fresh_cpu) == YES) && (*(current->fresh_gpu) == YES))
+      loc[0] = 'B';
+    if ((*(current->fresh_cpu) == NO) && (*(current->fresh_gpu) == YES))
+      loc[0] = 'G';
+    if ((*(current->fresh_cpu) == YES) && (*(current->fresh_gpu) == NO))
+      loc[0] = 'C';
+    if ((*(current->fresh_cpu) == NO) && (*(current->fresh_gpu) == NO))
+      loc[0] = '?';
+    printf ("%-20s%s\n",current->name, loc);
     current = current->next;
   }
 #endif
+}
+void JSInput_CPU(ScalarField *field, int line, const char *string){
+  int status, i;
+  boolean problem = NO, take_action = NO;
+#ifdef GPU
+  if (!(field->fresh_cpu)) take_action = YES;
+  if(take_action) {
+    if (field->fresh_gpu == NO) problem = YES;
+    if (problem) {
+      printf ("Problem on CPU %d: you want to transfer the field %s\n", CPU_Rank, field->Name);
+      printf ("From device to host in file %s at line %d, but the\n", string, line);
+      printf ("field is not fresh everywhere. Here are the values of\n");
+      printf ("'fresh' on the mesh, on the inside contour, and outside contour\n");
+      INSPECT_INT (field->fresh_gpu);
+    }
+    status = JSDev2Host3D(field);
+    FullArrayComms++;
+    //    printf("%d\n",status);
+    //printf("D==>H: %s Level: %d\n",field->Name,field->level);
+    if(status!=0) {
+      printf("Error %d in Dev2Host3D()! Field: %s\n",status,field->Name);
+      printf("called from line %d of file %s\n", line, string);
+      exit(0);
+    }
+  }
+//  else {
+//    printf("Field %s is up to date on Host.\n",field->name);
+//  }
+  field->fresh_cpu = YES;
+#endif
+  return;
+}
+
+void JSInput_GPU(ScalarField *field, int line, const char *string){
+  int i, status;
+  boolean problem=NO, take_action=NO;
+  /* Below we access directly a nested-mesh structure (ScalarField
+*). Its fields fresh_cpu and fresh_gpu are directly booleans, not
+*pointers. */
+#ifdef GPU
+  if (!(field->fresh_gpu)) take_action = YES;
+  if(take_action) {
+    if (field->fresh_cpu == NO) problem = YES;
+    if (problem) {
+      printf ("Problem on CPU %d: you want to transfer the field %s\n", CPU_Rank, field->Name);
+      printf ("From host to device in file %s at line %d, but the\n", string, line);
+      printf ("field is not fresh everywhere. Here are the values of\n");
+      printf ("'fresh' on the mesh, on the inside contour, and outside contour\n");
+      INSPECT_INT (field->fresh_cpu);
+    }
+    status = JSHost2Dev3D(field);
+    FullArrayComms++;
+    //printf("H==>D: %s Level: %d\n",field->Name,field->level);
+    if(status!=0) {
+      printf("Error %d in Host2Dev3D()! Field: %s\n",status,field->Name);
+      printf("called from line %d of file %s\n", line, string);
+      exit(0);
+    }
+  }
+//  else {
+//    printf("Field %s is up to date on Device.\n",field->name);
+//  }
+  field->fresh_gpu = YES;
+#endif
+  return;
+}
+
+void JSOutput_CPU(ScalarField *field, int line, const char *string){
+  field->fresh_cpu = YES;
+  field->fresh_gpu = NO;
+  // printf("field %s level %d fresh on CPU\n",field->Name,field->level);
+}
+
+void JSOutput_GPU(ScalarField *field, int line, const char *string){
+  field->fresh_cpu = NO;
+  field->fresh_gpu = YES;
+  // printf("field %s level %d fresh on GPU\n",field->Name,field->level);
+}
+
+void JVInput_CPU(VectorField *field, int di, int line, const char *string){
+  int status, i;
+  boolean problem = NO, take_action = NO;
+#ifdef GPU
+  if (!(field->fresh_cpu[di])) take_action = YES;
+  if(take_action) {
+    if (field->fresh_gpu[di] == NO) problem = YES;
+    if (problem) {
+      printf ("Problem on CPU %d: you want to transfer the component %d of vector field %s\n", CPU_Rank, di, field->Name);
+      printf ("From device to host in file %s at line %d, but the\n", string, line);
+      printf ("field is not fresh everywhere. Here are the values of\n");
+      printf ("'fresh' on the mesh, on the inside contour, and outside contour\n");
+      INSPECT_INT (field->fresh_gpu[di]);
+    }
+    status = JVDev2Host3D(field,di);
+    FullArrayComms++;
+    //    printf("%d\n",status);
+    //printf("D==>H: %s[%d] Level: %d\n",field->Name,di,field->level);
+    if(status!=0) {
+      printf("Error %d in Dev2Host3D()! Field: %s[%d]\n",status,field->Name,di);
+      printf("called from line %d of file %s\n", line, string);
+      exit(0);
+    }
+  }
+//  else {
+//    printf("Field %s is up to date on Host.\n",field->name);
+//  }
+  field->fresh_cpu[di] = YES;
+#endif
+  return;
+}
+
+ void JVInput_GPU(VectorField *field, int di, int line, const char *string){
+  int i, status;
+  boolean problem=NO, take_action=NO;
+#ifdef GPU
+  if (!(field->fresh_gpu[di])) take_action = YES;
+  if(take_action) {
+    if (field->fresh_cpu[di] == NO) problem = YES;
+    if (problem) {
+      printf ("Problem on CPU %d: you want to transfer the component %d of vector field %s\n", CPU_Rank, di, field->Name);
+      printf ("From host to device in file %s at line %d, but the\n", string, line);
+      printf ("field is not fresh everywhere. Here are the values of\n");
+      printf ("'fresh' on the mesh, on the inside contour, and outside contour\n");
+      INSPECT_INT (field->fresh_cpu[di]);
+    }
+    status = JVHost2Dev3D(field,di);
+    FullArrayComms++;
+    //printf("H==>D: %s[%d] Level: %d\n",field->Name,di,field->level);
+    if(status!=0) {
+      printf("Error %d in Host2Dev3D()!Field: %s[%d]\n",status,field->Name,di);
+      printf("called from line %d of file %s\n", line, string);
+      exit(0);
+    }
+  }
+//  else {
+//    printf("Field %s is up to date on Device.\n",field->name);
+//  }
+  field->fresh_gpu[di] = YES;
+#endif
+  return;
+}
+
+ void JVOutput_CPU(VectorField *field, int di, int line, const char *string){
+  field->fresh_cpu[di] = YES;
+  field->fresh_gpu[di] = NO;
+  //printf("field %s level %d fresh on CPU\n",field->Name,field->level);
+}
+
+ void JVOutput_GPU(VectorField *field, int di, int line, const char *string){
+  field->fresh_cpu[di] = NO;
+  field->fresh_gpu[di] = YES;
+  //printf("field %s level %d fresh on GPU\n",field->Name,field->level);
 }

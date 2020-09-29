@@ -47,28 +47,10 @@ void _CondInit() {
 }
 
 void CondInit() {
-
-  int feedback = YES;
-  char dust_name[MAXNAMELENGTH];
-  int global_index;
   int id;
   
-  printf("fluid index = %d \n", FluidColor);
-  
   for (id = 0; id<NFluids_per_rank; id++) {
-    global_index = FluidColor*NFluids_per_rank+id;
-    if (global_index == 0) {
-      Fluids[id] = CreateFluid("gas",GAS);
       SelectFluid(id);
       _CondInit();
-    }
-    else {
-      sprintf(dust_name,"dust%d",global_index);
-      Fluids[id]  = CreateFluid(dust_name, DUST);
-      SelectFluid(id);
-      _CondInit();
-    }
   }
-
-
 }

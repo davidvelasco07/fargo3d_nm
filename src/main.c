@@ -7,7 +7,7 @@ functions, then the main loop.
 */
 #include "fargo3d.h"
 
-int   begin_i = 0, NbRestart = 0;
+int   begin_i = 0;
 int   InnerOutputCounter=0, StillWriteOneOutput;
 real dt;
 real dtemp = 0.0;
@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
   
   int   i=0, OutputNumber = 0, d;
   char  sepline[]="===========================";
+  tGrid_CPU *grid;
+  FluidPatch *fluid;
   sprintf (FirstCommand, "%s", argv[0]);
   sprintf (CommandLine, "%s ", argv[0]);
   while (++i < argc) {
@@ -151,7 +153,6 @@ int main(int argc, char *argv[]) {
 	prs_exit (1);
   }
 #endif
-  
 
 #ifdef MPICUDA
   EarlyDeviceSelection();
@@ -179,15 +180,16 @@ int main(int argc, char *argv[]) {
   FluidColor  = CPU_World_Rank/NDOMAINS;
   
   MPI_Comm_split(MPI_COMM_WORLD, FluidColor, CPU_World_Rank, &DomainComm);
-  MPI_Comm_rank(DomainComm, &CPU_RowRank  );
-  MPI_Comm_size(DomainComm, &CPU_RowNumber);
-  
+  //MPI_Comm_rank(DomainComm, &CPU_RowRank  );
+  //MPI_Comm_size(DomainComm, &CPU_RowNumber);
+  printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
+  exit(1);
   MPI_Comm_split(MPI_COMM_WORLD, DomainColor, CPU_World_Rank, &FluidsComm);
   MPI_Comm_rank(FluidsComm, &CPU_ColumnRank  );
   MPI_Comm_size(FluidsComm, &CPU_ColumnNumber);
   
   printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
-  
+  exit(1);
   CPU_Rank   = CPU_RowRank;
   CPU_Number = CPU_RowNumber;
   
@@ -260,12 +262,16 @@ int main(int argc, char *argv[]) {
   ListVariablesIDL ("IDL.var");
   ChangeArch(); /*Changes the name of the main functions
 		  ChangeArch adds _cpu or _gpu if GPU is activated.*/
-  split(&Gridd); /*Split mesh over PEs*/
-  InitSpace();
-  WriteDim();
-  InitSurfaces();
-  LightGlobalDev(); /* Copy light arrays to the device global memory */
-  CreateFields(); // Allocate all fields.
+  printf("Before J Bs\n");
+  exit(1);
+  Adapt_for_JUPITER (ParameterFile);
+
+  //split(&Gridd); /*Split mesh over PEs*/
+  //InitSpace();
+  //WriteDim();
+  //InitSurfaces();
+  //LightGlobalDev(); /* Copy light arrays to the device global memory */
+  //CreateFields(); // Allocate all fields.
 
   Sys = InitPlanetarySystem(PLANETCONFIG);
   ListPlanets();
@@ -294,10 +300,26 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   else {
     if (ThereArePlanets)
       EmptyPlanetSystemFiles ();
-    CondInit(); // Initialize set up
+      NESTEDMESHES(CondInit);
+    //CondInit(); // Initialize set up
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }
+  tGrid *parent_grids = GridList;
+  while (parent_grids != NULL) {Ngrids++; parent_grids = parent_grids->next;}
+
+  for(i=0;i<Ngrids;i++){
+    Grid_item = Grid_CPU_list; 
+    do {   
+      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { 
+        AdaptFieldsFromJ (Grid_item);
+        SelectFluid(0);
+       __WriteField(Density,0);
+      } 
+      Grid_item= Grid_item->next;
+    } while (Grid_item != NULL); 
+  }
+  exit(1);
 
   if (StretchOldOutput == YES) {
     StretchOutput (StretchNumber);
@@ -434,7 +456,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       FARGO_SAFE(Collisions(0.5*dt, 0)); // 0 --> V is used and we update v_half.
 #endif
       
-      MULTIFLUID(Sources(dt)); //v_half is used in the R.H.S
+      //MULTIFLUID(Sources(dt)); //v_half is used in the R.H.S
 
 #ifdef DRAGFORCE
       FARGO_SAFE(DragForce(dt));
@@ -447,7 +469,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       FARGO_SAFE(DustDiffusion_Main(dt));
 #endif
       
-      MULTIFLUID(Transport(dt));
+      //MULTIFLUID(Transport(dt));
 
       PhysicalTime+=dt;
       Timestepcount++;

@@ -32,3 +32,5 @@ void MPI_Send();
 void MPI_Recv();
 void MPI_Wait();
 void MPI_Gather();
+void MPI_Iallreduce();
+void MPI_Abort();

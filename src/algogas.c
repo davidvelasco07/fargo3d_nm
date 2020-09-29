@@ -11,7 +11,8 @@ TimeProcess t_sub1_z;
 void FillGhosts (int var) {
 
   InitSpecificTime (&t_Comm, "MPI Communications");
-  FARGO_SAFE(comm (var));
+  //FARGO_SAFE(comm (var));
+  FARGO_SAFE(ExecCommSame (Current_Level, var));
   GiveSpecificTime (t_Comm);
   FARGO_SAFE(boundaries()); // Always after a comm.
 
@@ -27,7 +28,7 @@ void FillGhosts (int var) {
 }
      
 
-void Sources(real dt) {
+void AlgoGas1(real dt) {
      
   SetupHook1 (); //Setup specific hook. Defaults to empty function.
   
@@ -60,13 +61,13 @@ void Sources(real dt) {
 #endif
 
 #ifdef X
-  FARGO_SAFE(SubStep1_x(dt));
+  FARGO_SAFE(SubStep1_x(.5*dt));
 #endif    
 #ifdef Y
-  FARGO_SAFE(SubStep1_y(dt));
+  FARGO_SAFE(SubStep1_y(.5*dt));
 #endif  
 #ifdef Z
-  FARGO_SAFE(SubStep1_z(dt));
+  FARGO_SAFE(SubStep1_z(.5*dt));
 #endif
   
 #if (defined(VISCOSITY) || defined(ALPHAVISCOSITY))
@@ -115,46 +116,65 @@ void Sources(real dt) {
 #endif
   
   FARGO_SAFE(copy_velocities(VTEMP2V));
-  FARGO_SAFE(FillGhosts(PrimitiveVariables()));
-  FARGO_SAFE(copy_velocities(V2VTEMP));
+}
 
-#ifdef MHD //-------------------------------------------------------------------
-  if(Fluidtype == GAS){ //We do MHD only for the gaseous component
-    
+////////////////////////////////////////////
+
+void AlgoGas2 (real dt) {
+ int i,j,k,ll;
+  FARGO_SAFE(copy_velocities(V2VTEMP));
+#ifdef MHD
     FARGO_SAFE(UpdateMagneticField(dt,1,0,0));
     FARGO_SAFE(UpdateMagneticField(dt,0,1,0));
     FARGO_SAFE(UpdateMagneticField(dt,0,0,1));
+#endif
 
-#if !defined(STANDARD)
+#if defined (MHD) && (!defined(STANDARD))
     FARGO_SAFE(MHD_fargo (dt)); // Perform additional field update with uniform velocity
 #endif
 
-  } 
-#endif //END MHD ---------------------------------------------------------------
-}
-
-void Transport(real dt) {
-
-  //NOTE: V_temp IS USED IN TRANSPORT
-
 #ifdef X
 #ifndef STANDARD
-  FARGO_SAFE(ComputeVmed(Vx_temp)); 
+    FARGO_SAFE(ComputeVmed(Vx_temp)); 
 #endif
 #endif
 
-  transport(dt);
+    transport(dt);
+
+#ifdef ADIABATIC
+    FARGO_SAFE(ComputePressureFieldAd());
+#endif
+    
+#ifdef ISOTHERMAL
+    FARGO_SAFE(ComputePressureFieldIso());
+#endif
+
+#ifdef POLYTROPIC
+    FARGO_SAFE(ComputePressureFieldPoly());
+#endif   
+
+#ifdef X
+    FARGO_SAFE(SubStep1_x(.5*dt));
+#endif
+#ifdef Y
+    FARGO_SAFE(SubStep1_y(.5*dt));
+#endif
+#ifdef Z
+    FARGO_SAFE(SubStep1_z(.5*dt));
+#endif
+
+    FARGO_SAFE(copy_velocities(VTEMP2V));
+
+    GiveSpecificTime (t_Hydro);
   
-  GiveSpecificTime (t_Hydro);
-  
-  if (ForwardOneStep == YES) prs_exit(EXIT_SUCCESS);
+    if (ForwardOneStep == YES) prs_exit(EXIT_SUCCESS);
   
 #ifdef MHD
   if(Fluidtype == GAS) {   // We do MHD only for the gaseous component
-   *(Emfx->owner) = Emfx;  // EMFs claim ownership of their storage area
-   *(Emfy->owner) = Emfy;
-   *(Emfz->owner) = Emfz;
- }
+    *(Emfx->owner) = Emfx;  // EMFs claim ownership of their storage area
+    *(Emfy->owner) = Emfy;
+    *(Emfz->owner) = Emfz;
+  }
 #endif
-
 }
+

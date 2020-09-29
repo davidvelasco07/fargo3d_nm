@@ -23,10 +23,14 @@ MPI_Request RequestTotalDensity;
 int FluidColor;   //Rows
 int DomainColor;  //Columns
 
+int Current_Level = 0;
+tGrid_CPU *Current_Grid;
+tGrid_CPU *Grid_item;
+int NbRestart = 0;
 boolean CPU_Master = YES;
 
 //Global variables
-
+boolean FirstPassXAdvection = NO;
 boolean Resistivity_Profiles_Filled = NO;
 boolean VxIsResidual = NO;
 boolean LogGrid = NO;
@@ -51,6 +55,7 @@ boolean DeviceFileSpecified = NO;
 boolean StretchOldOutput = NO;
 boolean ThereArePlanets = NO;
 boolean ThereIsACentralBinary = NO;
+boolean AddSubPatch = NO;
 real    PhysicalTimeInitial;
 real    PhysicalTime = 0;
 real    XAxisRotationAngle = 0.0;
@@ -100,6 +105,9 @@ real globalforce[12];
 //FIELDS VARIABLES
 
 Grid Gridd;
+
+real *Fluxes[3][2];
+Field *Flux = NULL;
 
 Field *Vx;
 Field *Vy;
@@ -274,6 +282,16 @@ int ycells;
 int zcells;
 int y0cell;
 int z0cell;
+int Maxsize_cpu = 1;
+int Maxsize2D_cpu = 1;
+int Maxsize_gpu = 1;
+int Maxsize2D_gpu = 1;
+int MaxsizeInt_cpu = 1;
+int MaxsizeInt_gpu =1;
+int LocalBC[3][2];
+
+//Entry point to JUPITER architecture
+tGrid_CPU *Current_Jupiter_Patch = NULL;
 
 //For checknan
 Field *ListOfGrids = NULL;
@@ -308,6 +326,62 @@ int Fluidtype;
 int FluidIndex;
 real Min[NFLUIDS];      //Comment: NFLUIDS is the upper bound for the size of the array.
 Fluid *Fluids[NFLUIDS]; //Comment: NFLUIDS is the upper bound for the size of the array.
+
+//Nested Meshes variables
+char CoordNames[9][80] = {"X", "Y", "Z", "Radius", "Azimuth", "Z", "Radius", "Azimuth", "Co-latitude"};
+char SCoordNames[9][80]= {"X", "Y", "Z", "Rad", "Phi", "Z", "Rad", "Phi", "Theta"};
+char OutputDir[MAXLINELENGTH];
+char SubPatchInfo[MAXLINELENGTH];
+int NDIM;
+int InvCoordNb[3];
+int CoordNb[3];
+int CoordType;
+long MaxLevel = 100;
+real corner_min0[3];
+real corner_max0[3];
+long ncorner_min0[3];
+long ncorner_max0[3];
+long jstride[3];
+long LevMax = 0;
+boolean Refine[3];
+boolean Periodic[3];
+long Ncell0[3];
+long Nghost[3];
+boolean AllowFlushLog = YES;
+tGrid *GridList = NULL;
+tGrid_CPU *Grid_CPU_list = NULL;
+int _X_;
+int _Y_;
+int _Z_;
+int _RAD_;
+int _AZIM_;
+int _COLAT_;
+int _Radial_;
+int _Azimuthal_;
+int _Vertical_;
+int _Colatitude_;
+long cpugrid_number;
+jCommunicator *ComListGhost = NULL;
+jCommunicator *ComListFlux = NULL;
+jCommunicator *ComListMean = NULL;
+CommHash **CommHashSrc;  
+int NbFluids = 1;
+long TimeStepRatio[100];
+long FluxIndex = 0;
+real MaxLowLevDT[100];
+boolean LevelHasChangedSinceCFL[100];
+real MaxLowLevDT_loc[100];
+long TimeStepRatio[100];
+long BaseStepRatio[100];
+long LevelCost[100];
+long SubCycling;
+real LevelDate[100];
+long centered[80][3];
+int staggered[80];
+int stdim[80];
+real *source[80];
+real *dest[80];
+int Ngrids=0;
 
 //Pointers to functions
 //WARNING!!! FUNCTIONS' ARGUMENTS MUST NOT CONTAIN BLANK SPACES

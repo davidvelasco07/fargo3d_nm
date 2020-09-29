@@ -125,6 +125,24 @@ CUDALIB_LINUX = -L${CUDA}/lib64/  -lcudart
 CUDALIB_LINUX = -L${CUDA}/lib64/  -lcudart -lstdc++
 CXX_LINUX     = g++ -stdlib=libstdc++
 CXXPARA_LINUX = mpic++ -stdlib=libstdc++
+#---------------------------------------------------------------------                                                                                                                                                                                                    
+#PIZ DAINT PLATFORM AT CSCS                                                                                                                                                                                                                                                      
+#FARGO_ARCH must be set to DAINT                                                                                                                                                                                                                                  
+CC_DAINT      = cc
+SEQOPT_DAINT  = -O3
+PARAOPT_DAINT = ${SEQOPT_DAINT}
+PARACC_DAINT  = cc
+LIBS_DAINT    = -lm
+ENVRANK_DAINT = 0 #ONLY ONE GPU PER NODE 
+INC_DAINT     =
+NVCC_DAINT    = nvcc
+CUDAOPT_DAINT = -O3 -arch=sm_60
+PARAINC_DAINT =
+PARALIB_DAINT =
+CUDAINC_DAINT =
+CUDALIB_DAINT =
+CXX_DAINT     = CC
+CXXPARA_DAINT = CC
 #---------------------------------------------------------------------
 #KEPLER PLATFORM WITH OPENMPI-1.7.4 AT UNAM
 #FARGO_ARCH must be set to KEPLEROPENMPI
@@ -352,7 +370,15 @@ MAINOBJ  = LowTasks.o psys.o main.o param.o var.o usage.o   	    \
 	   nimhd_ohmic_diffusion_coeff.o			\
 	   compute_jx.o compute_jy.o compute_jz.o		\
 	   dragforce.o dragforce_sumc.o dragforce_sumcv.o       \
-	   dragforce_updatevel.o dragforce_coeff.o
+	   dragforce_updatevel.o dragforce_coeff.o J_refine_desc.o J_refine_field.o\
+	   J_gridfile.o J_gridabs.o J_log.o J_gridbuild.o       \
+	   J_low.o J2F3D.o J_split.o J_create.o J_create_fluid.o\
+	   J_desc.o J_comm_init.o J_comm_strip.o J_overlap.o    \
+	   J_comm_alloc.o J_comm_check.o J_gridread.o           \
+	   J_Output.o J_comm_exec.o J_comm_fill.o               \
+	   J_faceflux.o J_correct.o J_resetfluxes.o             \
+	   J_subcycling.o J_iter.o J_comm_device.o              \
+	   J_merge_field.o J_merge_desc.o J_readfield.o	
 
 #-----------------------#Cuda objects---------------------------------
 GPU_OBJ  =  reduction_sum_device.o reduction_min_device.o	\
@@ -407,7 +433,8 @@ GPU_OBJBLOCKS =  CompPresIso_gpu.o CompPresAd_gpu.o 		\
 	   nimhd_ohmic_diffusion_coeff_gpu.o			\
 	   compute_jx_gpu.o compute_jy_gpu.o compute_jz_gpu.o   \
            dragforce_sumc_gpu.o dragforce_sumcv_gpu.o           \
-           dragforce_updatevel_gpu.o dragforce_coeff_gpu.o 
+           dragforce_updatevel_gpu.o dragforce_coeff_gpu.o J_comm_kernels.o	\
+	   J_comm_exec_kernels.o J_correct_kernels.o
 #</CUDA OBJECTS>
 #---------------------------------------------------------------------
 

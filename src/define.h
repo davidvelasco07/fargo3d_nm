@@ -44,6 +44,22 @@
 #define MARK 1
 #define FREQUENCY 2
 
+//Nested Meshes
+#define MAXGRIDS 1000L
+#define INF 0L
+#define SUP 1L
+#define REFINEUPPERLIMIT 100L	/* Max refinement level ever. */
+#define NGH 10L
+#define GHOST 0L
+#define FLUX 1L
+#define MEAN 2L
+#define MEANWIDTH 4
+#define FLUXWIDTH 0
+#define NONE 0
+#define AUTO 1
+#define FULL 2
+#define MAXLENGTHONEDIM 512L
+
 // Ghost cells
 
 #ifdef X
@@ -565,6 +581,10 @@ a bug and obtain hints about its origin. */
 #define OUTPUT2D( field) Output2D_GPU(field, __LINE__, __FILE__);
 #define INPUT2DINT( field) Input2DInt_GPU(field, __LINE__, __FILE__);
 #define OUTPUT2DINT( field) Output2DInt_GPU(field, __LINE__, __FILE__);
+#define JSINPUT( field) JSInput_GPU(field, __LINE__, __FILE__);
+#define JVINPUT( field, di) JVInput_GPU(field, di, __LINE__, __FILE__);
+#define JSOUTPUT( field) JSOutput_GPU(field, __LINE__, __FILE__);
+#define JVOUTPUT( field, di) JVOutput_GPU(field, di, __LINE__, __FILE__);
 #else
 #define INPUT( field) Input_CPU(field, __LINE__, __FILE__);
 #define OUTPUT( field) Output_CPU(field, __LINE__, __FILE__);
@@ -572,6 +592,10 @@ a bug and obtain hints about its origin. */
 #define OUTPUT2D( field) Output2D_CPU(field, __LINE__, __FILE__);
 #define INPUT2DINT( field) Input2DInt_CPU(field, __LINE__, __FILE__);
 #define OUTPUT2DINT( field) Output2DInt_CPU(field, __LINE__, __FILE__);
+#define JSINPUT( field) JSInput_CPU(field, __LINE__, __FILE__);
+#define JVINPUT( field, di) JVInput_CPU(field, di, __LINE__, __FILE__);
+#define JSOUTPUT( field) JSOutput_CPU(field, __LINE__, __FILE__);
+#define JVOUTPUT( field, di) JVOutput_CPU(field, di, __LINE__, __FILE__);
 #endif
 
 #define DRAFT( field) Draft(field, __LINE__, __FILE__);
@@ -608,10 +632,20 @@ a bug and obtain hints about its origin. */
     SelectFluid(FluidIndex);						\
     call;}
 
+#define NESTEDMESHES( call) \
+  Grid_item = Grid_CPU_list; \
+  do {   \
+    if (Grid_item->cpu == CPU_Rank) { \
+      AdaptFieldsFromJ (Grid_item); \
+      call; \
+    } \
+    Grid_item= Grid_item->next; \
+  } while (Grid_item != NULL); 
+
 #define index(i,j) j+i*NFLUIDS
 
 #define SMALLVEL (1e-9*sqrt(G*MSTAR/R0))
 #define SMALLTIME (1e-10*sqrt(R0*R0*R0/(G*MSTAR)))
 
-#define CREATEFIELDALIAS(a,b,c) CreateFieldAlias (a,b,c)
-//#define CREATEFIELDALIAS(a,b,c) CreateField (a,c,0,0,0)
+//#define CREATEFIELDALIAS(a,b,c) CreateFieldAlias (a,b,c)
+#define CREATEFIELDALIAS(a,b,c,d) CreateField (a,b,0,0,0,0,1)

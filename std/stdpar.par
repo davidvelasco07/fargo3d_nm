@@ -106,3 +106,11 @@ WriteVz			No
 WriteDivergence		No
 WriteEnergyRad		No
 WriteTau		No
+
+INHIBREFDIM1	No
+INHIBREFDIM2	No
+INHIBREFDIM3	No
+
+PeriodicZ		No
+PeriodicY		No
+PeriodicX		Yes

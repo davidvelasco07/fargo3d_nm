@@ -295,7 +295,7 @@ void WriteMerging(Field *f, int n) {
   int next, previous;
   int relay;
 
-  sprintf(outname, "%s%s%d.dat", OUTPUTDIR, f->name, n);
+  sprintf(outname, "%s%s%d_grid%d.dat", OUTPUTDIR, f->name, n, Current_Jupiter_Patch->parent);
 
   if (CPU_Rank > 0) { // Force sequential read
     MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);

@@ -133,14 +133,14 @@ SEQOPT_DAINT  = -O3
 PARAOPT_DAINT = ${SEQOPT_DAINT}
 PARACC_DAINT  = cc
 LIBS_DAINT    = -lm
-ENVRANK_DAINT = 0 #ONLY ONE GPU PER NODE 
-INC_DAINT     =
+ENVRANK_DAINT = OMPI_COMM_WORLD_LOCAL_RANK 
+INC_DAINT     = -I../include
 NVCC_DAINT    = nvcc
-CUDAOPT_DAINT = -O3 -arch=sm_60
+CUDAOPT_DAINT = -O3 -arch=sm_60 -I$(CRAY_MPICH2_DIR)/include
 PARAINC_DAINT =
 PARALIB_DAINT =
-CUDAINC_DAINT =
-CUDALIB_DAINT =
+CUDAINC_DAINT = 
+CUDALIB_DAINT = -lcuda -lcudart
 CXX_DAINT     = CC
 CXXPARA_DAINT = CC
 #---------------------------------------------------------------------

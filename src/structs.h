@@ -322,6 +322,7 @@ struct tgrid {
   long dn[3];			/**< Cell size in absolute units */
   long linenumber;		/**< Line number in grid file */
   long monoCPU;			/**< Information used for a restart only */
+  long Ncpus[3];  /** Number of subdomains per direction */
 };
 
 /** The information relative to a fluid patch that is accessible to a

@@ -5,22 +5,27 @@ void boundaries() {
   
   if (!PERIODICZ) {
 #ifdef Z
-    if(Gridd.bc_down)
+    if(LocalBC[_Z_][0] > 0)
       boundary_zmin[global_index]();
-    if(Gridd.bc_up)
+    if(LocalBC[_Z_][1] > 0)
       boundary_zmax[global_index]();
 #endif
   }
   if (!PERIODICY) {
 #ifdef Y
-    if(Gridd.bc_left)
+    if(LocalBC[_Y_][0] > 0)
       boundary_ymin[global_index]();
-    if(Gridd.bc_right)
+    if(LocalBC[_Y_][1] > 0)
       boundary_ymax[global_index]();
 #endif
   }
-#ifdef GHOSTSX 
-  Fill_GhostsX();
+  if (!PERIODICX) {
+#ifdef X
+    if(LocalBC[_X_][0] > 0)
+      boundary_xmin[global_index]();
+    if(LocalBC[_X_][1] > 0)
+      boundary_xmax[global_index]();
 #endif
+  }
 }
 

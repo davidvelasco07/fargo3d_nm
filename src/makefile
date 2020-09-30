@@ -677,7 +677,7 @@ zmax_bound_%.o: zmax_bound_%.c ${GLOBAL}
 	@echo CC $< "==>" zmax_bound_$*.o
 	@${COMPILER} zmax_bound_$*.c -c ${INCLUDE} ${OPTIONS} ${FARGO_OPT}
 
-ymin_bound_%.c ymax_bound_%.c zmin_bound_%.c zmax_bound_%.c: boundaries.txt centering.txt ${SETUPSDIR}/${SETUP}/$(SETUP).bound.% ${GLOBAL} ${BOUNDARIES_DEP}
+xmin_bound_%.c xmax_bound_%.c ymin_bound_%.c ymax_bound_%.c zmin_bound_%.c zmax_bound_%.c: boundaries.txt centering.txt ${SETUPSDIR}/${SETUP}/$(SETUP).bound.% ${GLOBAL} ${BOUNDARIES_DEP}
 	@-python ${SCRIPTSDIR}/boundparser.py $^
 
 endif

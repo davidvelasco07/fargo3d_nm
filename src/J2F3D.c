@@ -221,6 +221,9 @@ void AdaptFieldsFromJ(tGrid_CPU *grid)
     //This should be changed to be called just once, the arrays defined here are global arrays with a fixed size = max_size
     //and there is no need to asign a descriptor to these fields as they are only used in FARGO3D routines (not involved in NM comms)
     FARGO_SAFE(CreateFields()); //(Re)alloc work arrays
+
+    Ncpu_x = grid->Parent->Ncpus[1];
+    Ncpu_y = grid->Parent->Ncpus[2];
   }
 }
 

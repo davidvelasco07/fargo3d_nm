@@ -14,7 +14,7 @@ real dtemp = 0.0;
 
 int main(int argc, char *argv[]) {
   
-  int   i=0, OutputNumber = 0, d;
+  int   i=0, OutputNumber = 0, d, level;
   char  sepline[]="===========================";
   tGrid_CPU *grid;
   FluidPatch *fluid;
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
 
 
   MakeDir(OUTPUTDIR); /*Create the output directory*/
-
+  
 #if !defined(X)
   NX = 1;
 #endif
@@ -300,31 +300,26 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     if (ThereArePlanets)
       EmptyPlanetSystemFiles ();
       NESTEDMESHES(CondInit(););
-    //CondInit(); // Initialize set up
+    // Initialize set up
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }
- 
+  
   for(i=0;i<Ngrids;i++){
     Grid_item = Grid_CPU_list; 
     do {   
       if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { 
         printf("Grid %d\n",Grid_item->parent);
         AdaptFieldsFromJ (Grid_item);
-        SelectFluid(0);
-       __WriteField(Density,0);
+        MULTIFLUID(WriteOutputs(ALL));
       } 
       Grid_item= Grid_item->next;
     } while (Grid_item != NULL); 
   }
-  
-  exit(0);
 
   if (StretchOldOutput == YES) {
     StretchOutput (StretchNumber);
   }
-  
-  MULTIFLUID(comm(ENERGY)); //Very important for isothermal cases!
 
   /* This must be placed ***after*** reading the input files in case of a restart */
   if ((ArrayNb) && (EarlyOutputRename == NO)) {
@@ -347,20 +342,35 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #ifdef LONGSUMMARY
   ExtractFromExecutable (NO, ArchFile, 2);
 #endif
-
-  
-  MULTIFLUID(FillGhosts(PrimitiveVariables()));
-
 #ifdef STOCKHOLM 
-  FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
+  //FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
 #endif
-  
-#ifdef GHOSTSX
+
+#ifndef NOGHOSTX
   masterprint ("\n\nNew version with ghost zones in X activated\n");
 #else
   masterprint ("Standard version with no ghost zones in X\n");
 #endif
 
+
+  SelectFluid(0);
+  for(i=0;i<3;i++)
+    Energy->field_cpu[6+i+NGHY*(Nx+2*NGHX)]=0;
+  NESTEDMESHES(MULTIFLUID(FillGhosts(StandardFields() | ENERGY)))
+SelectFluid(0);
+  for(i=0;i<6;i++)
+    printf("CPU %d,Grid  %d,i %d: %lf\n",CPU_Rank,Current_Level,i,Energy->field_cpu[6+i+NGHY*(Nx+2*NGHX)]);
+  exit(0);
+  for (level = 0; level <= LevMax; level++) {
+    MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
+  }
+  exit(0);
+#ifdef STOCKHOLM 
+  FARGO_for_all_patches_level (init_stockholm, 0);
+#endif
+
+  tGrid_CPU *current;
+  real mass, totalmass;
   for (i = begin_i; i<=NTOT; i++) { // MAIN LOOP
     if (NINTERM * (TimeStep = (i / NINTERM)) == i) {
 

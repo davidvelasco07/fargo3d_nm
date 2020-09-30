@@ -108,6 +108,7 @@ void splitgrid(tGrid *grid)
     resol_ratio[j] = (Refine[j] && (grid->level > 0) ? 2L : 1L);
     euclid_ratio[j] = (grid->ncell[j] / resol_ratio[j]) / mx[j];
     euclid_rest[j] = (grid->ncell[j] / resol_ratio[j]) - euclid_ratio[j] * mx[j];
+    grid->Ncpus[j] = mx[j];
   }
   for (i[0] = 0; i[0] < mx[0]; i[0]++)
   {

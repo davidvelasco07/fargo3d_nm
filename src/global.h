@@ -504,6 +504,8 @@ void (*__WriteField)();
 void (*__Restart)(Field*,int);
 
 //Comment: NFLUIDS is the upper bound for the size of the array.
+void (*boundary_xmin[NFLUIDS])();
+void (*boundary_xmax[NFLUIDS])();
 void (*boundary_ymin[NFLUIDS])();
 void (*boundary_ymax[NFLUIDS])();
 void (*boundary_zmin[NFLUIDS])();

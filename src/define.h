@@ -63,7 +63,7 @@
 // Ghost cells
 
 #ifdef X
-#ifdef GHOSTSX
+#ifndef NOGHOSTX
 #define NGHX 12
 #else
 #define NGHX 0
@@ -88,7 +88,7 @@
 #define NGHZ 0
 #endif
 
-#ifdef GHOSTSX
+#ifndef NOGHOSTX
 #define XIP (Nx+2*NGHX-1) //X Interval Plus (we need to address right neighbor in loop)
 #define XIM (1)           //X Interval Minus (we need to address left neighbor in loop)
 #else
@@ -388,7 +388,7 @@
 //Index define
 #ifndef __GPU
 
-#ifdef GHOSTSX              // <==== MAIN ifdef
+#ifndef NOGHOSTX              // <==== MAIN ifdef
 #define lxp ((l)+1)
 #define lxm ((l)-1)
 
@@ -426,7 +426,7 @@
 #define lzm (l)
 #endif
 
-#ifdef GHOSTSX
+#ifndef NOGHOSTX
 #define l   ((i)+(j)*(Nx+2*NGHX)+((k)*Stride))
 #else
 #define l   ((i)+(j)*(Nx)+((k)*Stride))

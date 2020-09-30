@@ -313,12 +313,11 @@ void WriteMerging(Field *f, int n) {
     MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
   }
 
-
   for (k=0; k<NZ; k++) {
     for (j = 0; j<Ncpu_x; j++) {
       if ((J==j) && (k>=Z0) && (k<(Z0+Nz))) {
-	for (jj = NGHY; jj < Ny+NGHY; jj++)
-	  fwrite(f->field_cpu+(k-Z0+NGHZ)*Stride+jj*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
+	      for (jj = NGHY; jj < Ny+NGHY; jj++)
+	        fwrite(f->field_cpu+(k-Z0+NGHZ)*Stride+jj*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
       }
       fflush(fo);
       MPI_Barrier(DomainComm);
@@ -588,7 +587,7 @@ void WriteOutputs(int type) {
   FILE *fp;
   char filename[MAXNAMELENGTH];
 
-  Summary (TimeStep);
+  //Summary (TimeStep);
   
   if (type == ALL){ //We store the .par variables' value for a while.
     writedensity = WRITEDENSITY;

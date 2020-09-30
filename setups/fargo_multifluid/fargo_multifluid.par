@@ -46,3 +46,7 @@ Ninterm	 		20		Time steps between outputs
 Ntot			20		Total number of time steps
 
 OutputDir		@outputs/fargo_multifluid
+
+#GRIDINFO
+#xmin ymin xmax ymax level
+-1.0 0.9 1.0 2.0 1

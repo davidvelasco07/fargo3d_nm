@@ -96,6 +96,11 @@ class Setup():
             f.variable = field['name']
             f.boundaries = {}
             try:
+                f.boundaries['xmin'] = field['xmin']
+                f.boundaries['xmax'] = field['xmax']
+            except:
+                pass
+            try:
                 f.boundaries['ymin'] = field['ymin']
                 f.boundaries['ymax'] = field['ymax']
             except:
@@ -168,6 +173,8 @@ class Boundary():
         ifields_lines = ""
         string = "%ifields"
         for field in self.setup.fields:
+            if self.side == 'xmin' : direction = "LOW"
+            if self.side == 'xmax' : direction = "HIGH"
             if self.side == 'ymin' : direction = "LEFT"
             if self.side == 'ymax' : direction = "RIGHT"
             if self.side == 'zmin' : direction = "DOWN"
@@ -181,6 +188,8 @@ class Boundary():
         ofields_lines = ""
         string = "%ofields"
         for field in self.setup.fields:
+            if self.side == 'xmin' : direction = "LOW"
+            if self.side == 'xmax' : direction = "HIGH"
             if self.side == 'ymin' : direction = "LEFT"
             if self.side == 'ymax' : direction = "RIGHT"
             if self.side == 'zmin' : direction = "DOWN"
@@ -214,6 +223,14 @@ class Boundary():
         n = self.stones[string]
         self.template.template[n] = \
             self.template.template[n] = pointerfield_lines
+        string = "%size_x"
+        n = self.stones[string]
+        if self.side[0] == "x":
+            self.template.template[n] = \
+                self.template.template[n].replace(string,"NGHX")
+        else:
+            self.template.template[n] = \
+                self.template.template[n].replace(string,"Nx+2*NGHX")
         
         string = "%size_y"
         n = self.stones[string]
@@ -238,6 +255,9 @@ class Boundary():
         global_variables = []
         for field in self.setup.fields:
             if field.centered[-1] == self.side[0]:
+                if self.side[:] == 'xmax':
+                    left_hand = "\t" + "if (i<size_x-1)\n"
+                    left_hand += "\t\t" + field.variable + "[lghs] = "
                 if self.side[:] == "ymax":
                     left_hand = "\t" + "if (j<size_y-1)\n"
                     left_hand += "\t\t" + field.variable + "[lghs] = "
@@ -320,6 +340,22 @@ class Boundary():
 
     def process_indices(self):
         indices_lines = ""
+        if self.side == 'xmin':
+            indices_lines += "\n\t" +"lgh = l;\n"            
+            indices_lines += "\t" +"lghs = l;\n"
+            indices_lines += "\t" +"lact = 2*nghx-i-1 + j*pitch + k*stride;\n"
+            indices_lines += "\t"+"lacts = 2*nghx-i + j*pitch + k*stride;\n"
+            indices_lines += "\t"+"lacts_null = nghx + j*pitch + k*stride;\n"
+            indices_lines += "\t" +"igh = i;\n"
+            indices_lines += "\t" +"iact = (2*nghx-i-1);\n\n"
+        if self.side == 'xmax':
+            indices_lines += "\n\t" +"lgh = nx+nghx+i + j*pitch + k*stride;\n"
+            indices_lines += "\t" +"lghs = nx+nghx+1+i + j*pitch + k*stride;\n"
+            indices_lines += "\t" +"lact = nx+nghx-1-i + j*pitch + k*stride;\n"
+            indices_lines += "\t" +"lacts = nx+nghx-1-i + j*pitch + k*stride;\n"
+            indices_lines += "\t" +"lacts_null = nx+nghx + j*pitch + k*stride;\n"
+            indices_lines += "\t" +"igh = (nx+nghx+i);\n"
+            indices_lines += "\t" +"iact = (nx+nghx-1-i);\n\n"
         if self.side == 'ymin':
             indices_lines += "\n\t" +"lgh = l;\n"            
             indices_lines += "\t" +"lghs = l;\n"
@@ -366,6 +402,10 @@ def write_mute(side, number, template):
     template1.template[stones['%side']] = \
         template1.template[stones['%side']].replace("%side",side+"min_{:d}_cpu".format(number))
     for key in stones.keys():
+        if key == "%size_x":
+            template1.template[stones['%size_x']] = \
+                template1.template[stones['%size_x']].replace("%size_x","1")
+            continue
         if key == "%size_y":
             template1.template[stones['%size_y']] = \
                 template1.template[stones['%size_y']].replace("%size_y","1")
@@ -385,6 +425,10 @@ def write_mute(side, number, template):
     template2.template[stones['%side']] = \
         template2.template[stones['%side']].replace("%side",side+"max_{:d}_cpu".format(number))
     for key in stones.keys():
+        if key == "%size_x":
+            template2.template[stones['%size_x']] = \
+                template2.template[stones['%size_x']].replace("%size_x","1")
+            continue
         if key == "%size_y":
             template2.template[stones['%size_y']] = \
                 template2.template[stones['%size_y']].replace("%size_y","1")
@@ -438,6 +482,7 @@ if __name__ == '__main__':
     try:
         setup = Setup(SETUP, BOUNDARIES, CENTERING)
     except:
+        write_mute("x",FLUIDNUMBER,copy.deepcopy(template))
         write_mute("y",FLUIDNUMBER,copy.deepcopy(template))
         write_mute("z",FLUIDNUMBER,copy.deepcopy(template))
         if (FLUIDNUMBER == 0):
@@ -449,6 +494,17 @@ if __name__ == '__main__':
                   "periodic boundaries.")
             print("=================================")
         exit()
+    try:
+        inf  = Boundary("xmin", FLUIDNUMBER,
+                         copy.deepcopy(setup),
+                         copy.deepcopy(template))
+        sup  = Boundary("xmax", FLUIDNUMBER,
+                         copy.deepcopy(setup), 
+                         copy.deepcopy(template))
+    except KeyError:
+        write_mute("x", FLUIDNUMBER, copy.deepcopy(template))
+        if (FLUIDNUMBER == 0):
+            print("Warning: X boundaries are not defined.")
 
     try:
         left  = Boundary("ymin", FLUIDNUMBER,

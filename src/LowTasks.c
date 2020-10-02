@@ -613,6 +613,7 @@ void InitSurfaces()
 
 void SelectFluid(int n)
 {
+  int i, j;
   //Function for selecting the current fluid
   Current_Fluid = Fluids[n]->FluidRank;
   Fluidtype = Fluids[n]->Fluidtype;
@@ -641,6 +642,11 @@ void SelectFluid(int n)
   Vy0 = Fluids[n]->Vy0;
   Vz0 = Fluids[n]->Vz0;
 #endif
+  for (i = 0; i < 3; i++){
+    for (j = 0; j < 2; j++){
+      Fluxes[i][j] = Fluids[n]->Fluxes[i][j];
+    }
+  }
 }
 
 void CreateFields()

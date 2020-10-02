@@ -324,17 +324,19 @@ of Metric.
     F3Dfluid->Energy->field_cpu = fluid->Energy->Field;
     #ifdef X
     F3Dfluid->Vx->field_cpu = fluid->Velocity->Field[_X_];
-    F3Dfluid->Vx_temp->field_cpu = fluid->Velocity->Field[_X_];
+    F3Dfluid->Vx_temp->field_cpu = fluid->V_temp->Field[_X_];
     #endif
     #ifdef Y
     F3Dfluid->Vy->field_cpu = fluid->Velocity->Field[_Y_];
-    F3Dfluid->Vy_temp->field_cpu = fluid->Velocity->Field[_Y_];
+    F3Dfluid->Vy_temp->field_cpu = fluid->V_temp->Field[_Y_];
     #endif
     #ifdef Z
     F3Dfluid->Vz->field_cpu = fluid->Velocity->Field[_Z_];
-    F3Dfluid->Vz_temp->field_cpu = fluid->Velocity->Field[_Z_];
+    F3Dfluid->Vz_temp->field_cpu = fluid->V_temp->Field[_Z_];
     #endif
-    
+    for(j=0;j<3;j++)
+      for(k=0;k<2;k++)
+        F3Dfluid->Fluxes[j][k] = fluid->Fluxes[j][k];
     #ifdef STOCKHOLM
     F3Dfluid->Density0->field_cpu = fluid->Rho0->Field;
     #ifdef X

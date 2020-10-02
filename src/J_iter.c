@@ -94,8 +94,6 @@ void ItereLevel (real dt, long level)
   item = Grid_CPU_list;
   while (item != NULL) {//Source 1st half 
     if ((level == item->level) && (item->cpu == CPU_Rank)) {
-      printf("CPU%d level%d\n",CPU_Rank,level);
-      
       //To make this work Adapt... has to Change Fluids-> to point to the fluids of the grid
       //We also have to include Vi_temp as a particular field for each fluid and each patch
       FARGO_SAFE(AdaptFieldsFromJ (item));
@@ -157,10 +155,12 @@ real RecursiveIteration (real dt, long level)
     MULTIFLUID(ExecCommDownMean (level+1,StandardFields()));
 
     //Finer data for "level" at same date
-    MULTIFLUID(TrueBC(level, StandardFields()));
+    //MULTIFLUID is called inside this function for FillGhost
+    //Which then calls CommSame and boundaries
+    TrueBC(level, StandardFields());
     //Includes comm same and boundaries 
     
-    //MULTIFLUID(ExecCommUp (level,StandardFields()));
+    MULTIFLUID(ExecCommUp (level,StandardFields()));
     //Coarser data for "level+1" at same date
 
     return time_var;

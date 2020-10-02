@@ -49,7 +49,7 @@
 #define INF 0L
 #define SUP 1L
 #define REFINEUPPERLIMIT 100L	/* Max refinement level ever. */
-#define NGH 3L
+#define NGH 5L
 #define GHOST 0L
 #define FLUX 1L
 #define MEAN 2L
@@ -64,18 +64,18 @@
 
 #ifdef X
 #ifndef NOGHOSTX
-#define NGHX 3
+#define NGHX NGH
 #else
 #define NGHX 0
 #endif
 #endif
 
 #ifdef Y
-#define NGHY 3
+#define NGHY NGH
 #endif
 
 #ifdef Z
-#define NGHZ 3
+#define NGHZ NGH
 #endif
 
 #ifndef NGHX

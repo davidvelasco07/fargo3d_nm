@@ -614,6 +614,7 @@ void InitSurfaces()
 void SelectFluid(int n)
 {
   //Function for selecting the current fluid
+  Current_Fluid = Fluids[n]->FluidRank;
   Fluidtype = Fluids[n]->Fluidtype;
   Density = Fluids[n]->Density;
   Energy = Fluids[n]->Energy;

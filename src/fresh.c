@@ -282,8 +282,10 @@ void Output_GPU(Field *field, int line, const char *string){
 }
 
 void Output2D_CPU(Field2D *field, int line, const char *string){
+  #ifdef GPU
   *(field->fresh_cpu) = YES;
   *(field->fresh_gpu) = NO;
+  #endif
 }
 
 void Output2D_GPU(Field2D *field, int line, const char *string){
@@ -292,8 +294,10 @@ void Output2D_GPU(Field2D *field, int line, const char *string){
 }
 
 void Output2DInt_CPU(FieldInt2D *field, int line, const char *string){
+  #ifdef GPU
   *(field->fresh_cpu) = YES;
   *(field->fresh_gpu) = NO;
+  #endif
 }
 
 void Output2DInt_GPU(FieldInt2D *field, int line, const char *string){

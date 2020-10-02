@@ -23,40 +23,41 @@ int BuildFieldType(int *fieldtype, int options){
 }
 
 void BuildCommSource(FluidPatch *fluid, int *fieldtype, int nvar){
- int i, field, le=0;
- while (fluid != NULL) {
-   for (i = 0; i < nvar; i++) {
-     field = fieldtype[i];
-     centered[le][0] = centered[le][1] = centered[le][2] = 1;
-     if ( field == _Density_ ){
-       JSINPUT(fluid->Density);
-     }
-     else if ( field == _Energy_ ){
-       JSINPUT(fluid->Energy);
-     }
+	int i, field, le=0;
+ 	while (fluid != NULL) {
+		if(fluid->FluidRank == Current_Fluid){
+   			for (i = 0; i < nvar; i++) {
+     			field = fieldtype[i];
+     			centered[le][0] = centered[le][1] = centered[le][2] = 1;
+     			if ( field == _Density_ ){
+       				JSINPUT(fluid->Density);
+     			}
+     			else if ( field == _Energy_ ){
+       				JSINPUT(fluid->Energy);
+    		 	}
 #ifdef X
-     else if ( field == _Vx_ ){
-       JVINPUT(fluid->Velocity,0);
-       centered[le][_X_] = 0;
-     }
+     			else if ( field == _Vx_ ){
+       				JVINPUT(fluid->Velocity,0);
+       				centered[le][_X_] = 0;
+     			}
 #endif 
 #ifdef Y
-     else if ( field == _Vy_ ){ 
-       JVINPUT(fluid->Velocity,1);
-       centered[le][_Y_] = 0;
-     }
+     			else if ( field == _Vy_ ){ 
+       				JVINPUT(fluid->Velocity,1);
+       				centered[le][_Y_] = 0;
+     			}
 #endif
 #ifdef Z
-     else if ( field == _Vz_ ){ 
-       JVINPUT(fluid->Velocity,2);
-       centered[le][_Z_] = 0;
-     }
+    			else if ( field == _Vz_ ){ 
+       				JVINPUT(fluid->Velocity,2);
+       				centered[le][_Z_] = 0;
+     			}
 #endif
- 
-     source[le++] = fluid->Ptr[field];
-   }
-   fluid = fluid->next;
- }
+ 				source[le++] = fluid->Ptr[field];
+			}
+   		}
+   		fluid = fluid->next;
+ 	}
 }
 
 void ExecCommSame (long lev, int options){
@@ -83,6 +84,7 @@ void ExecCommSameVar (long lev, long nvar, int *fieldtype) {
     		if (com->CPU_src == CPU_Rank) {
 				fluid = com->srcg->fluid;
 				BuildCommSource(fluid,fieldtype,nvar);
+				
 				for (le = 0; le < 3; le++) {
 	  				imin[le] = com->imin_src[le];
 	  				imax[le] = com->imax_src[le];

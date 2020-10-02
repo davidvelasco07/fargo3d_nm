@@ -49,7 +49,7 @@
 #define INF 0L
 #define SUP 1L
 #define REFINEUPPERLIMIT 100L	/* Max refinement level ever. */
-#define NGH 10L
+#define NGH 3L
 #define GHOST 0L
 #define FLUX 1L
 #define MEAN 2L
@@ -64,7 +64,7 @@
 
 #ifdef X
 #ifndef NOGHOSTX
-#define NGHX 12
+#define NGHX 3
 #else
 #define NGHX 0
 #endif
@@ -641,6 +641,19 @@ a bug and obtain hints about its origin. */
     } \
     Grid_item= Grid_item->next; \
   } while (Grid_item != NULL); 
+
+#define PARENTGRID( call) \
+  for(i=0;i<Ngrids;i++){ \
+    Grid_item = Grid_CPU_list; \
+    do {   \
+      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { \
+        AdaptFieldsFromJ (Grid_item); \
+        call; \
+      } \
+      Grid_item= Grid_item->next; \
+    } while (Grid_item != NULL); \
+  }
+
 
 #define index(i,j) j+i*NFLUIDS
 

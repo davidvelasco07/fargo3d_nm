@@ -191,7 +191,7 @@ ex boolean Read2D (Field2D *, char *, char *, int);
 ex void Disk3d(void);
 
 //divrho.c Prototypes
-ex void DivideByRho_cpu(Field*);
+ex void DivideByRho_cpu(Field*,Field*);
 
 //usage.c Prototypes
 ex void PrintUsage (char *execname);
@@ -320,12 +320,15 @@ ex void write_vtk_coordinates(FILE*, Field*);
 ex void write_vtk_scalar(FILE*, Field*);
 
 //update.c
-ex void UpdateX_cpu(real, Field*, Field*, Field*);
-ex void UpdateY_cpu(real, Field*, Field*);
-ex void UpdateZ_cpu(real, Field*, Field*);
-ex void UpdateDensityX_cpu(real, Field*, Field*);
-ex void UpdateDensityY_cpu(real, Field*);
-ex void UpdateDensityZ_cpu(real, Field*);
+ex void Update_a_X_cpu(real, Field*, Field*, Field*);
+ex void Update_dens_a_X_cpu(real, Field*, Field*, Field*);
+ex void Update_b_X_cpu(Field*, Field*);
+ex void Update_a_Y_cpu(real, Field*, Field*);
+ex void Update_dens_a_Y_cpu(real, Field*, Field*);
+ex void Update_b_Y_cpu(Field*, Field*);
+ex void Update_a_Z_cpu(real, Field*, Field*);
+ex void Update_dens_a_Z_cpu(real, Field*, Field*);
+ex void Update_b_Z_cpu(Field*, Field*);
 //newvel Prototypes
 ex void NewVelocity_x_cpu (void);
 ex void NewVelocity_y_cpu (void);
@@ -532,12 +535,15 @@ ex void momenta_x_gpu(void);
 ex void momenta_y_gpu(void);
 ex void momenta_z_gpu(void);
 
-ex void UpdateX_gpu(real, Field*, Field*, Field*);
-ex void UpdateY_gpu(real, Field*, Field*);
-ex void UpdateZ_gpu(real, Field*, Field*);
-ex void UpdateDensityX_gpu(real, Field*, Field*);
-ex void UpdateDensityY_gpu(real, Field*);
-ex void UpdateDensityZ_gpu(real, Field*);
+ex void Update_a_X_gpu(real, Field*, Field*, Field*);
+ex void Update_dens_a_X_gpu(real, Field*, Field*, Field*);
+ex void Update_b_X_gpu(Field*, Field*);
+ex void Update_a_Y_gpu(real, Field*, Field*);
+ex void Update_dens_a_Y_gpu(real, Field*, Field*);
+ex void Update_b_Y_gpu(Field*, Field*);
+ex void Update_a_Z_gpu(real, Field*, Field*);
+ex void Update_dens_a_Z_gpu(real, Field*, Field*);
+ex void Update_b_Z_gpu(Field*, Field*);
 
 ex void NewVelocity_x_gpu (void);
 ex void NewVelocity_y_gpu (void);

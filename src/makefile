@@ -328,8 +328,10 @@ MAINOBJ  = LowTasks.o psys.o main.o param.o var.o usage.o   	    \
 	   compfields.o advect_shift.o rescale.o		    \
 	   momenta_x.o momenta_y.o momenta_z.o			    \
 	   reduction_sum.o reduction_min.o			    \
-	   update_x.o update_y.o update_z.o 			    \
-           update_density_x.o update_density_y.o update_density_z.o \
+	   update_a_x.o update_a_y.o update_a_z.o 		\
+	   update_dens_a_x.o update_dens_a_y.o			\
+	   update_dens_a_z.o 							\
+	   update_b_x.o update_b_y.o update_b_z.o 		\
 	   newvel_x.o newvel_y.o newvel_z.o 			\
 	   compute_residual.o change_frame.o compute_vmed.o	\
            correct_vtheta.o cfl.o cfl_b.o			\

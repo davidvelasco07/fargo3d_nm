@@ -7,18 +7,18 @@
 #include "fargo3d.h"
 //<\INCLUDES>
 
-void DivideByRho_cpu(Field *Q) {
+void DivideByRho_cpu(Field *Q, Field *Div) {
 
 //<USER_DEFINED>
   INPUT(Density);
   INPUT(Q);
-  OUTPUT(DivRho);
+  OUTPUT(Div);
 //<\USER_DEFINED>
 
 
 //<EXTERNAL>
   real* q      = Q->field_cpu;
-  real* divrho = DivRho->field_cpu;
+  real* divrho = Div->field_cpu;
   real* rho    = Density->field_cpu;
   int size_x = Nx+2*NGHX;
   int size_y = Ny+2*NGHY;

@@ -24,6 +24,7 @@ int FluidColor;   //Rows
 int DomainColor;  //Columns
 
 int Current_Level = 0;
+int Current_Fluid = 0;
 tGrid_CPU *Current_Grid;
 tGrid_CPU *Grid_item;
 int NbRestart = 0;
@@ -394,7 +395,7 @@ void (*SubStep1_z)(real);
 void (*SubStep2_a)(real);
 void (*SubStep2_b)(real);
 void (*SubStep3)(real);
-void (*DivideByRho)(Field*);
+void (*DivideByRho)(Field*,Field*);
 void (*VanLeerX_a)(Field*);
 void (*VanLeerX_b)(real,Field*,Field*,Field*);
 void (*VanLeerY_a)(Field*);
@@ -406,12 +407,15 @@ void (*momenta_y)();
 void (*momenta_z)();
 void (*reduction_SUM)(Field*,int,int,int,int); 
 void (*reduction_MIN)(Field*,int,int,int,int); 
-void (*UpdateX)(real,Field*,Field*,Field*);
-void (*UpdateY)(real,Field*,Field*);
-void (*UpdateZ)(real,Field*,Field*);
-void (*UpdateDensityX)(real,Field*,Field*);
-void (*UpdateDensityY)(real,Field*);
-void (*UpdateDensityZ)(real,Field*);
+void (*Update_a_X)(real,Field*,Field*,Field*);
+void (*Update_dens_a_X)(real,Field*,Field*,Field*);
+void (*Update_b_X)(Field*,Field*);
+void (*Update_a_Y)(real,Field*,Field*);
+void (*Update_dens_a_Y)(real,Field*,Field*);
+void (*Update_b_Y)(Field*,Field*);
+void (*Update_a_Z)(real,Field*,Field*);
+void (*Update_dens_a_Z)(real,Field*,Field*);
+void (*Update_b_Z)(Field*,Field*);
 void (*NewVelocity_x)();
 void (*NewVelocity_y)();
 void (*NewVelocity_z)();

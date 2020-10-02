@@ -304,18 +304,6 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }
-  
-  for(i=0;i<Ngrids;i++){
-    Grid_item = Grid_CPU_list; 
-    do {   
-      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { 
-        printf("Grid %d\n",Grid_item->parent);
-        AdaptFieldsFromJ (Grid_item);
-        MULTIFLUID(WriteOutputs(ALL));
-      } 
-      Grid_item= Grid_item->next;
-    } while (Grid_item != NULL); 
-  }
 
   if (StretchOldOutput == YES) {
     StretchOutput (StretchNumber);
@@ -352,46 +340,40 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   masterprint ("Standard version with no ghost zones in X\n");
 #endif
 
-
-  SelectFluid(0);
-  for(i=0;i<3;i++)
-    Energy->field_cpu[6+i+NGHY*(Nx+2*NGHX)]=0;
-  NESTEDMESHES(MULTIFLUID(FillGhosts(StandardFields() | ENERGY)))
-SelectFluid(0);
-  for(i=0;i<6;i++)
-    printf("CPU %d,Grid  %d,i %d: %lf\n",CPU_Rank,Current_Level,i,Energy->field_cpu[6+i+NGHY*(Nx+2*NGHX)]);
-  exit(0);
+  NESTEDMESHES(MULTIFLUID(FillGhosts(ENERGY);););
+ 
   for (level = 0; level <= LevMax; level++) {
     MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
   }
-  exit(0);
+  
 #ifdef STOCKHOLM 
   FARGO_for_all_patches_level (init_stockholm, 0);
 #endif
 
   tGrid_CPU *current;
   real mass, totalmass;
+  SubCycling = FULL;
   for (i = begin_i; i<=NTOT; i++) { // MAIN LOOP
     if (NINTERM * (TimeStep = (i / NINTERM)) == i) {
 
 #if defined(MHD) && defined(DEBUG)
       FARGO_SAFE(ComputeDivergence(Bx, By, Bz));
 #endif
-      if (ThereArePlanets)
-	WritePlanetSystemFile(TimeStep, NO);
+      //if (ThereArePlanets)
+	    //  WritePlanetSystemFile(TimeStep, NO);
 
       
 #ifndef NOOUTPUTS
-      MULTIFLUID(WriteOutputs(ALL));
+      PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
+
       
 #ifdef MATPLOTLIB
       Display();
 #endif
 
-      if (FluidColor == 0) {
-	if(CPU_Master)
-	  printf("OUTPUTS %d at date t = %f OK\n", TimeStep, PhysicalTime);
-      }
+      if (FluidColor == 0 && CPU_Master)
+        printf("OUTPUTS %d at date t = %f OK\n", TimeStep, PhysicalTime);
+      
 #endif
       
       if (TimeInfo == YES) GiveTimeInfo (TimeStep);
@@ -400,18 +382,26 @@ SelectFluid(0);
     
     if (NSNAP != 0) {
       if (NSNAP * (TimeStep = (i / NSNAP)) == i) {
-	MULTIFLUID(WriteOutputs(SPECIFIC));
+	      MULTIFLUID(WriteOutputs(SPECIFIC));
 #ifdef MATPLOTLIB
-	Display();
+	      Display();
 #endif
       }
     }
 
     if (i==NTOT)
       break;
-    
+  
+    dtemp = PhysicalTime+DT;
+    while (PhysicalTime < dtemp-DT/1e10){
+      PhysicalTime += RecursiveIteration (dtemp-PhysicalTime, 0L);
+      printf("First Full iteration finished\n");
+      TimeStep++;
+      PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
+      exit(0);
+    }
+
     dtemp = 0.0;
-    
     while (dtemp<DT) { // DT LOOP
       
       /// AT THIS STAGE Vx IS THE INITIAL TOTAL VELOCITY IN X

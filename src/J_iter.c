@@ -29,8 +29,8 @@ void TrueBC (long lev, int options){
   do {
     if (item->cpu == CPU_Rank) {
       if (item->level == lev) {
-	FARGO_SAFE(AdaptFieldsFromJ (item));
-	FillGhosts(options); //does a comm and boundaries() 
+	      FARGO_SAFE(AdaptFieldsFromJ (item));
+	      MULTIFLUID(FillGhosts(options)); //does a comm and boundaries() 
       }
     }
     item = item->next;
@@ -51,7 +51,7 @@ void UpdateCourantLimit (long level)
         FARGO_SAFE(AdaptFieldsFromJ (item));
 #ifndef STANDARD
 	      if (level == 0)
-	        FARGO_SAFE(ComputeVmed(Vx)); // FARGO algorithm
+	        MULTIFLUID(ComputeVmed(Vx)); // FARGO algorithm
 #endif
         MULTIFLUID(cfl());
         CflFluidsMin();
@@ -90,23 +90,31 @@ void ItereLevel (real dt, long level)
   FluidPatch *Fluid;
   
   TrueBC(level,StandardFields());
-
+  
   item = Grid_CPU_list;
   while (item != NULL) {//Source 1st half 
     if ((level == item->level) && (item->cpu == CPU_Rank)) {
+      printf("CPU%d level%d\n",CPU_Rank,level);
+      
       //To make this work Adapt... has to Change Fluids-> to point to the fluids of the grid
       //We also have to include Vi_temp as a particular field for each fluid and each patch
       FARGO_SAFE(AdaptFieldsFromJ (item));
+      #ifdef POTENTIAL
+      FARGO_SAFE(Reset_field(Total_Density)); 
+      MULTIFLUID(ComputeTotalDensity());      
+      MPI_Iallreduce(MPI_IN_PLACE, Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+		     MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
+      #endif
       MULTIFLUID(AlgoGas1 (dt));
+      
       #ifdef DRAGFORCE
-      FARGO_SAFE(DragForce(.5*dt));
+      //FARGO_SAFE(DragForce(.5*dt));
       #endif
     }
     item = item->next;
   }
- 
-  MULTIFLUID(TrueBC(level,StandardFields()));//This may be needed with a grid of processes
   
+  TrueBC(level,StandardFields());//This may be needed with a grid of processes
   
   item = Grid_CPU_list;
   while (item != NULL) {//Transport + Source 2nd half
@@ -114,12 +122,12 @@ void ItereLevel (real dt, long level)
       FARGO_SAFE(AdaptFieldsFromJ (item));
       MULTIFLUID(AlgoGas2 (dt));
       #ifdef DRAGFORCE
-      FARGO_SAFE(DragForce(.5*dt));
+      //FARGO_SAFE(DragForce(.5*dt));
       #endif
     }
     item = item->next;
   }
-  
+
   LevelHasChangedSinceCFL[level] = YES;
 }
 
@@ -138,20 +146,23 @@ real RecursiveIteration (real dt, long level)
     RecursiveIteration (dt/(real)TimeStepRatio[level], level+1);
     if (TimeStepRatio[level] > 1)
       RecursiveIteration (dt/(real)TimeStepRatio[level], level+1);
-    FARGO_SAFE(ExecCommDownFlux (level+1));
+    
+    MULTIFLUID(ExecCommDownFlux (level+1));
+    
     //This allows "level" to overwrite fluxes during transport
     time_var = LevelDate[level+1]-LevelDate[level];
     ItereLevel (time_var, level);
     LevelDate[level] = LevelDate[level+1];
    
-    FARGO_SAFE(ExecCommDownMean (level+1,StandardFields()));
+    MULTIFLUID(ExecCommDownMean (level+1,StandardFields()));
+
     //Finer data for "level" at same date
-    FARGO_SAFE(TrueBC(level, StandardFields()));
+    MULTIFLUID(TrueBC(level, StandardFields()));
     //Includes comm same and boundaries 
     
-    FARGO_SAFE(ExecCommUp (level,StandardFields()));
+    //MULTIFLUID(ExecCommUp (level,StandardFields()));
     //Coarser data for "level+1" at same date
-     
+
     return time_var;
   } else {/* Finest level */
     dt_cfl_loc = CourantLimitGlobal () / (real)BaseStepRatio[level];

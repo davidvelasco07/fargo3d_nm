@@ -341,10 +341,10 @@ of Metric.
     F3Dfluid->Vx0->field_cpu = fluid->Vx0->Field;
     #endif
     #ifdef Y
-    F3Dfluid->Vy0->field_cpu = fluid->Vx0->Field;
+    F3Dfluid->Vy0->field_cpu = fluid->Vy0->Field;
     #endif
     #ifdef Z
-    F3Dfluid->Vz0->field_cpu = fluid->Vx0->Field;
+    F3Dfluid->Vz0->field_cpu = fluid->Vz0->Field;
     #endif
     #endif
 
@@ -411,6 +411,7 @@ of Metric.
 #endif
     desc->Fluids[i] = F3Dfluid;
     fluid->FluidRank = global_fluid_id;
+    F3Dfluid->FluidRank = global_fluid_id;
     printf("Fluid %d\n",fluid->FluidRank);
     printf("%s\n",F3Dfluid->Density->name);
     

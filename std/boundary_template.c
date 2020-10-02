@@ -9,6 +9,8 @@
 #define RIGHT 1
 #define DOWN  2
 #define UP    3
+#define LOW   4
+#define HIGH  5
 //<\INCLUDES>
 
 void boundary_%side () {
@@ -22,6 +24,8 @@ void boundary_%side () {
   int __attribute__((unused))i;
   int __attribute__((unused))j;
   int __attribute__((unused))k;
+  int __attribute__((unused))iact;
+  int __attribute__((unused))igh;
   int __attribute__((unused))jact;
   int __attribute__((unused))jgh;
   int __attribute__((unused))kact;
@@ -31,12 +35,13 @@ void boundary_%side () {
 
 //<EXTERNAL>
   %pointerfield;
-  int size_x = Nx+2*NGHX;
+  int size_x = %size_x;
   int size_y = %size_y;
   int size_z = %size_z;
   int nx = Nx;
   int ny = Ny;
   int nz = Nz;
+  int nghx = NGHX;
   int nghy = NGHY;
   int nghz = NGHZ;
   int pitch  = Pitch_cpu;

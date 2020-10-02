@@ -99,6 +99,7 @@ struct field { //Multiple fields on code (density, vx, vy,...)
 struct fluid {
   char *name;
   int Fluidtype;
+  int FluidRank;
   struct field2D *VxMed;
   struct field *Density;
   struct field *Energy;

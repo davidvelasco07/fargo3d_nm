@@ -91,6 +91,11 @@ void Repartition(long *nx, long ncpu, long *MX, long level)
         MX[j] = mx[j];
     }
   }
+  ////Hardwiring parallelization on Y direction
+  ////This has to be fixed
+  for (j = 0; j < 3; j++)
+        MX[j] = 1;
+  MX[1] = ncpu;
 }
 
 void splitgrid(tGrid *grid)
@@ -110,6 +115,7 @@ void splitgrid(tGrid *grid)
     euclid_rest[j] = (grid->ncell[j] / resol_ratio[j]) - euclid_ratio[j] * mx[j];
     grid->Ncpus[j] = mx[j];
   }
+  printf("Grid %d, CPUS (%d,%d,%d)\n",grid->number,mx[0],mx[1],mx[2]);
   for (i[0] = 0; i[0] < mx[0]; i[0]++)
   {
     for (i[1] = 0; i[1] < mx[1]; i[1]++)

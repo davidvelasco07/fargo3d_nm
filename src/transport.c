@@ -48,8 +48,8 @@ void TransportZ(Field *Q, Field *Qs, real dt) {
 }
 
 void X_advection (Field *Vx_t, real dt) {
-#ifdef X
   FluxIndex = 0;
+#ifdef X
   __VanLeerX(Density, DensStar, Vx_t, dt);
   TransportX(Mpx, Qs, Vx_t, dt);
   TransportX(Mmx, Qs, Vx_t, dt);
@@ -69,7 +69,10 @@ void X_advection (Field *Vx_t, real dt) {
 }
 
 void transport(real dt){
-
+  //This has to be done here so it can be done for each fluid at a time
+  if(Current_Level < LevMax){
+    ExecCommDownFlux (Current_Level+1);
+  }
 #ifdef X
   FARGO_SAFE(momenta_x());
 #endif
@@ -83,6 +86,7 @@ void transport(real dt){
 #ifdef Z
   FARGO_SAFE(VanLeerZ_a(Density));
   FARGO_SAFE(VanLeerZ_b(dt, Density, DensStar));
+  FluxIndex=0;
 #ifdef X
   TransportZ(Mpx, Qs, dt);
   TransportZ(Mmx, Qs, dt);
@@ -104,6 +108,7 @@ void transport(real dt){
 #ifdef Y
   FARGO_SAFE(VanLeerY_a(Density));
   FARGO_SAFE(VanLeerY_b(dt, Density, DensStar));
+  FluxIndex=0;
 #ifdef X  
   TransportY(Mpx, Qs, dt);
   TransportY(Mmx, Qs, dt);
@@ -137,10 +142,7 @@ void transport(real dt){
     FirstPassXAdvection = YES;
     X_advection (Vx, dt); // Vx => variable residual
     FirstPassXAdvection = NO;
-    //__VanLeerX= VanLeerX;
-    //__VanLeerX= VanLeerX_PPA;
     X_advection (Vx_temp, dt); // Vx_temp => fixed residual @ given r. This one only is done with PPA
-    __VanLeerX = VanLeerX;
     AdvectSHIFT(Mpx, Nshift);
     AdvectSHIFT(Mmx, Nshift);
 #ifdef Y

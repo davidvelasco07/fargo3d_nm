@@ -119,6 +119,7 @@ struct fluid {
   struct field2D *Vy0;
   struct field2D *Vz0;
 #endif
+  real *Fluxes[3][2];
 };
 
 struct field2D { //Multiple 2D fields on code (azimuthal averages, etc.)

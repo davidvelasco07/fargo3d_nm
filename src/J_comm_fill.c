@@ -395,9 +395,6 @@ void ExecCommDownFlux (long lev) {
 #ifdef ADIABATIC
   nvar+=1;	/* Energy flux */
 #endif
-#ifdef LABELED
-  nvar+=1;	
-#endif
   while (com != NULL) {
     if ((com->dest_level == lev-1) && (com->src_level == lev) && (com->type == FLUX)) {
       if (com->CPU_src == CPU_Rank) {
@@ -413,10 +410,11 @@ void ExecCommDownFlux (long lev) {
 		  if ((csizes[i]/dr[i] != csized[i]) && (i != dim))
 		    prs_error ("Flux communicator size internal error.");
 		}
-		le = 0;
 		fluid = com->srcg->fluid;
 		while (fluid != NULL) {
-		  source = fluid->Fluxes[dim][side];
+			if(fluid->FluidRank == Current_Fluid){	
+		  		source = fluid->Fluxes[dim][side];
+			}
 		  fluid = fluid->next;
 		}
 		dimp1 = (dim == 0);

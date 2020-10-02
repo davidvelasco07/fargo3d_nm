@@ -145,8 +145,6 @@ real RecursiveIteration (real dt, long level)
     if (TimeStepRatio[level] > 1)
       RecursiveIteration (dt/(real)TimeStepRatio[level], level+1);
     
-    MULTIFLUID(ExecCommDownFlux (level+1));
-    
     //This allows "level" to overwrite fluxes during transport
     time_var = LevelDate[level+1]-LevelDate[level];
     ItereLevel (time_var, level);

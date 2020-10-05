@@ -14,7 +14,7 @@ real dtemp = 0.0;
 
 int main(int argc, char *argv[]) {
   
-  int   i=0, OutputNumber = 0, d, level;
+  int   i=0, j, OutputNumber = 0, d, level;
   char  sepline[]="===========================";
   tGrid_CPU *grid;
   FluidPatch *fluid;
@@ -348,19 +348,17 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   real mass, totalmass;
   SubCycling = FULL;
   for (i = begin_i; i<=NTOT; i++) { // MAIN LOOP
-    if (NINTERM * (TimeStep = (i / NINTERM)) == i) {
+    if (NINTERM * (TimeStep = i / NINTERM) == i) {
 
 #if defined(MHD) && defined(DEBUG)
       FARGO_SAFE(ComputeDivergence(Bx, By, Bz));
 #endif
-      //if (ThereArePlanets)
-	    //  WritePlanetSystemFile(TimeStep, NO);
-
-      
+      if (ThereArePlanets)
+	      WritePlanetSystemFile(TimeStep, NO);
+ 
 #ifndef NOOUTPUTS
       PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
-
-      
+    
 #ifdef MATPLOTLIB
       Display();
 #endif
@@ -370,7 +368,6 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #endif
       
       if (TimeInfo == YES) GiveTimeInfo (TimeStep);
-
     }
     
     if (NSNAP != 0) {
@@ -381,28 +378,36 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #endif
       }
     }
-
-    if (i==NTOT)
+    if (i>=NTOT)
       break;
-  
+
     dtemp = PhysicalTime+DT;
     while (PhysicalTime < dtemp-DT/1e10){
       PhysicalTime += RecursiveIteration (dtemp-PhysicalTime, 0L);
-      TimeStep++;
-      printf(".");
-      PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
-      if(TimeStep > 10){
-        printf("\n");
-        exit(0);
+      Timestepcount++;
+      if (FluidColor == 0) {
+	      if(CPU_Master) {
+	        if (FullArrayComms)
+	          printf("%s", "!");
+	        else {
+	          if (ContourComms)
+	            printf("%s", ":");
+	          else
+	            printf("%s", ".");
+	        }
+        }
       }
-        
+#ifndef NOFLUSH
+      fflush(stdout);
+#endif
+      FullArrayComms = 0;
+      ContourComms = 0;
     }
-    printf("\n");
-    //PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
+    if (FluidColor == 0)
+      if(CPU_Master)
+	      printf("%s", "\n");
   }
-  
   MPI_Finalize();
-  
   masterprint("End of the simulation!\n");
   return 0;  
 }

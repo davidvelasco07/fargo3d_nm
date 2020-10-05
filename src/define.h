@@ -643,7 +643,7 @@ a bug and obtain hints about its origin. */
   } while (Grid_item != NULL); 
 
 #define PARENTGRID( call) \
-  for(i=0;i<Ngrids;i++){ \
+  for(j=0;j<Ngrids;j++){ \
     Grid_item = Grid_CPU_list; \
     do {   \
       if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { \

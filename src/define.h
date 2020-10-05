@@ -646,7 +646,7 @@ a bug and obtain hints about its origin. */
   for(j=0;j<Ngrids;j++){ \
     Grid_item = Grid_CPU_list; \
     do {   \
-      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == i) { \
+      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == j) { \
         AdaptFieldsFromJ (Grid_item); \
         call; \
       } \

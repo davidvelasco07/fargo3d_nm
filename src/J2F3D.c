@@ -81,29 +81,25 @@ void Adapt_for_JUPITER(char *filename)
 
   if (!Restart)
   {
-    printf("\n BEFORE  ScanGridFile \n");
     FARGO_SAFE(ScanGridFile(filename));
-    //    MPI_Barrier (MPI_COMM_WORLD);	/* All processes will have to read the above written file */
-    printf("\n AFTER ScanGridFile \n");
+    printf("\nGrid File Scanned \n");
   }
   else
   {
-    printf("\n BEFORE  ReadGrids \n");
     ReadGrids(NbRestart, grids);
-    printf("\n AFTER  ReadGrids \n");
+    printf("\nRead Grids \n");
     ConstructGrids(grids);
   }
-  //FARGO_SAFE(ScanGridFile (filename));
+
   grid = GridList;
   //At this point we have built the tgrids
   while (grid != NULL)
   {
     splitgrid(grid);
     Ngrids++;
+    printf("Grid %d N(%d,%d)\n",grid->number,grid->ncell[0],grid->ncell[1]);
     grid = grid->next;
   }
-  printf("Number of grids = %d\n", Ngrids);
-
   //At this point we have built the CPUgrids
   FARGO_SAFE(BuildCommunicators());
   //At this point we have built the COMMUNICATORS

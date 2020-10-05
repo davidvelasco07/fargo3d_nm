@@ -16,12 +16,12 @@ FLUIDS := 0 1 2
 NFLUIDS = 3
 
 # Parallel fluids flags
-NDOMAINS = 2
+NDOMAINS = 1
 
 FARGO_OPT += -DNFLUIDS=${NFLUIDS}
 FARGO_OPT += -DNDOMAINS=${NDOMAINS}
 #-----------------------------------------------------------
-
+FARGO_OPT += -DSTANDARD
 #MONITOR_SCALAR = MASS | MOM_X | TORQ
 #MONITOR_Y_RAW  = TORQ
 
@@ -45,7 +45,12 @@ FARGO_OPT += -DSTOKESNUMBER
 #Damping conditions
 FARGO_OPT += -DSTOCKHOLM
 
-FARGO_OPT += -DLONGSUMMARY
+#FARGO_OPT += -DLONGSUMMARY
+
+#Nested Meshes
+COMM = INTERNAL
+FARGO_OPT += -DCOMMADAPT
+#FARGO_OPT += -DRELNESTING
 
 #Cuda blocks
 ifeq (${GPU}, 1)

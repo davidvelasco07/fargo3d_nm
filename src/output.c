@@ -273,11 +273,11 @@ void WriteField(Field *f, int n) {
 void WriteFieldGhost(Field *f, int n) { // Diagnostic function
   int i,j,k;
   char filename[200];
-  FILE *fo;
-  INPUT (f);
-  sprintf(filename, "%s%s%d_%d.dat", OUTPUTDIR, f->name, n, CPU_Rank);
-  fo = fopen(filename,"w");
-  for (k=0; k<Nz+2*NGHZ; k++) { //Write grid with ghost cells
+  FILE *fo;  INPUT (f); 
+  printf("------------>%d %d %d %d %d\n", Nx,Ny, NGHX, NGHY, NGHZ);
+  sprintf(filename, "%s%s%d_grid%d_%d.dat", OUTPUTDIR, f->name, n, Current_Jupiter_Patch->parent,CPU_Rank);
+  fo = fopen(filename,"w");  
+  for (k=0; k<Nz+2*NGHZ; k++) {//Write grid with ghost cells
     for (j=0; j<Ny+2*NGHY; j++) {
       fwrite(f->field_cpu+j*(Nx+2*NGHX)+k*Stride, sizeof(real), Nx+2*NGHX, fo);
     }
@@ -301,29 +301,22 @@ void WriteMerging(Field *f, int n) {
     MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
   }
 
-  if (CPU_Master){ //An inefficient way to delete a file...
-    fo = fopen(outname, "w");
-    fclose(fo);
-    fo = fopen(outname, "a+");
-  }
-  else 
-    fo = fopen(outname, "a+");
-
-  if (CPU_Rank < CPU_Number-1) {  // Force sequential read
-    MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
-  }
-
+  if (CPU_Master) fo = fopen(outname, "w");
+  else fo = fopen(outname, "a+");
+  
   for (k=0; k<NZ; k++) {
     for (j = 0; j<Ncpu_x; j++) {
       if ((J==j) && (k>=Z0) && (k<(Z0+Nz))) {
 	      for (jj = NGHY; jj < Ny+NGHY; jj++)
 	        fwrite(f->field_cpu+(k-Z0+NGHZ)*Stride+jj*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
       }
-      fflush(fo);
-      MPI_Barrier(DomainComm);
     }
   }
   fclose(fo);
+  if (CPU_Rank < CPU_Number-1) {  // Force sequential read
+    MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
+  }
+  
 }
 
 void Write_offset(int file_offset, char* fieldname, char* fluidname){

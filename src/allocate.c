@@ -85,11 +85,12 @@ Fluid *CreateFluid(char *name, int fluidtype) {
   f = (Fluid *) malloc(sizeof(Fluid));
   f->name = fluidname;
   f->Fluidtype = fluidtype;
-
+  
   sprintf(fieldname,"%s%s",name,"dens");
   f->Density = CreateFieldEmpty(fieldname);
   sprintf(fieldname,"%s%s",name,"energy");
   f->Energy  = CreateFieldEmpty(fieldname);  
+  f->VxMed = NULL;
   CreateField2D (&(f->VxMed),"VxMed", YZ, 0);  
 #ifdef X
   sprintf(fieldname,"%s%s",name,"vx");
@@ -232,7 +233,6 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
     size1 = Nx+2*NGHX;
     size2 = Ny+2*NGHY;
   }
-  
   if (*ptr == NULL) {
     *ptr = field = (Field2D *) malloc(sizeof(Field));
     if (field == NULL) 
@@ -274,13 +274,10 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
   size = (field->desc->Pitch2D)*size2;
   if (field->field_gpu == NULL || size > field->size || field->desc->Pitch2D == -1){
     if(cudaMallocPitch(&arr_gpu, &pitch, size1*sizeof(real), size2) == cudaSuccess){
-      //printf("Field %s level %d has been created on the GPU\n", name, field->desc->level);
-      //printf("Pitch = %d bytes (%d elements) size1 %d size2 %d \n", (int)pitch, (int)(pitch/sizeof(real)),size1,size2);
       field->field_gpu = (real*)arr_gpu;
       field->pitch = pitch; //number of elements
       field->desc->Pitch2D = pitch/sizeof(real);
       field->size = (field->desc->Pitch2D)*size2;
-      //printf("Maxsize2D %d\n",field->size);
     }
     else{
       printf("There was an error allocating %s on the GPU.\n", field->name);

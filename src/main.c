@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(FluidsComm, &CPU_ColumnNumber);
   
   printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
-  
+ 
   CPU_Rank   = CPU_RowRank;
   CPU_Number = CPU_RowNumber;
   
@@ -219,7 +219,6 @@ int main(int argc, char *argv[]) {
     YMAX *= ORBITALRADIUS;
     DT   *= sqrt(ORBITALRADIUS*ORBITALRADIUS*ORBITALRADIUS);
   }
-
 
   SubsDef (OUTPUTDIR, DefaultOut);
 
@@ -264,7 +263,6 @@ int main(int argc, char *argv[]) {
 		  ChangeArch adds _cpu or _gpu if GPU is activated.*/
   
   Adapt_for_JUPITER (ParameterFile);
-  
   //split(&Gridd); /*Split mesh over PEs*/
   //InitSpace();
   //WriteDim();
@@ -305,10 +303,6 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     // custom scaling laws may be applied several times).
   }
 
-  if (StretchOldOutput == YES) {
-    StretchOutput (StretchNumber);
-  }
-
   /* This must be placed ***after*** reading the input files in case of a restart */
   if ((ArrayNb) && (EarlyOutputRename == NO)) {
     i = strlen(OUTPUTDIR);
@@ -341,7 +335,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #endif
 
   NESTEDMESHES(MULTIFLUID(FillGhosts(ENERGY);););
- 
+
   for (level = 0; level <= LevMax; level++) {
     MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
   }
@@ -373,7 +367,6 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 
       if (FluidColor == 0 && CPU_Master)
         printf("OUTPUTS %d at date t = %f OK\n", TimeStep, PhysicalTime);
-      
 #endif
       
       if (TimeInfo == YES) GiveTimeInfo (TimeStep);
@@ -395,127 +388,17 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     dtemp = PhysicalTime+DT;
     while (PhysicalTime < dtemp-DT/1e10){
       PhysicalTime += RecursiveIteration (dtemp-PhysicalTime, 0L);
-      printf("First Full iteration finished\n");
       TimeStep++;
+      printf(".");
       PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
-      exit(0);
-    }
-
-    dtemp = 0.0;
-    while (dtemp<DT) { // DT LOOP
-      
-      /// AT THIS STAGE Vx IS THE INITIAL TOTAL VELOCITY IN X
-#ifdef X
-#ifndef STANDARD
-      MULTIFLUID(ComputeVmed(Vx)); // FARGO algorithm -- very important to have it here!
-#endif
-#endif
-      /// NOW THE 2D MESH VxMed CONTAINS THE AZIMUTHAL AVERAGE OF Vx in X
-
-#ifdef FLOOR
-      MULTIFLUID(Floor());
-#endif
-
-#ifdef MHD
-#ifdef OHMICDIFFUSION
-      FARGO_SAFE(OhmicDiffusion_coeff());
-#endif
-#ifdef AMBIPOLARDIFFUSION
-      FARGO_SAFE(AmbipolarDiffusion_coeff());
-#endif
-#ifdef HALLEFFECT
-      FARGO_SAFE(HallEffect_coeff());
-#endif
-#endif
-
-      // CFL condition is applied below ----------------------------------------
-      MULTIFLUID(cfl());
-      
-      CflFluidsMin(); /*Fills StepTime with the " global min " of the
-			cfl, computed from each fluid.*/
-      dt = StepTime; //cfl works with the 'StepTime' global variable.
-      
-      dtemp+=dt;
-      if(dtemp>DT)  dt = DT - (dtemp-dt); //updating dt
-      //------------------------------------------------------------------------
-      
-      //------------------------------------------------------------------------
-      /* We now compute the total density of the mesh. We need first
-	 reset an array and then fill it by adding the density of each
-	 fluid */
-#ifdef POTENTIAL
-      FARGO_SAFE(Reset_field(Total_Density)); 
-      MULTIFLUID(ComputeTotalDensity());      
-      MPI_Iallreduce(MPI_IN_PLACE, Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
-		     MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
-#endif
-      //------------------------------------------------------------------------
-      
-#ifdef COLLISIONPREDICTOR
-      FARGO_SAFE(Collisions(0.5*dt, 0)); // 0 --> V is used and we update v_half.
-#endif
-      
-      //MULTIFLUID(Sources(dt)); //v_half is used in the R.H.S
-
-#ifdef DRAGFORCE
-      FARGO_SAFE(DragForce(dt));
-#endif
-#ifdef DRAGFORCEALL
-      FARGO_SAFE(Collisions(dt, 1));
-#endif
-      
-#ifdef DUSTDIFFUSION
-      FARGO_SAFE(DustDiffusion_Main(dt));
-#endif
-      
-      //MULTIFLUID(Transport(dt));
-
-      PhysicalTime+=dt;
-      Timestepcount++;
-
-#ifdef STOCKHOLM
-      MULTIFLUID(StockholmBoundary(dt));
-#endif
-
-      //We apply comms and boundaries at the end of the step
-      MULTIFLUID(FillGhosts(PrimitiveVariables()));
-
-
-      if (FluidColor == 0) {
-	if(CPU_Master) {
-	  if (FullArrayComms)
-	    printf("%s", "!");
-	  else {
-	    if (ContourComms)
-	      printf("%s", ":");
-	    else
-	      printf("%s", ".");
-	  }
-	}
+      if(TimeStep > 10){
+        printf("\n");
+        exit(0);
       }
-#ifndef NOFLUSH
-      fflush(stdout);
-#endif
-      FullArrayComms = 0;
-      ContourComms = 0;
+        
     }
-
-    if (FluidColor == 0) {
-      if(CPU_Master)
-	printf("%s", "\n");
-    }
-    
-    MULTIFLUID(MonitorGlobal (MONITOR2D      |	\
-			      MONITORY       |	\
-			      MONITORY_RAW   |	\
-			      MONITORSCALAR  |	\
-			      MONITORZ       |	\
-			      MONITORZ_RAW));
-
-    if (ThereArePlanets) {
-      WritePlanetSystemFile(TimeStep, YES);
-      SolveOrbits (Sys);
-    }
+    printf("\n");
+    //PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
   }
   
   MPI_Finalize();

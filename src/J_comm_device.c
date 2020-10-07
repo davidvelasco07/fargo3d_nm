@@ -208,7 +208,7 @@ void FillCommArrays()
       grid->gpuparms.sizey = grid->ncell[1];
       grid->gpuparms.sizez = grid->ncell[2];
 
-      cudaMalloc((void **)&grid->centered_gpu, nvar * sizeof(int));
+      cudaMalloc((void **)&grid->centered_gpu, nvar * 3 * sizeof(int));
       cudaMalloc((void **)&grid->source, nvar * sizeof(real));
       cudaMalloc((void **)&grid->dest, nvar * sizeof(real));
 
@@ -543,7 +543,6 @@ void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *f
   int n;
   int nbreq = 0;
   int parity, dimc;
-
   while (comm != NULL)
   {
     if ((comm->dest_level == levdest) && (comm->src_level == levsrc))
@@ -558,10 +557,9 @@ void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *f
         MPI_Isend(comm->bufferGPU.ptr, comm->yzsize * nvar * comm->bufferGPU.pitch / sizeof(real),
                   MPI_DOUBLE, comm->CPU_dest, comm->facedim,
                   DomainComm, Req + nbreq++);
+        check_errors("mpi src sends to buffer");
 #endif
       }
-      check_errors("mpi src sends to buffer");
-
       if ((comm->CPU_dest != comm->CPU_src && comm->CPU_dest == CPU_Rank))
       {
 #ifdef FLOAT
@@ -572,16 +570,14 @@ void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *f
         MPI_Irecv(comm->bufferGPU.ptr, comm->yzsize * nvar * comm->bufferGPU.pitch / sizeof(real),
                   MPI_DOUBLE, comm->CPU_src, comm->facedim,
                   DomainComm, Req + nbreq++);
+        check_errors("mpi dst recives buffer");
 #endif
       }
-      check_errors("mpi dst recives buffer");
     }
     comm = comm->next;
   }
   for (n = 0; n < nbreq; n++)
     MPI_Wait(Req + n, &stat);
-
-  MPI_Barrier(DomainComm);
   check_errors("ExecComm_gpu");
 #endif
 }
@@ -612,8 +608,9 @@ void ExecCommS_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *
                   MPI_DOUBLE, comm->CPU_dest, comm->facedim,
                   DomainComm, reqs + nbreqs++);
 #endif
+        check_errors("mpi src sends to buffer");
       }
-      check_errors("mpi src sends to buffer");
+      
 
       if (comm->CPU_dest == CPU_Rank)
       {

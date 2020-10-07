@@ -4,6 +4,7 @@
 #include "fargo3d.h"
 
 extern "C" void check_errors(const char *s) {
+  #ifdef CUDACHECK
   cudaDeviceSynchronize();
   cudaError_t  cudaError = cudaGetLastError();
   const char *error; 
@@ -12,6 +13,7 @@ extern "C" void check_errors(const char *s) {
     printf("%s in %s\n",error, s);
     exit(EXIT_FAILURE);
   }
+  #endif
 }
 
 extern "C" int DevMalloc(void **v,size_t size) {

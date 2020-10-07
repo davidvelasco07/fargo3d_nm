@@ -1,7 +1,12 @@
 #include "fargo3d.h"
 
 void _CondInit() {
-  
+  //This is now needed for gpus
+  OUTPUT(Density);
+  OUTPUT(Energy);
+  OUTPUT(Vx);
+  OUTPUT(Vy);
+
   int i,j,k;
   real r, omega;
   

@@ -615,6 +615,7 @@ void SelectFluid(int n)
 {
   int i, j;
   //Function for selecting the current fluid
+  Fluids[n] = Current_Jupiter_Patch->Fluids[n];
   Current_Fluid = Fluids[n]->FluidRank;
   Fluidtype = Fluids[n]->Fluidtype;
   Density = Fluids[n]->Density;

@@ -336,10 +336,9 @@ of Metric.
       sprintf(dust_name, "dust%d", global_fluid_id);
       desc->fluid = CreateFluidPatch(desc, dust_name, DUST);
     }
+    AdaptFieldsFromJ(desc);
     fluid = desc->fluid;
     F3Dfluid = CreateFluid(fluid->Name, fluid->Fluidtype);
-    printf("Lets see\n");
-    exit(0);
     F3Dfluid->Density->field_cpu = fluid->Density->Field;
     F3Dfluid->Energy->field_cpu = fluid->Energy->Field;
 #ifdef X

@@ -90,7 +90,7 @@ void Adapt_for_JUPITER(char *filename)
     printf("\nRead Grids \n");
     ConstructGrids(grids);
   }
-
+  
   grid = GridList;
   //At this point we have built the tgrids
   while (grid != NULL)
@@ -117,14 +117,13 @@ void AdaptFieldsFromJ(tGrid_CPU *grid)
     int di, i, j, k;
     size_t pitch;
     Current_Jupiter_Patch = grid;
-    for (i = 0; i < NFluids_per_rank; i++)
-      Fluids[i] = grid->Fluids[i]; //Array of fluids of this grid
+    //for (i = 0; i < NFluids_per_rank; i++)
+    //  Fluids[i] = grid->Fluids[i]; //Array of fluids of this grid
 
     for (i = 0; i < 3; i++)
     {
       for (j = 0; j < 2; j++)
       {
-        Fluxes[i][j] = grid->fluid->Fluxes[i][j];
         LocalBC[i][j] = (int)(grid->iface[i][j]);
       }
     }

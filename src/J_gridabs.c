@@ -22,7 +22,8 @@ void GridPos (GridFileInfo *grids)
   long i,j,levmax,lp,level;
   long occupyg;
   i=0;
-  occupyg =  (level > 0 ? (NGH+1)/2 : 1);  //<<<<< CREO QUE ENCONTRE EL ERROR ;) ESTO HACE QUE Ncell0[0]/occuypg VALGA CERO
+  occupyg =  1; //(level > 0 ? (NGH+1)/2 : 1);
+  //<<<<< CREO QUE ENCONTRE EL ERROR ;) ESTO HACE QUE Ncell0[0]/occuypg VALGA CERO
   do {
     level = grids[i].level;
     for (j = 0; j < 3; j++) {

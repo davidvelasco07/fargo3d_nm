@@ -398,8 +398,9 @@ GPU_OBJBLOCKS =  CompPresIso_gpu.o CompPresAd_gpu.o 		\
 	   vanleer_y_a_gpu.o vanleer_y_b_gpu.o 			\
 	   vanleer_z_a_gpu.o vanleer_z_b_gpu.o 			\
 	   momenta_x_gpu.o momenta_y_gpu.o momenta_z_gpu.o	\
-	   update_x_gpu.o update_y_gpu.o update_z_gpu.o 	\
-	   update_density_x_gpu.o update_density_y_gpu.o update_density_z_gpu.o\
+	   update_a_x_gpu.o update_a_y_gpu.o update_a_z_gpu.o   \
+	   update_dens_a_x_gpu.o update_dens_a_y_gpu.o		\
+	   update_dens_a_z_gpu.o update_b_x_gpu.o update_b_y_gpu.o update_b_z_gpu.o\
            newvel_x_gpu.o newvel_y_gpu.o newvel_z_gpu.o 	\
 	   advect_shift_gpu.o compute_residual_gpu.o 		\
 	   change_frame_gpu.o potential_gpu.o 			\
@@ -436,7 +437,7 @@ GPU_OBJBLOCKS =  CompPresIso_gpu.o CompPresAd_gpu.o 		\
 	   compute_jx_gpu.o compute_jy_gpu.o compute_jz_gpu.o   \
            dragforce_sumc_gpu.o dragforce_sumcv_gpu.o           \
            dragforce_updatevel_gpu.o dragforce_coeff_gpu.o J_comm_kernels.o	\
-	   J_comm_exec_kernels.o J_correct_kernels.o
+	   J_comm_exec_kernels.o J_correct_kernels.o J_faceflux_kernels.o
 #</CUDA OBJECTS>
 #---------------------------------------------------------------------
 
@@ -663,7 +664,25 @@ reduction_min_device.o: reduction_min_device.cu
 	@/bin/cp -f $< $(ARCHDIR)
 	@${NVCC} $^ -c ${CUDAOPT} ${CUDAINC} ${INCLUDE}	${FARGO_OPT}
 
+J_comm_kernels.o: J_comm_kernels.cu
+	@echo NVCC $< "==>" $*.o
+	@/bin/cp -f $< $(ARCHDIR)
+	@${NVCC} $^ -c ${CUDAOPT} ${CUDAINC} ${INCLUDE} ${FARGO_OPT} 
 
+J_comm_exec_kernels.o: J_comm_exec_kernels.cu
+	@echo NVCC $< "==>" $*.o
+	@/bin/cp -f $< $(ARCHDIR)
+	@${NVCC} $^ -c ${CUDAOPT} ${CUDAINC} ${INCLUDE} ${FARGO_OPT} 
+
+J_correct_kernels.o: J_correct_kernels.cu
+	@echo NVCC $< "==>" $*.o
+	@/bin/cp -f $< $(ARCHDIR)
+	@${NVCC} $^ -c ${CUDAOPT} ${CUDAINC} ${INCLUDE}	${FARGO_OPT}
+
+J_faceflux_kernels.o: J_faceflux_kernels.cu
+	@echo NVCC $< "==>" $*.o
+	@/bin/cp -f $< $(ARCHDIR)
+	@${NVCC} $^ -c ${CUDAOPT} ${CUDAINC} ${INCLUDE}	${FARGO_OPT}
 # If HARDBOUNDARIES is set in the .opt file, boundaries are not created by the script
 ifneq (-DHARDBOUNDARIES,${findstring -DHARDBOUNDARIES,${FARGO_OPT}})
 ymin_bound_%.o: ymin_bound_%.c ${GLOBAL}

@@ -154,21 +154,14 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
     Maxsize2D_cpu = Size2D;
     printf("Maxsize2D_cpu = %d\n", Maxsize2D_cpu);
   }
-  nvar = 3 + NDIM; //Density,Energy,Potential,Velocity
-#ifdef RADIATIVE_TRANSFER
-  nvar += 2; //EnergyRad,Qplus
-#endif
-#ifdef LABELED
-  nvar += 1;
-#endif
+  nvar = 2 + NDIM; //Density,Energy,Velocity
   StartField = prs_malloc(sizeof(real) * (Size * nvar + Size2D * 5));
   /* Global contiguous allocation */
   patch->StartField = StartField;
   Density = CreateScalarField(desc, "density", StartField); /* Density MUST be the first field (see function ResetPatch below) */
   Energy = CreateScalarField(desc, "energy", StartField + Size);
   Velocity = CreateVectorField(desc, "velocity", StartField + 2 * Size);
-  jump = (2 + NDIM);
-  V_temp = CreateVectorField(desc, "v_temp", StartField + jump * Size);
+  V_temp = CreateVectorField(desc, "v_temp", StartField + nvar * Size);
 
   patch->Ptr[_Density_] = Density->Field;
   patch->Ptr[_Energy_] = Energy->Field;
@@ -239,9 +232,6 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
 #ifdef ADIABATIC
   nvar++; //Energy flux
 #endif
-#ifdef LABELED
-  nvar++;
-#endif
   for (dim = 0; dim < 3; dim++)
   { // 3, not NDIM
     dimp1 = (dim == 0);
@@ -261,16 +251,16 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   cudaMemcpy(patch->FluxesGPU, &Fluxes, 6 * sizeof(real), cudaMemcpyHostToDevice);
 #endif
 #ifdef X
-  patch->Vx0 = CreateScalarField2D(desc, "vx0", StartField + (3 + NDIM) * Size);
+  patch->Vx0 = CreateScalarField2D(desc, "vx0", StartField + (2+2*NDIM) * Size);
 #endif
 #ifdef Y
-  patch->Vy0 = CreateScalarField2D(desc, "vy0", StartField + (3 + NDIM) * Size + Size2D);
+  patch->Vy0 = CreateScalarField2D(desc, "vy0", StartField + (2+2*NDIM) * Size + Size2D);
 #endif
 #ifdef Z
-  patch->Vz0 = CreateScalarField2D(desc, "vz0", StartField + (3 + NDIM) * Size + Size2D * 2);
+  patch->Vz0 = CreateScalarField2D(desc, "vz0", StartField + (2+2*NDIM) * Size + Size2D * 2);
 #endif
-  patch->Rho0 = CreateScalarField2D(desc, "rho0", StartField + (3 + NDIM) * Size + Size2D * 3);
-  patch->Energy0 = CreateScalarField2D(desc, "energy0", StartField + (3 + NDIM) * Size + Size2D * 4);
+  patch->Rho0 = CreateScalarField2D(desc, "rho0", StartField + (2+2*NDIM) * Size + Size2D * 3);
+  patch->Energy0 = CreateScalarField2D(desc, "energy0", StartField + (2+2*NDIM) * Size + Size2D * 4);
   return patch;
 }
 

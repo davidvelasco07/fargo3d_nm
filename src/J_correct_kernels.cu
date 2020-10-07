@@ -66,14 +66,14 @@ void OverWriteBoundaryFluxes_gpu (int dim)
     if ((com->destg == Current_Grid) && (dim == com->facedim) && (number != com->srcg->parent)) {
       number = com->srcg->parent;
       kernel_OWFLUX<<<grid->dst.nbCommsFlux,THREADS>>>(Flux->field_gpu, grid->gpuparms, grid->dst.BuffersFlux, grid->dst.ParmsFlux, FluxIndex, dim, number, FirstPassXAdvection);
-      cudaThreadSynchronize();
+      //cudaThreadSynchronize();
     }
     com=com->next;
   }
 #else
   if(grid->dst.nbCommsFlux !=0){ 
     kernel_OWFLUX<<<grid->dst.nbCommsFlux,THREADS>>>(Flux->field_gpu, grid->gpuparms, grid->dst.BuffersFlux, grid->dst.ParmsFlux, FluxIndex, dim, number, FirstPassXAdvection);
-    cudaThreadSynchronize();
+    //cudaThreadSynchronize();
   }
 #endif
   FluxIndex++;

@@ -290,9 +290,12 @@ of Metric.
   {
     Ymed(j) = 0.5 * (Ymin(j + 1) + Ymin(j));
   }
-  for (k = 0; k < Nz + 2 * NGHZ; k++)
-  {
-    Zmed(k) = 0.5 * (Zmin(k + 1) + Zmin(k));
+  for (k = 0; k<Nz+2*NGHZ; k++) {
+#ifdef Z
+    Zmed(k) = 0.5*(Zmin(k+1)+Zmin(k));
+#else
+    Zmed(k) = Zmin(k+1) = Zmin(k) = 0;
+#endif
   }
 
   InitSurfaces();
@@ -335,6 +338,8 @@ of Metric.
     }
     fluid = desc->fluid;
     F3Dfluid = CreateFluid(fluid->Name, fluid->Fluidtype);
+    printf("Lets see\n");
+    exit(0);
     F3Dfluid->Density->field_cpu = fluid->Density->Field;
     F3Dfluid->Energy->field_cpu = fluid->Energy->Field;
 #ifdef X
@@ -369,7 +374,7 @@ of Metric.
     F3Dfluid->Density->field_gpu = fluid->Density->Field_gpu;
     F3Dfluid->Density->fresh_cpu = &(fluid->Density->fresh_cpu);
     F3Dfluid->Density->fresh_gpu = &(fluid->Density->fresh_gpu);
-
+    
 #ifdef STOCKHOLM
     F3Dfluid->Density0->field_gpu = fluid->Rho0->Field_gpu;
     F3Dfluid->Density0->fresh_cpu = &(fluid->Rho0->fresh_cpu);

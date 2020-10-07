@@ -245,7 +245,7 @@ void UPLIL (tGrid_CPU *grid, int fields)
 {
  if(grid->src.nbCommsUp !=0){
    kernel_UPLIL<<<grid->src.nbCommsUp*fields,THREADS>>>(grid->source, grid->Ymin_d, grid->Zmin_d, OMEGAFRAME, grid->gpuparms, grid->src.BuffersUp, grid->src.ParmsUp, grid->centered_gpu, NDIM, fields);
-   cudaThreadSynchronize();
+   //cudaThreadSynchronize();
  }
 }		
 
@@ -254,15 +254,22 @@ void DOWNMEAN (tGrid_CPU *grid, int fields)
 {
   if(grid->src.nbCommsDown !=0){
     kernel_DOWNMEAN<<<grid->src.nbCommsDown*fields,THREADS>>>(grid->source,  grid->gpuparms, grid->src.BuffersDown, grid->src.ParmsDown, grid->centered_gpu, fields);
-    cudaThreadSynchronize();
+    //cudaThreadSynchronize();
   }
 }		
 
 extern "C"
 void DOWNFLUX (tGrid_CPU *grid, int fields)
 {
+  FluidPatch *fluid;
+  fluid = grid->fluid;
   if(grid->src.nbCommsFlux !=0){
-    kernel_DOWNFLUX<<<grid->src.nbCommsFlux*fields,THREADS>>>(grid->fluid->FluxesGPU, grid->gpuparms, grid->src.BuffersFlux, grid->src.ParmsFlux, fields, CPU_Rank);
-    cudaThreadSynchronize();
+    while (fluid != NULL){
+		  if (fluid->FluidRank == Current_Fluid){
+        kernel_DOWNFLUX<<<grid->src.nbCommsFlux*fields,THREADS>>>(fluid->FluxesGPU, grid->gpuparms, grid->src.BuffersFlux, grid->src.ParmsFlux, fields, CPU_Rank);
+        //cudaThreadSynchronize();
+      }
+      fluid = fluid->next;
+    }
   }
 }

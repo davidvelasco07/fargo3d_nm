@@ -159,14 +159,14 @@ void EXECUP (tGrid_CPU *grid, int fields)
     if ((com->destg == grid) && (grid->level > com->srcg->level) && (number != com->srcg->parent)) {
       number = com->srcg->parent;
       kernel_UP<<<grid->dst.nbCommsUp*fields,THREADS>>>(grid->dest, grid->Ymin_d, grid->Zmin_d, OMEGAFRAME, grid->gpuparms, grid->dst.BuffersUp, grid->dst.ParmsUp, grid->centered_gpu, fields, number);
-      cudaThreadSynchronize();
+      //cudaDeviceSynchronize();
     }
     com=com->next;
   }
 #else
   if(grid->dst.nbCommsUp !=0){
     kernel_UP<<<grid->dst.nbCommsUp*fields,THREADS>>>(grid->dest, grid->Ymin_d, grid->Zmin_d, OMEGAFRAME, grid->gpuparms, grid->dst.BuffersUp, grid->dst.ParmsUp, grid->centered_gpu, fields, number);
-    cudaThreadSynchronize();
+    //cudaDeviceSynchronize();
   }
 #endif
 }		
@@ -182,14 +182,14 @@ void EXECDOWN (tGrid_CPU *grid, int fields)
     if ((com->destg == grid) && (number != com->srcg->parent)) {
       number = com->srcg->parent;
       kernel_DOWN<<<grid->dst.nbCommsDown*fields,THREADS>>>(grid->dest,  grid->gpuparms, grid->dst.BuffersDown, grid->dst.ParmsDown, grid->centered_gpu, fields, number);
-      cudaThreadSynchronize();
+      //cudaDeviceSynchronize();
     }
     com=com->next;
   }
 #else
   if(grid->dst.nbCommsDown !=0){
     kernel_DOWN<<<grid->dst.nbCommsDown*fields,THREADS>>>(grid->dest,  grid->gpuparms, grid->dst.BuffersDown, grid->dst.ParmsDown, grid->centered_gpu, fields, number);
-    cudaThreadSynchronize();
+    //cudaDeviceSynchronize();
   }
 #endif
 }		
@@ -197,8 +197,12 @@ void EXECDOWN (tGrid_CPU *grid, int fields)
 extern "C"
 void RESETFLUX (tGrid_CPU *grid, int fields)
 {
- if(grid->src.nbCommsFlux !=0){
-   kernel_RESETFLUX<<<grid->src.nbCommsFlux*fields,THREADS>>>(grid->fluid->FluxesGPU, grid->src.ParmsFlux, fields);
-   cudaThreadSynchronize();
- }
+  FluidPatch *fluid;
+  fluid = grid->fluid;
+  if(grid->src.nbCommsFlux !=0){
+    while (fluid != NULL){
+      kernel_RESETFLUX<<<grid->src.nbCommsFlux*fields,THREADS>>>(fluid->FluxesGPU, grid->src.ParmsFlux, fields);
+      fluid = fluid->next;
+    }
+  }
 }

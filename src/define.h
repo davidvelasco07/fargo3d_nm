@@ -49,7 +49,7 @@
 #define INF 0L
 #define SUP 1L
 #define REFINEUPPERLIMIT 100L	/* Max refinement level ever. */
-#define NGH 5L
+#define NGH 10L
 #define GHOST 0L
 #define FLUX 1L
 #define MEAN 2L
@@ -59,6 +59,14 @@
 #define AUTO 1
 #define FULL 2
 #define MAXLENGTHONEDIM 512L
+
+/////////////////////
+//Communication deployment
+#define INTERNAL 0
+#define EXTERNAL 1
+#define ASYMETRIC 2
+//#define COMM INTERNAL
+
 
 // Ghost cells
 

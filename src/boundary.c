@@ -1,30 +1,29 @@
 #include "fargo3d.h"
 void boundaries() {
-
-  int global_index = FluidColor*NFluids_per_rank+FluidIndex;
-  
+  //Current_Fluid is the global fluid rank
+  //It is asigned in SelectFluid
   if (!PERIODICZ) {
 #ifdef Z
     if(LocalBC[_Z_][0] > 0)
-      boundary_zmin[global_index]();
+      boundary_zmin[Current_Fluid]();
     if(LocalBC[_Z_][1] > 0)
-      boundary_zmax[global_index]();
+      boundary_zmax[Current_Fluid]();
 #endif
   }
   if (!PERIODICY) {
 #ifdef Y
     if(LocalBC[_Y_][0] > 0)
-      boundary_ymin[global_index]();
+      boundary_ymin[Current_Fluid]();
     if(LocalBC[_Y_][1] > 0)
-      boundary_ymax[global_index]();
+      boundary_ymax[Current_Fluid]();
 #endif
   }
   if (!PERIODICX) {
 #ifdef X
     if(LocalBC[_X_][0] > 0)
-      boundary_xmin[global_index]();
+      boundary_xmin[Current_Fluid]();
     if(LocalBC[_X_][1] > 0)
-      boundary_xmax[global_index]();
+      boundary_xmax[Current_Fluid]();
 #endif
   }
 }

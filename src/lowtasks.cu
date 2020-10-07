@@ -145,3 +145,167 @@ extern "C" int Dev2Host2DInt (FieldInt2D *F) {
   return (int)cudaMemcpy2D (F->field_cpu, (Ny+2*NGHY)*sizeof(int), F->field_gpu, Pitch_Int_gpu*sizeof(int),\
 			    (Ny+2*NGHY)*sizeof(int),Nz+2*NGHZ,cudaMemcpyDeviceToHost);
 }
+
+extern "C" int JSHost2Dev3D(ScalarField *field) {
+  int status,di;
+  di=0;
+ tGrid_CPU *grid;
+  grid = field->desc;
+  di=0;
+ #ifdef X
+  int Nx = grid->ncell[di];
+  di++;
+ #else
+  int Nx = 1;
+ #endif
+ #ifdef Y
+  int Ny = grid->ncell[di];
+  di++;
+ #else
+  int Ny = 1;
+ #endif
+ #ifdef Y
+  int Nz = grid->ncell[di];
+  di++;
+ #else
+  int Nz = 1;
+ #endif
+ 
+  if (Nx +2*NGHX== 1)
+    status = cudaMemcpy2D (field->Field_gpu, grid->Stride_gpu*sizeof(real), field->Field, (Ny+2*NGHY)*sizeof(real),(Ny+2*NGHY)*sizeof(real),Nz+2*NGHZ,cudaMemcpyHostToDevice);
+  else
+     status = cudaMemcpy2D (field->Field_gpu, grid->Pitch_gpu*sizeof(real), field->Field, (Nx+2*NGHX)*sizeof(real),(Nx+2*NGHX)*sizeof(real),(Ny+2*NGHY)*(Nz+2*NGHZ),cudaMemcpyHostToDevice);
+  
+  /*if(status != 0) {
+    printf("\n-------------------------------------------------");
+    printf("\nError copying data with Host2Dev3D. Error %d.\n", status);
+    printf("--------------------------------------------------\n\n");
+    exit(1);
+   }
+   else*/ 
+     return status;
+ }
+ 
+ 
+ 
+ extern "C" int JSDev2Host3D(ScalarField *field) {
+  int status,di;
+  di=0;
+ tGrid_CPU *grid;
+  grid = field->desc;
+  di=0;
+ #ifdef X
+  int Nx = grid->ncell[di];
+  di++;
+ #else
+  int Nx = 1;
+ #endif
+ #ifdef Y
+  int Ny = grid->ncell[di];
+  di++;
+ #else
+  int Ny = 1;
+ #endif
+ #ifdef Y
+  int Nz = grid->ncell[di];
+  di++;
+ #else
+  int Nz = 1;
+ #endif
+   if (Nx+2*NGHX == 1)
+     status = cudaMemcpy2D (field->Field, (Ny+2*NGHY)*sizeof(real), field->Field_gpu, grid->Stride_gpu*sizeof(real),\
+        (Ny+2*NGHY)*sizeof(real),Nz+2*NGHZ,cudaMemcpyDeviceToHost);
+   else
+     status = cudaMemcpy2D (field->Field, (Nx+2*NGHX)*sizeof(real), field->Field_gpu, grid->Pitch_gpu*sizeof(real), \
+        (Nx+2*NGHX)*sizeof(real),(Ny+2*NGHY)*(Nz+2*NGHZ),cudaMemcpyDeviceToHost);
+   /* if(status != 0) {
+    printf("\n-------------------------------------------------");
+    printf("\nError copying data with  Dev2Host3D. Error %d.\n",status);
+    printf("--------------------------------------------------\n\n");
+    exit(1);
+   }
+   else*/ 
+     return status;
+ }
+ 
+ extern "C" int JVHost2Dev3D(VectorField *field, int dim) {
+  int status,di;
+  di=0;
+ tGrid_CPU *grid;
+  grid = field->desc;
+  di=0;
+ #ifdef X
+  int Nx = grid->ncell[di];
+  di++;
+ #else
+  int Nx = 1;
+ #endif
+ #ifdef Y
+  int Ny = grid->ncell[di];
+  di++;
+ #else
+  int Ny = 1;
+ #endif
+ #ifdef Y
+  int Nz = grid->ncell[di];
+  di++;
+ #else
+  int Nz = 1;
+ #endif
+ 
+  if (Nx +2*NGHX== 1)
+    status = cudaMemcpy2D (field->Field_gpu[dim], grid->Stride_gpu*sizeof(real), field->Field[dim], (Ny+2*NGHY)*sizeof(real),(Ny+2*NGHY)*sizeof(real),Nz+2*NGHZ,cudaMemcpyHostToDevice);
+  else
+     status = cudaMemcpy2D (field->Field_gpu[dim], grid->Pitch_gpu*sizeof(real), field->Field[dim], (Nx+2*NGHX)*sizeof(real),(Nx+2*NGHX)*sizeof(real),(Ny+2*NGHY)*(Nz+2*NGHZ),cudaMemcpyHostToDevice);
+  
+  /*if(status != 0) {
+    printf("\n-------------------------------------------------");
+    printf("\nError copying data with Host2Dev3D. Error %d.\n", status);
+    printf("--------------------------------------------------\n\n");
+    exit(1);
+   }
+   else*/ 
+     return status;
+ }
+ 
+ 
+ 
+ extern "C" int JVDev2Host3D(VectorField *field, int dim) {
+  int status,di;
+  di=0;
+ tGrid_CPU *grid;
+  grid = field->desc;
+  di=0;
+ #ifdef X
+  int Nx = grid->ncell[di];
+  di++;
+ #else
+  int Nx = 1;
+ #endif
+ #ifdef Y
+  int Ny = grid->ncell[di];
+  di++;
+ #else
+  int Ny = 1;
+ #endif
+ #ifdef Y
+  int Nz = grid->ncell[di];
+  di++;
+ #else
+  int Nz = 1;
+ #endif
+   if (Nx+2*NGHX == 1)
+     status = cudaMemcpy2D (field->Field[dim], (Ny+2*NGHY)*sizeof(real), field->Field_gpu[dim], grid->Stride_gpu*sizeof(real),\
+        (Ny+2*NGHY)*sizeof(real),Nz+2*NGHZ,cudaMemcpyDeviceToHost);
+   else
+     status = cudaMemcpy2D (field->Field[dim], (Nx+2*NGHX)*sizeof(real), field->Field_gpu[dim], grid->Pitch_gpu*sizeof(real), \
+        (Nx+2*NGHX)*sizeof(real),(Ny+2*NGHY)*(Nz+2*NGHZ),cudaMemcpyDeviceToHost);
+   /* if(status != 0) {
+    printf("\n-------------------------------------------------");
+    printf("\nError copying data with  Dev2Host3D. Error %d.\n",status);
+    printf("--------------------------------------------------\n\n");
+    exit(1);
+   }
+   else*/ 
+     return status;
+ }

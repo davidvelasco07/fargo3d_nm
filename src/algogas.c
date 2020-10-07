@@ -11,9 +11,9 @@ TimeProcess t_sub1_z;
 void FillGhosts (int var) {
 
   InitSpecificTime (&t_Comm, "MPI Communications");
-  //FARGO_SAFE(comm (var));
   FARGO_SAFE(ExecCommSame (Current_Level, var));
   GiveSpecificTime (t_Comm);
+  
   FARGO_SAFE(boundaries()); // Always after a comm.
 
 #if defined(Y)
@@ -24,10 +24,8 @@ void FillGhosts (int var) {
   if (NZ == 1)    /* Z dimension is mute */
     CheckMuteZ();
 #endif
-
 }
      
-
 void AlgoGas1(real dt) {
      
   SetupHook1 (); //Setup specific hook. Defaults to empty function.
@@ -43,10 +41,17 @@ void AlgoGas1(real dt) {
   FARGO_SAFE(ComputePressureFieldPoly());
 #endif
   //-----------------------------------------------------------------------------
-    
+
+#ifdef X
+#ifndef STANDARD
+    FARGO_SAFE(ComputeVmed(Vx)); // FARGO algorithm
+#endif
+#endif
+
   InitSpecificTime (&t_Hydro, "Eulerian Hydro (no transport) algorithms");
   
   // REGARDLESS OF WHETHER WE USE FARGO, Vx IS ALWAYS THE TOTAL VELOCITY IN X
+int i;
 
 #ifdef POTENTIAL
   MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
@@ -55,7 +60,7 @@ void AlgoGas1(real dt) {
     FARGO_SAFE(CorrectVtheta(Domega));
   }
 #endif
-  
+
 #if ((defined(SHEARINGSHEET2D) || defined(SHEARINGBOX3D)) && !defined(SHEARINGBC))
   FARGO_SAFE(NonReflectingBC(Vy));
 #endif
@@ -69,7 +74,7 @@ void AlgoGas1(real dt) {
 #ifdef Z
   FARGO_SAFE(SubStep1_z(.5*dt));
 #endif
-  
+
 #if (defined(VISCOSITY) || defined(ALPHAVISCOSITY))
   if (Fluidtype == GAS) viscosity(dt);
 #endif
@@ -102,12 +107,14 @@ void AlgoGas1(real dt) {
 #ifndef STANDARD
     FARGO_SAFE(ChangeFrame(+1, Vx, VxMed)); //Vx becomes the total, updated velocity
     VxIsResidual = NO;
-#endif //STANDARD
+#endif 
+//STANDARD
     FARGO_SAFE(copy_velocities(V2VTEMP));
-    // THIS COPIES Vx INTO Vx_temp
+// THIS COPIES Vx INTO Vx_temp
     GiveSpecificTime (t_Mhd);
   }
-#endif //END MHD----------------------------------------------------------------
+
+#endif//END MHD----------------------------------------------------------------
 
   InitSpecificTime (&t_Hydro, "Transport algorithms");
 
@@ -138,7 +145,7 @@ void AlgoGas2 (real dt) {
     FARGO_SAFE(ComputeVmed(Vx_temp)); 
 #endif
 #endif
-
+    
     transport(dt);
 
 #ifdef ADIABATIC
@@ -175,6 +182,10 @@ void AlgoGas2 (real dt) {
     *(Emfy->owner) = Emfy;
     *(Emfz->owner) = Emfz;
   }
+#endif
+
+#ifdef STOCKHOLM
+    FARGO_SAFE(StockholmBoundary(dt));
 #endif
 }
 

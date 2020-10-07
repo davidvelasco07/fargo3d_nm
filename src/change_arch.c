@@ -241,17 +241,20 @@ void ChangeArch() {
       }
       if (strcmp(name, "update") == 0) {
 	if(strval[0] == 'g'){
-	  UpdateX = UpdateX_gpu;
-	  UpdateY = UpdateY_gpu;
-	  UpdateZ = UpdateZ_gpu;
+	  Update_a_X = Update_a_X_gpu;
+	  Update_b_X = Update_b_X_gpu;
+	  Update_a_Y = Update_a_Y_gpu;
+	  Update_b_Y = Update_b_Y_gpu;
+	  Update_a_Z = Update_a_Z_gpu;
+	  Update_b_Z = Update_b_Z_gpu;
 	  printf("update runs on the GPU\n");
 	}
       }
       if (strcmp(name, "updatedensity") == 0) {
 	if(strval[0] == 'g'){
-	  UpdateDensityX = UpdateDensityX_gpu;
-	  UpdateDensityY = UpdateDensityY_gpu;
-	  UpdateDensityZ = UpdateDensityZ_gpu;
+	  Update_dens_a_X    = Update_dens_a_X_gpu;
+	  Update_dens_a_Y    = Update_dens_a_Y_gpu;
+	  Update_dens_a_Z    = Update_dens_a_Z_gpu;
 	  printf("updatedensity runs on the GPU\n");
 	}
       }

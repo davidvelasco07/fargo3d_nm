@@ -10,6 +10,7 @@
 void StockholmBoundary_cpu(real dt) {
 
 //<USER_DEFINED>
+  if (Current_Level > 0) return;
   INPUT(Density);
   INPUT2D(Density0);
   OUTPUT(Density);

@@ -513,7 +513,7 @@ ex void SubStep1_z_gpu(real);
 ex void SubStep2_a_gpu(real);
 ex void SubStep2_b_gpu(real);
 ex void SubStep3_gpu(real);
-ex void DivideByRho_gpu(Field*);
+ex void DivideByRho_gpu(Field*,Field*);
 
 ex void mon_dens_gpu(void);
 ex void mon_momx_gpu(void);
@@ -774,7 +774,7 @@ ex int JSHost2Dev3D (ScalarField*);
 ex int JSDev2Host3D (ScalarField*);
 ex int JVHost2Dev3D (VectorField*, int);
 ex int JVDev2Host3D (VectorField*, int);
-ex int BuildFieldTypes (int*, boolean);
+ex int BuildFieldType (int*, int);
 ex void ExecCommSameVar_gpu (int, int, int *);
 ex void ExecCommUpVar_gpu (int, int, int *);
 ex void ExecCommDownMeanVar_gpu(int, int, int *);

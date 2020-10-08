@@ -425,7 +425,10 @@ void ExecCommSameVar_gpu(int lev, int nvar, int *fieldtype)
     }
     comm = comm->next;
   }
+  #ifdef MPICUDA
+  //This function handles the MPI_CUDA_AWARE communications
   FARGO_SAFE(ExecComm_gpu(ComListGhost, lev, lev, nvar, fieldtype));
+  #endif
   comm = ComListGhost;
   while (comm != NULL)
   {
@@ -468,7 +471,9 @@ void ExecCommUpVar_gpu(int level, int nvar, int *fieldtype)
     }
     grid = grid->next;
   } /*Now all comms with source "grid" have been filled, next step is to communicate them to the pertinent destination grid*/
+  #ifdef MPICUDA
   FARGO_SAFE(ExecComm_gpu(ComListGhost, level, level + 1, nvar, fieldtype));
+  #endif
   grid = Grid_CPU_list;
   while (grid != NULL)
   {
@@ -497,7 +502,9 @@ void ExecCommDownMeanVar_gpu(int level, int nvar, int *fieldtype)
     }
     grid = grid->next;
   } /*Now all comms with source "grid" have been filled, next step is to communicate them to the pertinent destination grid*/
+  #ifdef MPICUDA
   FARGO_SAFE(ExecComm_gpu(ComListMean, level, level - 1, nvar, fieldtype));
+  #endif
   grid = Grid_CPU_list;
   while (grid != NULL)
   {
@@ -530,13 +537,15 @@ void ExecCommDownFlux_gpu(int level)
       DOWNFLUX(grid, nvar);
     grid = grid->next;
   }
+  #ifdef MPICUDA
   FARGO_SAFE(ExecComm_gpu(ComListFlux, level, level - 1, nvar, fieldtype));
+  #endif
 #endif
 }
 
 void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *fieldtype)
 {
-#ifdef GPU
+#ifdef MPICUDA
   //MPI_Request reqs[8], reqr[8];
   jCommunicator *commsave;
   MPI_Status stat;
@@ -579,81 +588,6 @@ void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *f
   for (n = 0; n < nbreq; n++)
     MPI_Wait(Req + n, &stat);
   check_errors("ExecComm_gpu");
-#endif
-}
-
-void ExecCommS_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *fieldtype)
-{
-#ifdef GPU
-  MPI_Request reqs[8], reqr[8];
-  long i, j, k, le, m, n, d;
-  int field, nbreqs = 0, nbreqr = 0, staggered, stagdim, displacement[3], cut[3];
-  int xmindest, ymindest, zmindest, xmaxdest, ymaxdest, zmaxdest;
-  FluidPatch *fluid;
-  //struct cudaPitchedPtr destiny[80];
-
-  while (comm != NULL)
-  {
-    if ((comm->dest_level == levdest) && (comm->src_level == levsrc))
-    {
-
-      if (comm->CPU_src != comm->CPU_dest && comm->CPU_src == CPU_Rank)
-      {
-#ifdef FLOAT
-        MPI_Isend(comm->bufferGPU.ptr, comm->yzsize * nvar * comm->bufferGPU.pitch / sizeof(real),
-                  MPI_FLOAT, comm->CPU_dest, comm->facedim,
-                  DomainComm, reqs + nbreqs++);
-#else
-        MPI_Isend(comm->bufferGPU.ptr, comm->yzsize * nvar * comm->bufferGPU.pitch / sizeof(real),
-                  MPI_DOUBLE, comm->CPU_dest, comm->facedim,
-                  DomainComm, reqs + nbreqs++);
-#endif
-        check_errors("mpi src sends to buffer");
-      }
-      
-
-      if (comm->CPU_dest == CPU_Rank)
-      {
-        le = 0;
-        xmindest = comm->imin_dest[0];
-        ymindest = comm->imin_dest[1];
-        zmindest = comm->imin_dest[2];
-        xmaxdest = comm->imax_dest[0];
-        ymaxdest = comm->imax_dest[1];
-        zmaxdest = comm->imax_dest[2];
-        comm->OnDst.srcPtr = comm->bufferGPU;
-        fluid = comm->destg->fluid;
-        BuildCommDest_gpu(fluid, fieldtype, nvar, 0);
-        if (comm->CPU_dest != comm->CPU_src)
-        {
-#ifdef FLOAT
-          MPI_Irecv(comm->bufferGPU.ptr, comm->yzsize * nvar * comm->bufferGPU.pitch / sizeof(real),
-                    MPI_FLOAT, comm->CPU_src, comm->facedim,
-                    DomainComm, reqr + nbreqr);
-#else
-          MPI_Irecv(comm->bufferGPU.ptr, comm->yzsize * nvar * comm->bufferGPU.pitch / sizeof(real),
-                    MPI_DOUBLE, comm->CPU_src, comm->facedim,
-                    DomainComm, reqr + nbreqr);
-#endif
-          MPI_Wait(reqr + nbreqr++, MPI_STATUS_IGNORE);
-          /* This WAIT instruction must be here, as we have to
-		 wait for the data to be ready to send it to the
-		 device. We therefore split send and receive requests. */
-        }
-        for (le = 0; le < nvar; le++)
-        {
-          comm->OnDst.srcPos = make_cudaPos(0, 0, le * comm->dz);
-          comm->OnDst.dstPtr = dest_gpu[le];
-          cudaMemcpy3D(&(comm->OnDst));
-          check_errors("cudaMemcpy3D");
-        }
-      }
-    }
-    comm = comm->next;
-  }
-  for (n = 0; n < nbreqs; n++)
-    MPI_Wait(reqs + n, MPI_STATUS_IGNORE);
-  MPI_Barrier(DomainComm);
 #endif
 }
 

@@ -166,7 +166,7 @@ extern "C" int JSHost2Dev3D(ScalarField *field) {
  #else
   int Ny = 1;
  #endif
- #ifdef Y
+ #ifdef Z
   int Nz = grid->ncell[di];
   di++;
  #else
@@ -208,7 +208,7 @@ extern "C" int JSHost2Dev3D(ScalarField *field) {
  #else
   int Ny = 1;
  #endif
- #ifdef Y
+ #ifdef Z
   int Nz = grid->ncell[di];
   di++;
  #else
@@ -248,7 +248,7 @@ extern "C" int JSHost2Dev3D(ScalarField *field) {
  #else
   int Ny = 1;
  #endif
- #ifdef Y
+ #ifdef Z
   int Nz = grid->ncell[di];
   di++;
  #else
@@ -290,7 +290,7 @@ extern "C" int JSHost2Dev3D(ScalarField *field) {
  #else
   int Ny = 1;
  #endif
- #ifdef Y
+ #ifdef Z
   int Nz = grid->ncell[di];
   di++;
  #else

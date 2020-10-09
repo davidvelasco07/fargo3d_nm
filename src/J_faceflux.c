@@ -7,8 +7,7 @@
 #include "fargo3d.h"
 //<\INCLUDES>
 
-void Save_Face_Flux_X() {
-#ifndef GPUCOMM
+void Save_Face_Flux_X_cpu() {
   INPUT(Flux);
 //<EXTERNAL>
   real* flux = Flux->field_cpu;
@@ -62,14 +61,22 @@ void Save_Face_Flux_X() {
 #endif
   
 //<\MAIN_LOOP>
+}
+
+void Save_Face_Flux_X() {
+#ifndef GPU
+  Save_Face_Flux_X_cpu();
+#else
+#ifndef COMMGPU
+  Save_Face_Flux_X_cpu();
 #else
   Input_GPU(Flux, __LINE__, __FILE__);
   Save_Face_Flux_X_gpu();
 #endif
+#endif
 }
 
-void Save_Face_Flux_Y() {
-#ifndef GPUCOMM
+void Save_Face_Flux_Y_cpu() {
   INPUT(Flux);
 //<EXTERNAL>
   real* flux = Flux->field_cpu;
@@ -122,14 +129,23 @@ void Save_Face_Flux_Y() {
   }
 #endif
 //<\MAIN_LOOP>
+}
+
+void Save_Face_Flux_Y() {
+#ifndef GPU
+  Save_Face_Flux_Y_cpu();
+#else
+#ifndef COMMGPU
+  Save_Face_Flux_Y_cpu();
 #else
   Input_GPU(Flux, __LINE__, __FILE__);
   Save_Face_Flux_Y_gpu();
 #endif
+#endif
 }
 
-void Save_Face_Flux_Z() {
-#ifndef GPU
+
+void Save_Face_Flux_Z_cpu() {
   INPUT(Flux);
 
 //<EXTERNAL>
@@ -183,9 +199,18 @@ void Save_Face_Flux_Z() {
   }
 #endif
 //<\MAIN_LOOP>  
+}
+
+void Save_Face_Flux_Z() {
+#ifndef GPU
+  Save_Face_Flux_Z_cpu();
+#else
+#ifndef COMMGPU
+  Save_Face_Flux_Z_cpu();
 #else
   Input_GPU(Flux, __LINE__, __FILE__);
   Save_Face_Flux_Z_gpu();
+#endif
 #endif
 }
 

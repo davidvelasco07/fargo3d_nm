@@ -295,25 +295,24 @@ void WriteMerging(Field *f, int n) {
   int i, j, k;
   
   sprintf(outname, "%s%s%d_grid%d.dat", OUTPUTDIR, f->name, n, Current_Jupiter_Patch->parent);
-
   if (CPU_Rank > 0) // Force sequential write
     MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
 
   if (CPU_Master) fo = fopen(outname, "w");
   else            fo = fopen(outname, "r+");
 
-  long offset = (Nx+2*NGHX)*Y0 + Nx*NY*Z0;
+  long offset = Nx*Y0 + Nx*NY*Z0;
 
   for (k=NGHZ; k<Nz+NGHZ; k++) {
     fseek(fo, offset*sizeof(real), SEEK_SET);
     for (j = NGHY; j < Ny+NGHY; j++) {
       fwrite(f->field_cpu+k*Stride+j*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
     }
-    offset += (Nx+2*NGHX)*NY;
+    offset += Nx*NY;
   }
 
   fclose(fo);
-  
+
   if (CPU_Rank < CPU_Number-1)  // Force sequential write
     MPI_Send (&relay, 1, MPI_INT, CPU_Rank+1, 42, DomainComm);
   

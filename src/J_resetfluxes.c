@@ -1,6 +1,6 @@
 #include "fargo3d.h"
 
-void ResetFluxesLevel(int lev)
+void ResetFluxesLevel_cpu(int lev)
 {
   int dim, side, dimp1, dimp2, k, size, nvar;
   tGrid_CPU *item;
@@ -16,7 +16,6 @@ void ResetFluxesLevel(int lev)
     {
       if (item->level == lev)
       {
-#ifndef GPUCOMM
         fluid = item->fluid;
         do{
           for (dim = 0; dim < 3; dim++)
@@ -32,12 +31,47 @@ void ResetFluxesLevel(int lev)
           }
           fluid = fluid->next;
         }while(fluid != NULL);
+      }
+    }
+    item = item->next;
+  } while (item != NULL);
+}
 
-#else
+void ResetFluxesLevel_gpu(int lev)
+{
+  int dim, side, dimp1, dimp2, k, size, nvar;
+  tGrid_CPU *item;
+  FluidPatch *fluid;
+  item = Grid_CPU_list;
+  nvar = 1 + 2 * NDIM;
+#ifdef ADIABATIC
+  nvar++;
+#endif
+  do
+  {
+    if (item->cpu == CPU_Rank)
+    {
+      if (item->level == lev)
+      {
+#ifdef GPU
+#ifdef COMMGPU
         RESETFLUX(item, nvar);
+#endif
 #endif
       }
     }
     item = item->next;
   } while (item != NULL);
+}
+
+void ResetFluxesLevel(int lev){
+#ifndef GPU
+	ResetFluxesLevel_cpu(lev);
+#else
+#ifndef COMMGPU
+	ResetFluxesLevel_cpu(lev);
+#else
+	ResetFluxesLevel_gpu(lev);
+#endif
+#endif
 }

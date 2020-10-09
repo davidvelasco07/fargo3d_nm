@@ -225,9 +225,12 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   patch->Energy = Energy;
   patch->Velocity = Velocity;
   patch->V_temp = V_temp;
-#ifdef GPUCOMM
+#ifdef GPU
+#ifdef COMMGPU
   real *Fluxes[6];
 #endif
+#endif
+
   nvar = 1 + 2 * NDIM; //Density and 2 flavors of momenta
 #ifdef ADIABATIC
   nvar++; //Energy flux
@@ -236,7 +239,12 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   { // 3, not NDIM
     dimp1 = (dim == 0);
     dimp2 = 2 - (dim == 2);
-#ifndef GPUCOMM
+
+#ifndef GPU
+    patch->Fluxes[dim][INF] = prs_malloc(size[dimp1] * size[dimp2] * nvar * sizeof(real));
+    patch->Fluxes[dim][SUP] = prs_malloc(size[dimp1] * size[dimp2] * nvar * sizeof(real));
+#else
+#ifndef COMMGPU
     patch->Fluxes[dim][INF] = prs_malloc(size[dimp1] * size[dimp2] * nvar * sizeof(real));
     patch->Fluxes[dim][SUP] = prs_malloc(size[dimp1] * size[dimp2] * nvar * sizeof(real));
 #else
@@ -245,7 +253,9 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
     Fluxes[dim * 2 + INF] = patch->Fluxes[dim][INF];
     Fluxes[dim * 2 + SUP] = patch->Fluxes[dim][SUP];
 #endif
+#endif
   }
+
 #ifdef GPU
   cudaMalloc((void **)&patch->FluxesGPU, 6 * sizeof(real));
   cudaMemcpy(patch->FluxesGPU, &Fluxes, 6 * sizeof(real), cudaMemcpyHostToDevice);

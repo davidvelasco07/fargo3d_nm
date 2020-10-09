@@ -12,11 +12,11 @@
 # If you need N-fluids, write: FLUIDS := 0 1 2 ... N-1
 # (replace "..." with a complete list) and NFLUIDS = N
 
-FLUIDS := 0
-NFLUIDS = 1
+FLUIDS := 0 1 2 3
+NFLUIDS = 4
 
 # Parallel fluids flags
-NDOMAINS = 1
+NDOMAINS = 2
 
 FARGO_OPT += -DNFLUIDS=${NFLUIDS}
 FARGO_OPT += -DNDOMAINS=${NDOMAINS}
@@ -50,7 +50,7 @@ FARGO_OPT += -DSTOKESNUMBER
 #Nested Meshes
 COMM = INTERNAL
 FARGO_OPT += -DCOMMADAPT
-FARGO_OPT += -DGPUCOMM
+FARGO_OPT += -DCOMMGPU
 #FARGO_OPT += -DRELNESTING
 
 #Cuda blocks

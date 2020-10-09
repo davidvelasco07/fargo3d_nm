@@ -1,9 +1,7 @@
 #include "fargo3d.h"
 
-//extern long TimeStepRatio[REFINEUPPERLIMIT];
-void OverWriteBoundaryFluxes(int dim)
+void OverWriteBoundaryFluxes_cpu(int dim)
 {
-#ifndef GPUCOMM
   //<USER_DEFINED>
   OUTPUT(Flux);
   //<\USER_DEFINED>
@@ -54,8 +52,17 @@ void OverWriteBoundaryFluxes(int dim)
      quantity every time a new quantity is transported. FluxIndex
      should be reset to 0 every time we change dimension. */
   FluxIndex++;
+}
+
+void OverWriteBoundaryFluxes(int dim){
+#ifndef GPU
+	OverWriteBoundaryFluxes_cpu(dim);
 #else
-  Output_GPU(Flux, __LINE__, __FILE__);
+#ifndef COMMGPU
+	OverWriteBoundaryFluxes_cpu(dim);
+#else
+	Output_GPU(Flux, __LINE__, __FILE__);
   OverWriteBoundaryFluxes_gpu(dim);
+#endif
 #endif
 }

@@ -545,7 +545,7 @@ void ExecCommDownFlux_gpu(int level)
 
 void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *fieldtype)
 {
-#ifdef MPICUDA
+#ifdef GPU
   //MPI_Request reqs[8], reqr[8];
   jCommunicator *commsave;
   MPI_Status stat;

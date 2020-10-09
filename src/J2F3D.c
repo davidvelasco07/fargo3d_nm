@@ -219,6 +219,9 @@ void AdaptFieldsFromJ(tGrid_CPU *grid)
 
     Ncpu_x = grid->Parent->Ncpus[1];
     Ncpu_y = grid->Parent->Ncpus[2];
+
+    Y0 = grid->pcorner_min[1];
+    Z0 = grid->pcorner_min[2];
   //}
 }
 

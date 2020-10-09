@@ -75,10 +75,14 @@ void ExecCommSame(long lev, int options)
 	int fieldtype[20];
 	int nvar;
 	nvar = BuildFieldType(fieldtype, options);
-#ifndef GPUCOMM
+#ifndef GPU
+	ExecCommSameVar(lev, nvar, fieldtype);
+#else
+#ifndef COMMGPU
 	ExecCommSameVar(lev, nvar, fieldtype);
 #else
 	ExecCommSameVar_gpu(lev, nvar, fieldtype);
+#endif
 #endif
 }
 
@@ -135,10 +139,14 @@ void ExecCommUp(long lev, int options)
 	int fieldtype[20];
 	int nvar;
 	nvar = BuildFieldType(fieldtype, options);
-#ifndef GPUCOMM
+#ifndef GPU
+	ExecCommUpVar(lev, nvar, fieldtype);
+#else
+#ifndef COMMGPU
 	ExecCommUpVar(lev, nvar, fieldtype);
 #else
 	ExecCommUpVar_gpu(lev, nvar, fieldtype);
+#endif
 #endif
 }
 
@@ -335,10 +343,14 @@ void ExecCommDownMean(long lev, int options)
 	int fieldtype[20];
 	int nvar;
 	nvar = BuildFieldType(fieldtype, options);
-#ifndef GPUCOMM
+#ifndef GPU
+	ExecCommDownMeanVar(lev, nvar, fieldtype);	
+#else
+#ifndef COMMGPU
 	ExecCommDownMeanVar(lev, nvar, fieldtype);
 #else	
 	ExecCommDownMeanVar_gpu(lev, nvar, fieldtype);
+#endif
 #endif
 }
 
@@ -438,9 +450,8 @@ void ExecCommDownMeanVar(long lev, long nvar, int *fieldtype)
 	ExecComm(lev, lev - 1, MEAN, nvar, fieldtype);
 }
 
-void ExecCommDownFlux(long lev)
+void ExecCommDownFlux_cpu(long lev)
 {
-#ifndef GPUCOMM
 	/* Execute communications from level lev to coarser level lev-1, of
      type FLUX */
 	jCommunicator *com;
@@ -504,7 +515,16 @@ void ExecCommDownFlux(long lev)
 		com = com->next;
 	}
 	ExecCommFlux(lev);
+}
+
+void ExecCommDownFlux(long lev){
+#ifndef GPU
+	ExecCommDownFlux_cpu(lev);
+#else
+#ifndef COMMGPU
+	ExecCommDownFlux_cpu(lev);
 #else
 	ExecCommDownFlux_gpu(lev);
+#endif
 #endif
 }

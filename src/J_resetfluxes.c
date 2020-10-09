@@ -16,7 +16,7 @@ void ResetFluxesLevel(int lev)
     {
       if (item->level == lev)
       {
-#ifndef GPU
+#ifndef GPUCOMM
         fluid = item->fluid;
         do{
           for (dim = 0; dim < 3; dim++)

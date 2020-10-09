@@ -225,7 +225,7 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   patch->Energy = Energy;
   patch->Velocity = Velocity;
   patch->V_temp = V_temp;
-#ifdef GPU
+#ifdef GPUCOMM
   real *Fluxes[6];
 #endif
   nvar = 1 + 2 * NDIM; //Density and 2 flavors of momenta
@@ -236,7 +236,7 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   { // 3, not NDIM
     dimp1 = (dim == 0);
     dimp2 = 2 - (dim == 2);
-#ifndef GPU
+#ifndef GPUCOMM
     patch->Fluxes[dim][INF] = prs_malloc(size[dimp1] * size[dimp2] * nvar * sizeof(real));
     patch->Fluxes[dim][SUP] = prs_malloc(size[dimp1] * size[dimp2] * nvar * sizeof(real));
 #else

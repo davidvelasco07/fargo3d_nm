@@ -8,7 +8,7 @@
 //<\INCLUDES>
 
 void Save_Face_Flux_X() {
-#ifndef GPU
+#ifndef GPUCOMM
   INPUT(Flux);
 //<EXTERNAL>
   real* flux = Flux->field_cpu;
@@ -69,7 +69,7 @@ void Save_Face_Flux_X() {
 }
 
 void Save_Face_Flux_Y() {
-#ifndef GPU
+#ifndef GPUCOMM
   INPUT(Flux);
 //<EXTERNAL>
   real* flux = Flux->field_cpu;

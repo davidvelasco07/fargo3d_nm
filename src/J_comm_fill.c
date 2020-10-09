@@ -76,10 +76,8 @@ void ExecCommSame(long lev, int options)
 	int nvar;
 	nvar = BuildFieldType(fieldtype, options);
 #ifndef GPUCOMM
-	printf("CPU comms\n");
 	ExecCommSameVar(lev, nvar, fieldtype);
 #else
-	printf("GPU comms\n");
 	ExecCommSameVar_gpu(lev, nvar, fieldtype);
 #endif
 }
@@ -339,7 +337,7 @@ void ExecCommDownMean(long lev, int options)
 	nvar = BuildFieldType(fieldtype, options);
 #ifndef GPUCOMM
 	ExecCommDownMeanVar(lev, nvar, fieldtype);
-#else
+#else	
 	ExecCommDownMeanVar_gpu(lev, nvar, fieldtype);
 #endif
 }

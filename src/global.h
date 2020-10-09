@@ -29,6 +29,7 @@ tGrid_CPU *Current_Grid;
 tGrid_CPU *Grid_item;
 int NbRestart = 0;
 boolean CPU_Master = YES;
+int nbdump;
 
 //Global variables
 boolean FirstPassXAdvection = NO;
@@ -110,103 +111,103 @@ Grid Gridd;
 real *Fluxes[3][2];
 Field *Flux = NULL;
 
-Field *Vx;
-Field *Vy;
-Field *Vz;
+Field *Vx=NULL;
+Field *Vy=NULL;
+Field *Vz=NULL;
 
-Field *Vx_temp;
-Field *Vy_temp;
-Field *Vz_temp;
+Field *Vx_temp=NULL;
+Field *Vy_temp=NULL;
+Field *Vz_temp=NULL;
 
-Field *Vx_half;
-Field *Vy_half;
-Field *Vz_half;
+Field *Vx_half=NULL;
+Field *Vy_half=NULL;
+Field *Vz_half=NULL;
 
-Field *Slope;
+Field *Slope=NULL;
 
-Field *Mpx;
-Field *Mpy;
-Field *Mpz;
-Field *Mmx;
-Field *Mmy;
-Field *Mmz;
+Field *Mpx=NULL;
+Field *Mpy=NULL;
+Field *Mpz=NULL;
+Field *Mmx=NULL;
+Field *Mmy=NULL;
+Field *Mmz=NULL;
 
-Field *Pot;
+Field *Pot=NULL;
 
-Field *DivRho;
-Field *DensStar;
-Field *Qs;
+Field *DivRho=NULL;
+Field *DensStar=NULL;
+Field *Qs=NULL;
 
-Field *Density;
-Field *Energy;
-Field *Pressure;
+Field *Density=NULL;
+Field *Energy=NULL;
+Field *Pressure=NULL;
 
-Field *Total_Density;
+Field *Total_Density=NULL;
 
-Field *QL;
-Field *QR;
-Field *LapPPA;
+Field *QL=NULL;
+Field *QR=NULL;
+Field *LapPPA=NULL;
 
-Field *Sdiffyczc;
-Field *Sdiffyfzc;
-Field *Sdiffyczf;
-Field *Sdiffyfzf;
+Field *Sdiffyczc=NULL;
+Field *Sdiffyfzc=NULL;
+Field *Sdiffyczf=NULL;
+Field *Sdiffyfzf=NULL;
 
 
 // Below: fields specific to FARGO algorithms
-Field2D *VxMed;
-Field2D *Vxhy;
-Field2D *Vxhyr;
-Field2D *Vxhz;
-Field2D *Vxhzr;
-Field2D *Reduction2D;
+Field2D *VxMed=NULL;
+Field2D *Vxhy=NULL;
+Field2D *Vxhyr=NULL;
+Field2D *Vxhz=NULL;
+Field2D *Vxhzr=NULL;
+Field2D *Reduction2D=NULL;
 
-FieldInt2D *Nxhy;
-FieldInt2D *Nxhz;
-FieldInt2D *Nshift;
+FieldInt2D *Nxhy=NULL;
+FieldInt2D *Nxhz=NULL;
+FieldInt2D *Nshift=NULL;
 
 //MHD FIELDS
 //#ifdef MHD
-Field *Bx;
-Field *By;
-Field *Bz;
+Field *Bx=NULL;
+Field *By=NULL;
+Field *Bz=NULL;
 
-Field *B1_star;
-Field *B2_star;
+Field *B1_star=NULL;
+Field *B2_star=NULL;
 
-Field *V1_star;
-Field *V2_star;
+Field *V1_star=NULL;
+Field *V2_star=NULL;
 
-Field *Slope_b1;
-Field *Slope_v1;
-Field *Slope_b2;
-Field *Slope_v2;
+Field *Slope_b1=NULL;
+Field *Slope_v1=NULL;
+Field *Slope_b2=NULL;
+Field *Slope_v2=NULL;
 
-Field *Emfx; 
-Field *Emfy;
-Field *Emfz;
+Field *Emfx=NULL; 
+Field *Emfy=NULL;
+Field *Emfz=NULL;
 
-Field *EmfxH;
-Field *EmfyH;
-Field *EmfzH;
-Field *BxH;
-Field *ByH;
-Field *BzH;
-Field *Jx;
-Field *Jy;
-Field *Jz;
-Field *EtaOhm;
-Field *EtaHall;
-Field *EtaAD;
+Field *EmfxH=NULL;
+Field *EmfyH=NULL;
+Field *EmfzH=NULL;
+Field *BxH=NULL;
+Field *ByH=NULL;
+Field *BzH=NULL;
+Field *Jx=NULL;
+Field *Jy=NULL;
+Field *Jz=NULL;
+Field *EtaOhm=NULL;
+Field *EtaHall=NULL;
+Field *EtaAD=NULL;
 
-Field *Divergence;
+Field *Divergence=NULL;
 //#endif
 
-Field2D *Density0;
-Field2D *Vx0;
-Field2D *Vy0;
-Field2D *Vz0;
-Field2D *Energy0;
+Field2D *Density0=NULL;
+Field2D *Vx0=NULL;
+Field2D *Vy0=NULL;
+Field2D *Vz0=NULL;
+Field2D *Energy0=NULL;
 
 //Communications variables
 
@@ -227,38 +228,38 @@ Buffer Bfcur; //|
 //CPU GLOBAL LIGHT ARRAYS
 
 real Dx;
-real *Xmin;
-real *Ymin;
-real *Zmin;
-real *Xmed;
-real *Ymed;
-real *Zmed;
-real *InvDiffXmed;
-real *InvDiffYmed;
-real *InvDiffZmed;
-real *Sxj;
-real *Sxk;
-real *Syj;
-real *Syk;
-real *Szj;
-real *Szk;
-real *InvVj;
+real *Xmin=NULL;
+real *Ymin=NULL;
+real *Zmin=NULL;
+real *Xmed=NULL;
+real *Ymed=NULL;
+real *Zmed=NULL;
+real *InvDiffXmed=NULL;
+real *InvDiffYmed=NULL;
+real *InvDiffZmed=NULL;
+real *Sxj=NULL;
+real *Sxk=NULL;
+real *Syj=NULL;
+real *Syk=NULL;
+real *Szj=NULL;
+real *Szk=NULL;
+real *InvVj=NULL;
 real shift_buffer[MAX1D];
 
 //GPU GLOBAL LIGHT ARRAYS
-real *Alpha;
-real *Alpha_d;
-real *Dx_d;
-real *Xmin_d;
-real *Ymin_d;
-real *Zmin_d;
-real *Sxj_d;
-real *Sxk_d;
-real *Syj_d;
-real *Syk_d;
-real *Szj_d;
-real *Szk_d;
-real *InvVj_d;
+real *Alpha=NULL;
+real *Alpha_d=NULL;
+real *Dx_d=NULL;
+real *Xmin_d=NULL;
+real *Ymin_d=NULL;
+real *Zmin_d=NULL;
+real *Sxj_d=NULL;
+real *Sxk_d=NULL;
+real *Syj_d=NULL;
+real *Syk_d=NULL;
+real *Szj_d=NULL;
+real *Szk_d=NULL;
+real *InvVj_d=NULL;
 real shift_buffer_d[MAX1D];
 
 //Grid variables

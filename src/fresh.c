@@ -140,13 +140,13 @@ void Input_CPU(Field *field, int line, const char *string){
     prs_exit (EXIT_FAILURE);
   }*/
 #ifdef GPU
-  if (!field->fresh_cpu) take_action = YES;
+  if (!(*(field->fresh_cpu))) take_action = YES;
   /*for (i = 0; i < 4; i++) {
     if (field->fresh_inside_contour_cpu[i] == NO) take_action = YES;
     if (field->fresh_outside_contour_cpu[i] == NO) take_action = YES;
   }*/
   if(take_action) {
-    if (field->fresh_gpu == NO) problem = YES;
+    if (*(field->fresh_gpu) == NO) problem = YES;
     /*for (i = 0; i < 4; i++) {
       if (field->fresh_inside_contour_gpu[i] == NO) problem = YES;
       if (field->fresh_outside_contour_gpu[i] == NO) problem = YES;
@@ -171,11 +171,12 @@ void Input_CPU(Field *field, int line, const char *string){
       printf("called from line %d of file %s\n", line, string);
       exit(0);
     }
+    *(field->fresh_cpu) = YES;
   }
 //  else {
 //    printf("Field %s is up to date on Host.\n",field->name);
 //  }
-  *(field->fresh_cpu) = YES;
+  
   /*for (i = 0; i < 4; i++) {
     field->fresh_inside_contour_cpu[i] = YES;
     field->fresh_outside_contour_cpu[i] = YES;
@@ -232,11 +233,12 @@ void Input_GPU(Field *field, int line, const char *string){
       printf("called from line %d of file %s\n", line, string);
       exit(0);
     }
+    *(field->fresh_gpu) = YES;
   }
 //  else {
 //    printf("Field %s is up to date on Device.\n",field->name);
 //  }
-  *(field->fresh_gpu) = YES;
+  
   /*for (i = 0; i < 4; i++) {
     field->fresh_inside_contour_gpu[i] = YES;
     field->fresh_outside_contour_gpu[i] = YES;

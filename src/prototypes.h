@@ -797,3 +797,4 @@ ex void refine_field (char *, long, long, GridFileInfo *, long, long, long, tGri
 ex int StandardFields (void);
 ex void merge (int);
 ex void merge_field (char*, long, long, long*, long*, long*, long, long, long);
+ex void SelectGrid(tGrid_CPU *);

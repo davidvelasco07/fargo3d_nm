@@ -3,7 +3,7 @@
 //extern long TimeStepRatio[REFINEUPPERLIMIT];
 void OverWriteBoundaryFluxes(int dim)
 {
-#ifndef GPU
+#ifndef GPUCOMM
   //<USER_DEFINED>
   OUTPUT(Flux);
   //<\USER_DEFINED>

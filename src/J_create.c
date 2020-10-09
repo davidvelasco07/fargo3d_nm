@@ -336,7 +336,7 @@ of Metric.
       sprintf(dust_name, "dust%d", global_fluid_id);
       desc->fluid = CreateFluidPatch(desc, dust_name, DUST);
     }
-    AdaptFieldsFromJ(desc);
+    SelectGrid(desc);
     fluid = desc->fluid;
     F3Dfluid = CreateFluid(fluid->Name, fluid->Fluidtype);
     F3Dfluid->Density->field_cpu = fluid->Density->Field;

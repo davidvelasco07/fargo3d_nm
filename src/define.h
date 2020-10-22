@@ -58,7 +58,8 @@
 #define NONE 0
 #define AUTO 1
 #define FULL 2
-#define MAXLENGTHONEDIM 512L
+#define MAXLENGTHONEDIM 8192L
+#define ONETHIRD 0.333333333333333333333
 
 /////////////////////
 //Communication deployment

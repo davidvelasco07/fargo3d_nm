@@ -20,8 +20,10 @@ ScalarField *CreateScalarField2D(tGrid_CPU *desc, char *name, real *ptr)
 #ifdef GPU
   cudaMallocPitch(&ptr_gpu, &pitch, size[1] * sizeof(real), size[2]);
   check_errors("CreateScalarField2D");
+#ifdef DEBUG
   printf("Field %s has been created on the GPU\n", name);
   printf("Pitch = %d bytes (%d elements)\n", (int)pitch, (int)(pitch / sizeof(real)));
+#endif
   sf->Field_gpu = (real *)ptr_gpu;
   desc->Pitch2D = pitch / sizeof(real);
 #endif
@@ -63,8 +65,10 @@ ScalarField *CreateScalarField(tGrid_CPU *desc, char *name, real *ptr)
 #ifdef GPU
   cudaMallocPitch(&ptr_gpu, &pitch, size[0] * sizeof(real), size[1] * size[2]);
   check_errors("CreateScalarField");
+#ifdef DEBUG
   printf("Field %s has been created on the GPU\n", name);
   printf("-0-0-0- Pitch = %d bytes (%d elements)\n", (int)pitch, (int)(pitch / sizeof(real)));
+#endif  
   sf->Field_gpu = (real *)ptr_gpu;
   sf->pitch = pitch;
 #endif
@@ -127,7 +131,7 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   char *Name;
   real *StartField;
   long dim, di, i, size[3], Size, Size2D, RealSize, dimp1, dimp2, nvar, jump;
-  ScalarField *Density, *Energy, *Potential;
+  ScalarField *Density, *Energy;
   VectorField *Velocity, *V_temp;
   FluidPatch *patch;
   void *ptr_gpu;
@@ -154,14 +158,14 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
     Maxsize2D_cpu = Size2D;
     printf("Maxsize2D_cpu = %d\n", Maxsize2D_cpu);
   }
-  nvar = 2 + NDIM; //Density,Energy,Velocity
+  nvar = 2 + (2*NDIM); //Density,Energy,Velocity,V_temp
   StartField = prs_malloc(sizeof(real) * (Size * nvar + Size2D * 5));
   /* Global contiguous allocation */
   patch->StartField = StartField;
   Density = CreateScalarField(desc, "density", StartField); /* Density MUST be the first field (see function ResetPatch below) */
   Energy = CreateScalarField(desc, "energy", StartField + Size);
   Velocity = CreateVectorField(desc, "velocity", StartField + 2 * Size);
-  V_temp = CreateVectorField(desc, "v_temp", StartField + nvar * Size);
+  V_temp = CreateVectorField(desc, "v_temp", StartField + (2+NDIM) * Size);
 
   patch->Ptr[_Density_] = Density->Field;
   patch->Ptr[_Energy_] = Energy->Field;

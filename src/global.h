@@ -2,6 +2,7 @@
 
 int NCPUS_per_domain;
 int NFluids_per_rank;
+int NFluidColors;
 
 int CPU_World_Rank;
 int CPU_World_Number;
@@ -29,6 +30,7 @@ tGrid_CPU *Current_Grid;
 tGrid_CPU *Grid_item;
 int NbRestart = 0;
 boolean CPU_Master = YES;
+boolean CPU_Global_Master = YES;
 int nbdump;
 
 //Global variables
@@ -426,7 +428,7 @@ void (*ChangeFrame)(int,Field*,Field2D*);
 void (*Potential)();
 void (*CorrectVtheta)(real);
 void (*cfl)(void);
-void (*_ComputeForce)(real,real,real,real,real);
+void (*_ComputeForce)(real,real,real,real,real,char*);
 void (*copy_velocities)(int);
 void (*VanLeerX_PPA_a)(Field*);
 void (*VanLeerX_PPA_b)(Field*);

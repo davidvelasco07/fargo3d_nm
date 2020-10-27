@@ -226,7 +226,7 @@ ex void compute_potential(real);
 //planets.c Prototypes
 ex void Potential_cpu(void);
 ex Force ComputeForce(real, real, real, real, real);
-ex void  _ComputeForce_cpu(real, real, real, real, real);
+ex void  _ComputeForce_cpu(real, real, real, real, real, char*);
 ex void AdvanceSystemFromDisk(real);
 ex void CorrectVtheta_cpu(real);
 ex void ComputeIndirectTerm (void);
@@ -557,7 +557,7 @@ ex void Potential_gpu(void);
 ex void CorrectVtheta_gpu(real);
 ex void cfl_gpu(void);
 
-ex void  _ComputeForce_gpu(real, real, real, real, real);
+ex void  _ComputeForce_gpu(real, real, real, real, real, char*);
 
 ex void Fill_GhostsX_gpu(void);
 

@@ -21,7 +21,8 @@ Force ComputeForce(real x, real y, real z,
 		   real rsmoothing, real mass) {
   
   Force Force;
-
+  tGrid_CPU *item;
+  item = Grid_CPU_list;
   /* The trick below, which uses VxMed as a 2D temporary array,
      amounts to subtracting the azimuthally averaged density prior to
      the torque evaluation. This has no impact on the torque, but has
@@ -34,7 +35,20 @@ Force ComputeForce(real x, real y, real z,
   ChangeFrame (-1, Total_Density, VxMed);
 #endif
   /* The density is now the perturbed density */
-  FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass)); /* Function/Kernel Launcher. */
+  while(item != NULL) {
+    if (item->cpu == CPU_Rank) {
+      AdaptFieldsFromJ (item);
+#ifdef GPU
+      FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden_d));
+#else
+      FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden));
+#endif
+    }
+    item = item->next;
+  }
+  // Adapt everything back to the calling level (which should be finest level)
+  AdaptFieldsFromJ(Current_Jupiter_Patch);
+  
   /* We restore the total density below by adding back the azimuthal
      average */
 #ifdef BM08

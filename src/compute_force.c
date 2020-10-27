@@ -13,7 +13,7 @@
 
 // Fills forces arrays of the force experienced by the planet
 
-void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass) {
+void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass, char* hidden) {
 
 //<USER_DEFINED>
   INPUT(Total_Density);
@@ -89,7 +89,7 @@ void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass) {
 	   for 2D simulations (ie: surface area). */
 
 	ll = l;
-	cellmass = Vol(j,k)*dens[ll];
+  cellmass = Vol(j,k)*dens[ll]*(1-hidden[ll]);
 #ifdef CARTESIAN
 	dx = xmed(i)-x;
 	dy = ymed(j)-y;
@@ -167,50 +167,38 @@ void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass) {
   if (index >= NGHY) {
     if(index < Ny+NGHY) {
       /*Inner Force*/
-      localforce[0]  = reduction_full_SUM(Mmx, NGHY, index, NGHZ, Nz+NGHZ);
-      localforce[1]  = reduction_full_SUM(Mpx, NGHY, index, NGHZ, Nz+NGHZ);
-      localforce[2]  = reduction_full_SUM(Mmy, NGHY, index, NGHZ, Nz+NGHZ);
-      localforce[3]  = reduction_full_SUM(Mpy, NGHY, index, NGHZ, Nz+NGHZ);
-      localforce[4]  = reduction_full_SUM(Vx_temp, NGHY, index, NGHZ, Nz+NGHZ);
-      localforce[5]  = reduction_full_SUM(Vy_temp, NGHY, index, NGHZ, Nz+NGHZ);
+      localforce[0]  += reduction_full_SUM(Mmx, NGHY, index, NGHZ, Nz+NGHZ);
+      localforce[1]  += reduction_full_SUM(Mpx, NGHY, index, NGHZ, Nz+NGHZ);
+      localforce[2]  += reduction_full_SUM(Mmy, NGHY, index, NGHZ, Nz+NGHZ);
+      localforce[3]  += reduction_full_SUM(Mpy, NGHY, index, NGHZ, Nz+NGHZ);
+      localforce[4]  += reduction_full_SUM(Vx_temp, NGHY, index, NGHZ, Nz+NGHZ);
+      localforce[5]  += reduction_full_SUM(Vy_temp, NGHY, index, NGHZ, Nz+NGHZ);
       /*Outer Force*/
-      localforce[6]  = reduction_full_SUM(Mmx, index, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[7]  = reduction_full_SUM(Mpx, index, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[8]  = reduction_full_SUM(Mmy, index, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[9]  = reduction_full_SUM(Mpy, index, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[10] = reduction_full_SUM(Vx_temp, index, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[11] = reduction_full_SUM(Vy_temp, index, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[6]  += reduction_full_SUM(Mmx, index, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[7]  += reduction_full_SUM(Mpx, index, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[8]  += reduction_full_SUM(Mmy, index, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[9]  += reduction_full_SUM(Mpy, index, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[10] += reduction_full_SUM(Vx_temp, index, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[11] += reduction_full_SUM(Vy_temp, index, Ny+NGHY, NGHZ, Nz+NGHZ);
     }
     /*All is Inner Force*/
     else{
-      localforce[0]   = reduction_full_SUM(Mmx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[1]   = reduction_full_SUM(Mpx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[2]   = reduction_full_SUM(Mmy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[3]   = reduction_full_SUM(Mpy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[4]   = reduction_full_SUM(Vx_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[5]   = reduction_full_SUM(Vy_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-      localforce[6]   = 0.0;
-      localforce[7]   = 0.0;
-      localforce[8]   = 0.0;
-      localforce[9]   = 0.0;
-      localforce[10]  = 0.0;
-      localforce[11]  = 0.0;
+      localforce[0]   += reduction_full_SUM(Mmx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[1]   += reduction_full_SUM(Mpx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[2]   += reduction_full_SUM(Mmy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[3]   += reduction_full_SUM(Mpy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[4]   += reduction_full_SUM(Vx_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+      localforce[5]   += reduction_full_SUM(Vy_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
     }
   }
   /*All is Outer Force*/
   else{
-    localforce[0]  = 0.0;
-    localforce[1]  = 0.0;
-    localforce[2]  = 0.0;
-    localforce[3]  = 0.0;
-    localforce[4]  = 0.0;
-    localforce[5]  = 0.0;
-    localforce[6]  = reduction_full_SUM(Mmx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-    localforce[7]  = reduction_full_SUM(Mpx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-    localforce[8]  = reduction_full_SUM(Mmy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-    localforce[9]  = reduction_full_SUM(Mpy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-    localforce[10] = reduction_full_SUM(Vx_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-    localforce[11] = reduction_full_SUM(Vy_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    localforce[6]  += reduction_full_SUM(Mmx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    localforce[7]  += reduction_full_SUM(Mpx, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    localforce[8]  += reduction_full_SUM(Mmy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    localforce[9]  += reduction_full_SUM(Mpy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    localforce[10] += reduction_full_SUM(Vx_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    localforce[11] += reduction_full_SUM(Vy_temp, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
   }
 
 //<\LAST_BLOCK>

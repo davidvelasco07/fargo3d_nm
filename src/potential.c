@@ -18,42 +18,37 @@ void compute_potential(real dt) {
   int subcycling = 5;
   static int alreadycalculated = -1;
 
-  //if (alreadycalculated != Timestepcount){ //For multifluid purposes...
-    
-    if (Corotating && Current_Level == LevMax) GetPsysInfo (MARK);
+  if (Corotating && Current_Level == LevMax) GetPsysInfo (MARK);
     
 #ifdef GPU
   //Copy all the planetary data to device
-    DevMemcpyH2D(Sys->x_gpu, Sys->x_cpu, sizeof(real)*(Sys->nb+1));
-    DevMemcpyH2D(Sys->y_gpu, Sys->y_cpu, sizeof(real)*(Sys->nb+1));
-    DevMemcpyH2D(Sys->z_gpu, Sys->z_cpu, sizeof(real)*(Sys->nb+1));
-    DevMemcpyH2D(Sys->mass_gpu, Sys->mass_cpu, sizeof(real)*(Sys->nb+1));
+  DevMemcpyH2D(Sys->x_gpu, Sys->x_cpu, sizeof(real)*(Sys->nb+1));
+  DevMemcpyH2D(Sys->y_gpu, Sys->y_cpu, sizeof(real)*(Sys->nb+1));
+  DevMemcpyH2D(Sys->z_gpu, Sys->z_cpu, sizeof(real)*(Sys->nb+1));
+  DevMemcpyH2D(Sys->mass_gpu, Sys->mass_cpu, sizeof(real)*(Sys->nb+1));
 #endif
-    
-    DiskOnPrimaryAcceleration = ComputeAccel(0.0, 0.0, 0.0, 0.0, 0.0);
-    FARGO_SAFE(ComputeIndirectTerm());
-    FARGO_SAFE(Potential()); // Gravitational potential from star and planet(s)
+  
+  DiskOnPrimaryAcceleration = ComputeAccel(0.0, 0.0, 0.0, 0.0, 0.0);
+  FARGO_SAFE(ComputeIndirectTerm());
+  FARGO_SAFE(Potential()); // Gravitational potential from star and planet(s)
+  
+  if (Current_Level == LevMax){ //Only the finest level advances the planet(s)
+    FARGO_SAFE(AdvanceSystemFromDisk(dt));
 
-    if (Current_Level == LevMax){ //Only the finest level advances the planet(s)
-      FARGO_SAFE(AdvanceSystemFromDisk(dt));
-
-      if (ThereIsACentralBinary)
+    if (ThereIsACentralBinary)
       subcycling = 30;		/* Arbitrary number of subcycles which
 				   should fit most needs */
-      for (i = 0; i < subcycling; i++)
-        FARGO_SAFE(AdvanceSystemRK5(1.0/((double)(subcycling))*dt));
-  
-      alreadycalculated = Timestepcount;
-  
-      if (Corotating) {
-        omeganew = GetPsysInfo(GET)/dt;
-        Domega = omeganew-OMEGAFRAME;
-        FARGO_for_all_patches(_CorrectVtheta);
-        OMEGAFRAME = omeganew;
-      }
-      RotatePsys(OMEGAFRAME*dt);
+    for (i = 0; i < subcycling; i++)
+      FARGO_SAFE(AdvanceSystemRK5(1.0/((double)(subcycling))*dt));
+
+    if (Corotating) {
+      omeganew = GetPsysInfo(GET)/dt;
+      Domega = omeganew-OMEGAFRAME;
+      FARGO_for_all_patches(_CorrectVtheta);
+      OMEGAFRAME = omeganew;
     }
-  //}
+    RotatePsys(OMEGAFRAME*dt);
+  }
 }
 
 void Potential_cpu() {
@@ -149,10 +144,7 @@ void Potential_cpu() {
 
 	for(n=0; n<nb; n++) {
 	  mp = mplanet[n]*taper;
-	  
-    xplanet[n]=1;
-    yplanet[n]=0;
-    zplanet[n]=0;
+
 	  planetdistance = sqrt(xplanet[n]*xplanet[n]+
 				yplanet[n]*yplanet[n]+
 				zplanet[n]*zplanet[n]);

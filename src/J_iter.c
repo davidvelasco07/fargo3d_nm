@@ -15,9 +15,6 @@ int StandardFields () {
 #ifdef ADIABATIC
   options |= ENERGY;
 #endif
-#ifdef LABELED
-  options |= LABEL;
-#endif
   return options;
 }
 
@@ -104,9 +101,8 @@ void ItereLevel (real dt, long level)
 		     MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
       #endif
       MULTIFLUID(AlgoGas1 (dt));
-      
       #ifdef DRAGFORCE
-      //FARGO_SAFE(DragForce(.5*dt));
+      FARGO_SAFE(DragForce(dt));
       #endif
     }
     item = item->next;
@@ -140,6 +136,8 @@ real RecursiveIteration (real dt, long level)
     FARGO_SAFE(FindBestSubcycling ());
   }
   if (level < LevMax) {/* Not finest level */
+    //This function iterates over all fluids, 
+    //therefore it is not necessary to call it with MULTIFLUID
     FARGO_SAFE(ResetFluxesLevel (level+1));
     RecursiveIteration (dt/(real)TimeStepRatio[level], level+1);
     if (TimeStepRatio[level] > 1)
@@ -149,7 +147,7 @@ real RecursiveIteration (real dt, long level)
     time_var = LevelDate[level+1]-LevelDate[level];
     ItereLevel (time_var, level);
     LevelDate[level] = LevelDate[level+1];
-   
+  
     MULTIFLUID(ExecCommDownMean (level+1,StandardFields()));
 
     //Finer data for "level" at same date
@@ -162,7 +160,8 @@ real RecursiveIteration (real dt, long level)
     //Coarser data for "level+1" at same date
 
     return time_var;
-  } else {/* Finest level */
+  } 
+  else {/* Finest level */
     dt_cfl_loc = CourantLimitGlobal () / (real)BaseStepRatio[level];
     MPI_Allreduce (&dt_cfl_loc, &dt_cfl, 1, MPI_DOUBLE, MPI_MIN, DomainComm);
     dt = (dt_cfl < dt ? dt_cfl : dt);

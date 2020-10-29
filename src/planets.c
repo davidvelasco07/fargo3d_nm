@@ -42,7 +42,12 @@ Force ComputeForce(real x, real y, real z,
     if (item->cpu == CPU_Rank) {
       AdaptFieldsFromJ (item);
 #ifdef GPU
-      FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden_d));
+      if(EverythingOnCPU){
+        FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden));
+      }
+      else{
+        FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden_d));
+      }
 #else
       FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden));
 #endif

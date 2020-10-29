@@ -55,7 +55,8 @@ int i;
 
 #ifdef POTENTIAL
   MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
-  FARGO_SAFE(compute_potential(dt));
+  if(FluidIndex==0)//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
+    FARGO_SAFE(compute_potential(dt));
   if (Corotating) {
     FARGO_SAFE(CorrectVtheta(Domega));
   }

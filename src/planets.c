@@ -21,8 +21,11 @@ Force ComputeForce(real x, real y, real z,
 		   real rsmoothing, real mass) {
   
   Force Force;
-  tGrid_CPU *item;
+  tGrid_CPU *item, *current;
   item = Grid_CPU_list;
+  current = Current_Jupiter_Patch;
+  memset(localforce, 0.0, 12*sizeof(real));
+
   /* The trick below, which uses VxMed as a 2D temporary array,
      amounts to subtracting the azimuthally averaged density prior to
      the torque evaluation. This has no impact on the torque, but has
@@ -47,7 +50,7 @@ Force ComputeForce(real x, real y, real z,
     item = item->next;
   }
   // Adapt everything back to the calling level (which should be finest level)
-  AdaptFieldsFromJ(Current_Jupiter_Patch);
+  AdaptFieldsFromJ(current);
   
   /* We restore the total density below by adding back the azimuthal
      average */

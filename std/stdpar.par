@@ -114,3 +114,5 @@ INHIBREFDIM3	No
 PeriodicZ		No
 PeriodicY		No
 PeriodicX		Yes
+
+NFluidColors    1

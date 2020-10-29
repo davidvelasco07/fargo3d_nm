@@ -161,44 +161,55 @@ int main(int argc, char *argv[]) {
 
   MPI_Comm_rank (MPI_COMM_WORLD, &CPU_World_Rank);
   MPI_Comm_size (MPI_COMM_WORLD, &CPU_World_Number);
-
-  NCPUS_per_domain = CPU_World_Number/NDOMAINS;
-  NFluids_per_rank = NFLUIDS/NCPUS_per_domain;
-  
-  if (CPU_World_Number%NDOMAINS != 0) {
-    printf("Error!!! The total number of Ranks (%d) must be divisible by the number of domains (%d).", CPU_World_Number, NDOMAINS);
+  CPU_Rank   = CPU_World_Rank;   
+  CPU_Number = CPU_World_Number;
+  InitVariables ();
+  MPI_Barrier(MPI_COMM_WORLD);
+  ReadDefaultOut ();
+  ReadVarFile (ParameterFile);
+  if (CPU_World_Number < NFLUIDCOLORS) {
+    printf("Error!!! The total number of Ranks (%d) has to at least be the number of fluid colors asked (NFLUIDCOLORS %d).\n", CPU_World_Number, NFLUIDCOLORS);
+    exit(0);
+  }
+  if (NFLUIDCOLORS > NFLUIDS) {
+    printf("Error!!! The number of Fluid Colors (%d) can not exeed the number of Fluids (%d) \n.", NFLUIDCOLORS, NFLUIDS);
+    exit(0);
+  }
+  NDomains = CPU_World_Number/NFLUIDCOLORS;
+  NFluids_per_rank = NFLUIDS/NFLUIDCOLORS;
+  if (CPU_World_Number%NFLUIDCOLORS != 0) {
+    printf("Error!!! The total number of Ranks (%d) must be divisible by the number of fluid colors (%d).", CPU_World_Number, NFLUIDCOLORS);
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
-  if (CPU_World_Number > NDOMAINS*NFLUIDS) {
-    printf("Error!!! The total number of Ranks (%d) can not exeed NDOMAINSxNFLUIDS (%d).", CPU_World_Number, NDOMAINS*NFLUIDS);
+  if (CPU_World_Number != NDomains*NFLUIDCOLORS) {
+    printf("Error!!! The total number of Ranks (%d) has to be NDOMAINSxNFLUIDCOLORS (%d).", CPU_World_Number, NDomains*NFLUIDCOLORS);
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
-
-  
-  DomainColor = CPU_World_Rank%NDOMAINS;
-  FluidColor  = CPU_World_Rank/NDOMAINS;
+  DomainColor = CPU_World_Rank%NDomains;
+  FluidColor  = CPU_World_Rank/NDomains;
   
   MPI_Comm_split(MPI_COMM_WORLD, FluidColor, CPU_World_Rank, &DomainComm);
   MPI_Comm_rank(DomainComm, &CPU_RowRank  );
   MPI_Comm_size(DomainComm, &CPU_RowNumber);
-  
-  
+    
   MPI_Comm_split(MPI_COMM_WORLD, DomainColor, CPU_World_Rank, &FluidsComm);
   MPI_Comm_rank(FluidsComm, &CPU_ColumnRank  );
   MPI_Comm_size(FluidsComm, &CPU_ColumnNumber);
   
   printf("CPU_Rank=%d\tDomainColor=%d\tFluidColor =%d\tNFLUIDS_PER_RANK=%d\n",CPU_World_Rank, DomainColor, FluidColor , NFluids_per_rank);
- 
+  MPI_Barrier(MPI_COMM_WORLD);
   CPU_Rank   = CPU_RowRank;
   CPU_Number = CPU_RowNumber;
   
   CPU_Master = (CPU_Rank == 0 ? 1 : 0);
+  CPU_Global_Master = (CPU_World_Rank == 0 ? 1 : 0);
 
   if (strlen(xstr(VERSION)) < 2)
     sprintf (VersionString, "FARGO3D Public version 1.3");
   else
     sprintf (VersionString, "FARGO3D git version %s", xstr(VERSION));
+  
   masterprint("\n\n%s\n%s\nSETUP: '%s'\n%s\n\n",
 	      sepline, VersionString, xstr(SETUPNAME), sepline);
   
@@ -207,10 +218,7 @@ int main(int argc, char *argv[]) {
 #ifndef MPICUDA
   SelectDevice(CPU_Rank);
 #endif
-  InitVariables ();
-  MPI_Barrier(MPI_COMM_WORLD);
-  ReadDefaultOut ();
-  ReadVarFile (ParameterFile);
+
   if (strcmp (PLANETCONFIG, "NONE") != 0)
     ThereArePlanets = YES;
 
@@ -263,13 +271,14 @@ int main(int argc, char *argv[]) {
 		  ChangeArch adds _cpu or _gpu if GPU is activated.*/
   
   Adapt_for_JUPITER (ParameterFile);
+  
   //split(&Gridd); /*Split mesh over PEs*/
   //InitSpace();
   //WriteDim();
   //InitSurfaces();
   //LightGlobalDev(); /* Copy light arrays to the device global memory */
   //CreateFields(); // Allocate all fields.
-
+  
   Sys = InitPlanetarySystem(PLANETCONFIG);
   ListPlanets();
   if(Corotating)
@@ -325,7 +334,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   ExtractFromExecutable (NO, ArchFile, 2);
 #endif
 #ifdef STOCKHOLM 
-  //FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
+  FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
 #endif
 
 #ifndef NOGHOSTX
@@ -334,12 +343,11 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   masterprint ("Standard version with no ghost zones in X\n");
 #endif
 
-  NESTEDMESHES(MULTIFLUID(FillGhosts(ENERGY);););
+  NESTEDMESHES(MULTIFLUID(FillGhosts(StandardFields() | ENERGY);););
 
   for (level = 0; level <= LevMax; level++) {
     MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
   }
-  
 #ifdef STOCKHOLM 
   FARGO_for_all_patches_level (init_stockholm, 0);
 #endif
@@ -353,12 +361,12 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #if defined(MHD) && defined(DEBUG)
       FARGO_SAFE(ComputeDivergence(Bx, By, Bz));
 #endif
-      if (ThereArePlanets)
-	      WritePlanetSystemFile(TimeStep, NO);
- 
+      //if (ThereArePlanets)
+	    //  WritePlanetSystemFile(TimeStep, NO);
+
 #ifndef NOOUTPUTS
       PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
-    
+      
 #ifdef MATPLOTLIB
       Display();
 #endif

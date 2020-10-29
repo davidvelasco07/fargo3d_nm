@@ -2,7 +2,7 @@
 
 int NCPUS_per_domain;
 int NFluids_per_rank;
-int NFluidColors;
+int NDomains;
 
 int CPU_World_Rank;
 int CPU_World_Number;

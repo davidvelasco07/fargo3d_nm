@@ -103,7 +103,7 @@ void splitgrid(tGrid *grid)
   long ncpus, mx[3], i[3], cpu, ii, j, resol_ratio[3];
   long euclid_ratio[3], euclid_rest[3];
   tGrid_CPU *gridcpu;
-  ncpus = NDOMAINS;
+  ncpus = NDomains;
   Repartition(grid->ncell, ncpus, mx, grid->level);
   for (j = 0; j < 3; j++)
   {
@@ -115,7 +115,7 @@ void splitgrid(tGrid *grid)
     euclid_rest[j] = (grid->ncell[j] / resol_ratio[j]) - euclid_ratio[j] * mx[j];
     grid->Ncpus[j] = mx[j];
   }
-  printf("Grid %d, CPUS (%d,%d,%d)\n",grid->number,mx[0],mx[1],mx[2]);
+  //printf("Grid %d, CPUS (%d,%d,%d)\n",grid->number,mx[0],mx[1],mx[2]);
   for (i[0] = 0; i[0] < mx[0]; i[0]++)
   {
     for (i[1] = 0; i[1] < mx[1]; i[1]++)

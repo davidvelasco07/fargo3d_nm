@@ -186,6 +186,7 @@ void AlgoGas2 (real dt) {
 #endif
 
 #ifdef STOCKHOLM
+  if(Current_Level==0)
     FARGO_SAFE(StockholmBoundary(dt));
 #endif
 }

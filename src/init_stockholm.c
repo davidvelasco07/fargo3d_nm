@@ -129,7 +129,7 @@ void init_stockholm() {
 
   static boolean init = TRUE;
 
-  if (init) MULTIFLUID(_init_stockholm());
+  if (init && (Current_Level == 0)) MULTIFLUID(_init_stockholm());
   
   init = FALSE;
 

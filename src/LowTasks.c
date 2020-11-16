@@ -1132,7 +1132,7 @@ void RestartDat(Field *field, int n)
   MPI_Barrier(DomainComm);
   if (Restart_Full == YES)
   {
-    sprintf(filename, "%s%s%d.dat", OUTPUTDIR, name, n);
+    sprintf(filename, "%s%s%d_grid%d.dat", OUTPUTDIR, name, n, Current_Jupiter_Patch->parent);
     fi = fopen(filename, "r");
     if (fi == NULL)
     {

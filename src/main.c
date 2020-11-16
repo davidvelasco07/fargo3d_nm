@@ -292,11 +292,11 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 
   
   if(Restart == YES || Restart_Full == YES) {
-    CondInit (); //Needed even for restarts: some setups have custom
+    NESTEDMESHES(CondInit();); //Needed even for restarts: some setups have custom
 		 //definitions (eg potential for setup MRI) or custom
 		 //scaling laws (eg. setup planetesimalsRT).
 
-    MULTIFLUID( begin_i  = RestartSimulation(NbRestart));
+    PARENTGRID(MULTIFLUID( begin_i  = RestartSimulation(NbRestart)));
     
     if (ThereArePlanets) {
       PhysicalTime  = GetfromPlanetFile (NbRestart, 9, 0);
@@ -307,12 +307,11 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   else {
     if (ThereArePlanets)
       EmptyPlanetSystemFiles ();
-      NESTEDMESHES(CondInit(););
+    NESTEDMESHES(CondInit(););
     // Initialize set up
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }
-
   /* This must be placed ***after*** reading the input files in case of a restart */
   if ((ArrayNb) && (EarlyOutputRename == NO)) {
     i = strlen(OUTPUTDIR);
@@ -335,7 +334,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   ExtractFromExecutable (NO, ArchFile, 2);
 #endif
 #ifdef STOCKHOLM 
-  FARGO_SAFE(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
+  NESTEDMESHES(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
 #endif
 
 #ifndef NOGHOSTX
@@ -362,8 +361,8 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #if defined(MHD) && defined(DEBUG)
       FARGO_SAFE(ComputeDivergence(Bx, By, Bz));
 #endif
-      //if (ThereArePlanets)
-	    //  WritePlanetSystemFile(TimeStep, NO);
+      if (ThereArePlanets)
+	      WritePlanetSystemFile(TimeStep, NO);
 
 #ifndef NOOUTPUTS
       PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));

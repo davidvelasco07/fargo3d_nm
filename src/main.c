@@ -271,6 +271,7 @@ int main(int argc, char *argv[]) {
 		  ChangeArch adds _cpu or _gpu if GPU is activated.*/
   
   Adapt_for_JUPITER (ParameterFile);
+  PARENTGRID(OutputSpace());
   
   //split(&Gridd); /*Split mesh over PEs*/
   //InitSpace();

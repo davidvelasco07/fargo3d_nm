@@ -79,6 +79,7 @@ ex Point ComputeAccel(real,real,real,real,real);
 
 ex void CreateBuffers(void);
 ex void InitSpace(void);
+ex void OutputSpace(void);
 ex void InitSurfaces(void);
 ex void CreateFields(void);
 ex real ComputeMass(void);

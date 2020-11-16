@@ -207,7 +207,7 @@ void masterfprintf(FILE *f, const char *template, ...)
 void masterprint(const char *template, ...)
 {
   va_list ap;
-  if (!CPU_Master)
+  if (!CPU_Global_Master)
     return;
   va_start(ap, template);
   vfprintf(stdout, template, ap);
@@ -1154,6 +1154,104 @@ void RestartDat(Field *field, int n)
     {
       masterprint("Only one restart option must be enabled.\n");
       MPI_Finalize();
+    }
+  }
+}
+
+void OutputSpace()
+{
+  int i, j, k;
+
+  FILE *domain;
+  char domain_out[512];
+  real ymin, zmin, xmin;
+  int jmin, jmax, kmin, kmax;
+  real temp1;
+  int temp, relay;
+  int init = 0;
+
+  //Linear
+  masterprint("Warning: The spacing for Nested-Meshes is linear (default).\n");
+  if (CPU_Master && FluidColor == 0)
+  {
+    sprintf(domain_out, "%s%s%d_x.dat", OUTPUTDIR, "domain_" ,Current_Jupiter_Patch->parent);
+    domain = fopen(domain_out, "w");
+    for (i = 0; i < Nx + 2 * NGHX + 1; i++)
+    {
+      fprintf(domain, "%#.18lf\n", Xmin(i));
+      fflush(domain);
+    }
+  }
+  if (FluidColor == 0)
+  {
+    if (CPU_Rank > 0)
+    { // Force sequential read
+      MPI_Recv(&relay, 1, MPI_INT, CPU_Rank - 1, 42, DomainComm, MPI_STATUS_IGNORE);
+    }
+    sprintf(domain_out, "%s%s%d_y.dat", OUTPUTDIR, "domain_" ,Current_Jupiter_Patch->parent);
+    if (CPU_Master)
+    {
+      domain = fopen(domain_out, "w");
+      jmin = 0;
+      jmax = Ny + NGHY + 1;
+    }
+    else
+    {
+      if (CPU_Rank < Ncpu_x)
+      {
+        domain = fopen(domain_out, "a");
+        jmin = NGHY + 1;
+        jmax = Ny + NGHY + 1;
+      }
+    }
+    if (CPU_Rank == Ncpu_x - 1)
+      jmax = Ny + 2 * NGHY + 1;
+    if (CPU_Rank < Ncpu_x)
+    {
+      for (j = jmin; j < jmax; j++)
+      {
+        fprintf(domain, "%#.18lf\n", Ymin(j));
+      }
+      fclose(domain);
+    }
+    if (CPU_Rank < CPU_Number - 1)
+    { // Force sequential read
+      MPI_Send(&relay, 1, MPI_INT, CPU_Rank + 1, 42, DomainComm);
+    }
+
+    if (CPU_Rank > 0)
+    { // Force sequential read
+      MPI_Recv(&relay, 1, MPI_INT, CPU_Rank - 1, 43, DomainComm, MPI_STATUS_IGNORE);
+    }
+    sprintf(domain_out, "%s%s%d_z.dat", OUTPUTDIR, "domain_" ,Current_Jupiter_Patch->parent);
+    if (CPU_Master)
+    {
+      domain = fopen(domain_out, "w");
+      jmin = 0;
+      jmax = Nz + NGHZ + 1;
+    }
+    else
+    {
+      if (J == 0)
+      {
+        domain = fopen(domain_out, "a");
+        jmin = NGHZ + 1;
+        jmax = Nz + NGHZ + 1;
+      }
+    }
+    if ((K == Ncpu_y - 1) && (J == 0))
+      jmax = Nz + 2 * NGHZ + 1;
+    if (J == 0)
+    {
+      for (j = jmin; j < jmax; j++)
+      {
+        fprintf(domain, "%#.18lf\n", Zmin(j));
+      }
+      fclose(domain);
+    }
+    if (CPU_Rank < CPU_Number - 1)
+    { // Force sequential read
+      MPI_Send(&relay, 1, MPI_INT, CPU_Rank + 1, 43, DomainComm);
     }
   }
 }

@@ -124,6 +124,14 @@ Fluid *CreateFluid(char *name, int fluidtype) {
   f->Vy0  = CreateFieldEmpty2D ("vy0", YZ);
   f->Vz0  = CreateFieldEmpty2D ("vz0", YZ);
 #endif
+
+#ifdef DRAGFORCE
+  real *coeffvalues;
+  coeffvalues = (real*)malloc(sizeof(real)*(3));
+  for(int n=0; n<3;n++) coeffvalues[n]=0.0;
+  f->Coeffval = coeffvalues;
+  //Coeffval[0] = Stokesnumber;                                                                                                                         //Coeffval[1] = PaeticleSize;                                                                                                                         //Coeffval[2] = RhoSolid;
+#endif
   return f;
 }
 

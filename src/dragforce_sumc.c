@@ -11,22 +11,24 @@ void DragForce_SumC_cpu (real dt) {
  
 //<USER_DEFINED>
   INPUT(Density);
-  INPUT(Total_Density);
   INPUT(Qs);
-  OUTPUT(Slope);
+  INPUT(DensStar);
+  OUTPUT(DensStar);
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-  real* dens     = Density->field_cpu;
-  real* dens_gas = Total_Density->field_cpu;
-  real* c        = Slope->field_cpu;
-  real* pref     = Qs->field_cpu;
+  real* dens = Density->field_cpu;
+  real* c    = DensStar->field_cpu;
+  real* pref = Qs->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
   int fluidtype = Fluidtype;
+  real invstokesnumber = Coeffval[0];
+  real invparticlesize = Coeffval[1];
+  real rhosolid        = Coeffval[2];
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -36,9 +38,8 @@ void DragForce_SumC_cpu (real dt) {
   int ll;
   real alphak;
   real sk;
-  real _c;
-  real epsilon;
 //<\INTERNAL>
+
 
 //<MAIN_LOOP>
 
@@ -56,14 +57,17 @@ void DragForce_SumC_cpu (real dt) {
 //<#>
 	ll = l;
 
-	epsilon = dens[ll]/dens_gas[ll];
-	alphak  = pref[ll];	
+#ifdef STOKESNUMBER
+	alphak  = pref[ll]*invstokesnumber;
+#endif
+#ifdef DUSTSIZE
+	alphak  = pref[ll]*sqrt(8./M_PI)*invparticlesize/rhosolid;
+#endif
 	sk      = dt*alphak/(1+dt*alphak);
 
-	if (fluidtype == GAS)  _c = 0.;
-	else _c  = epsilon*sk;
+	if (fluidtype == GAS)  sk = 1.0;
+	c[ll] += dens[ll]*sk;
 
-	c[ll] += _c;
 //<\#>
 #ifdef X
       }

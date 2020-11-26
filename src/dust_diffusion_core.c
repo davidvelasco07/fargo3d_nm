@@ -17,8 +17,8 @@ void DustDiffusion_Core_cpu(real dt) {
   INPUT(Sdiffyfzf);
 #endif
   INPUT(Density);
-  INPUT(Fluids[0]->Density);
-  OUTPUT(Pressure);// we use the pressure field for temporal storage.
+  INPUT(QR);
+  OUTPUT(Qs);// we use the Qs field for temporal storage.
 //<\USER_DEFINED>
 
   //Arrays Mmx, Mpx, Mmy and Mpy were filled with the dust diffusion coefficients in DustDiffusion_Coefficients()
@@ -31,13 +31,8 @@ void DustDiffusion_Core_cpu(real dt) {
   real* sdiff_yfzf = Sdiffyfzf->field_cpu;
 #endif
   real* rhod  = Density->field_cpu;
-  real* rhog  = Fluids[0]->Density->field_cpu;
-  real* temp  = Pressure->field_cpu;
-#ifdef __GPU
-  real* alpha = Alpha_d;
-#else
-  real* alpha = Alpha;
-#endif
+  real* rhog  = QR->field_cpu;
+  real* temp  = Qs->field_cpu;
   real dx    = Dx;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;

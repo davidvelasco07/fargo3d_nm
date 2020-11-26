@@ -46,7 +46,7 @@ Alpha			0.0
 PlanetConfig		NONE
 PeriodicZ		No
 PeriodicY		No
-
+Floormin		1.0e-14
 OhmicDiffusionCoeff	0.0
 HallEffectCoeff		0.0
 AmbipolarDiffusionCoeff	0.0

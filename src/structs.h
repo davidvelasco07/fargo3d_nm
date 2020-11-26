@@ -119,6 +119,9 @@ struct fluid {
   struct field2D *Vy0;
   struct field2D *Vz0;
 #endif
+#ifdef DRAGFORCE
+  real *Coeffval;
+#endif
   real *Fluxes[3][2];
 };
 

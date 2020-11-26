@@ -14,11 +14,19 @@ void DragForce_Coeff_cpu () {
     and solid density are added through alpha[n] in each source file */
   
 //<USER_DEFINED>
+#ifdef DUSTSIZE
+  INPUT(QR);
+  INPUT(DivRho);
+#endif
   OUTPUT(Qs);
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-  real* coef = Qs->field_cpu;
+  real* coeff      = Qs->field_cpu;
+#ifdef DUSTSIZE
+  real* dens_gas   = QR->field_cpu;
+  real* energy_gas = DivRho->field_cpu;
+#endif
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
@@ -32,6 +40,7 @@ void DragForce_Coeff_cpu () {
   int k;
   int ll;
   real omega;
+  real cs;
 //<\INTERNAL>
 
 //<CONSTANT>
@@ -54,9 +63,22 @@ void DragForce_Coeff_cpu () {
 //<#>
 	ll = l;
 
+	
+#ifdef STOKESNUMBER
 	omega    = sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)));
-	coef[ll] = omega;
-
+	coeff[ll] = omega;
+#endif
+	
+#ifdef DUSTSIZE
+#ifdef ADIABATIC
+	cs = sqrt(GAMMA*(GAMMA-1)*energy_gas[ll]/dens_gas[ll]);
+#endif
+#ifdef ISOTHERMAL
+	cs = energy_gas[ll];
+#endif
+	coeff[ll] = dens_gas[ll]*cs;
+#endif
+	
 //<\#>
 #ifdef X
       }

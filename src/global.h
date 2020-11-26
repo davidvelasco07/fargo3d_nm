@@ -20,6 +20,9 @@ MPI_Comm DomainComm; //Intra communicator for each fluid
 MPI_Comm FluidsComm; //Intra communicator for each domain
 
 MPI_Request RequestTotalDensity;
+MPI_Request RequestGasDensity;
+MPI_Request RequestGasEnergy;
+MPI_Request request_c;
 
 int FluidColor;   //Rows
 int DomainColor;  //Columns
@@ -328,6 +331,7 @@ long VtkPosition = 0;
 int Timestepcount = 0;
 int Fluidtype;
 int FluidIndex;
+real *Coeffval;
 real Min[NFLUIDS];      //Comment: NFLUIDS is the upper bound for the size of the array.
 Fluid *Fluids[NFLUIDS]; //Comment: NFLUIDS is the upper bound for the size of the array.
 

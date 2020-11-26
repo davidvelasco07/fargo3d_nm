@@ -154,13 +154,16 @@ ex void SendRecv(int);
 ex void comm_cpu(int);
 ex void comm_gpu(int);
 
-// DragForce Prototypes
-ex void DragForce(real);
+
+// DragForce Prototypes                                                                                                                               
+ex void DragForce_Comm();
+ex void DragForce_a(real);
+ex void DragForce_b(real);
 ex void DragForce_Coeff_cpu();
 ex void DragForce_SumC_cpu(real);
 ex void DragForce_SumCV(real,int);
 ex void _DragForce_SumCV_cpu(real,int,int,int,Field*,Field*);
-ex void DragForce_UpdateVel(real,int); 
+ex void DragForce_UpdateVel(real,int);
 ex void _DragForce_UpdateVel_cpu(real,int,int,int,Field*,Field*);
 
 ex void _collisions_gpu(real,int,int,int,int);
@@ -355,7 +358,8 @@ ex void ChangeFrame_cpu(int, Field*, Field2D*);
 
 ex void copy_field_cpu(Field*,Field*);
 
-//Dust Diffusion module Prototypes
+//Dust Diffusion module Prototypes                                                                                                                    
+ex void DustDiffusion_Comm();
 ex void DustDiffusion_Main(real);
 ex void DustDiffusion_Core_cpu(real);
 ex void DustDiffusion_Coefficients_cpu();

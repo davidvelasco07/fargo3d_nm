@@ -13,7 +13,7 @@ void DustDiffusion_Coefficients_cpu() {
 #ifdef ALPHAVISCOSITY
   INPUT(Energy);
 #ifdef ADIABATIC
-  INPUT(Density);
+  INPUT(QR);
 #endif
 #endif
   OUTPUT(Sdiffyczc);
@@ -33,14 +33,14 @@ void DustDiffusion_Coefficients_cpu() {
 #endif
 #ifdef ALPHAVISCOSITY  
 #ifdef ISOTHERMAL
-  real* cs = Fluids[0]->Energy->field_cpu;
+  real* cs = Energy->field_cpu;
 #endif
 #ifdef ADIABATIC
-  real* e = Fluids[0]->Energy->field_cpu;
-  real* rhog = Fluids[0]->Density->field_cpu;
+  real* e    = Energy->field_cpu;
+  real* rhog = QR->field_cpu;
   real gamma = GAMMA;
 #endif
-  real alphavisc = ALPHA;
+  real alphavisc = DELTA;
 #else
   real nu = NU;
 #endif

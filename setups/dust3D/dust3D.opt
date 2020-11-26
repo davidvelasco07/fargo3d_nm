@@ -1,0 +1,50 @@
+# You may enter a description between the BEGIN and END labels.
+# BEGIN
+# END
+#-------------------------------------------------------------------------
+
+FLUIDS := 0 1
+NFLUIDS = 2
+
+FARGO_OPT += -DNFLUIDS=${NFLUIDS}
+#-----------------------------------------------------------
+
+FARGO_OPT +=  -DX
+FARGO_OPT +=  -DY
+FARGO_OPT +=  -DZ
+
+#Coordinate System.
+FARGO_OPT +=  -DSPHERICAL
+
+#Equation of State
+FARGO_OPT += -DISOTHERMAL
+
+# Boundaries
+FARGO_OPT += -DSTOCKHOLM
+FARGO_OPT += -DHALFDISK
+
+# Viscosity
+FARGO_OPT += -DALPHAVISCOSITY
+
+# Potential
+FARGO_OPT += -DPOTENTIAL
+
+#Drag force between species
+FARGO_OPT += -DDRAGFORCE
+FARGO_OPT += -DSTOKESNUMBER
+FARGO_OPT += -DFLOOR
+FARGO_OPT += -DDUSTDIFFUSION
+
+#Nested Meshes
+COMM = INTERNAL
+FARGO_OPT += -DCOMMADAPT
+FARGO_OPT += -DCOMMGPU
+#FARGO_OPT += -DRELNESTING
+
+
+#Cuda blocks
+ifeq (${GPU}, 1)
+FARGO_OPT += -DBLOCK_X=16
+FARGO_OPT += -DBLOCK_Y=8
+FARGO_OPT += -DBLOCK_Z=4
+endif

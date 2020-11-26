@@ -643,6 +643,9 @@ void SelectFluid(int n)
   Vy0 = Fluids[n]->Vy0;
   Vz0 = Fluids[n]->Vz0;
 #endif
+#ifdef DRAGFORCE
+  Coeffval = Fluids[n]->Coeffval;
+#endif
   for (i = 0; i < 3; i++){
     for (j = 0; j < 2; j++){
       Fluxes[i][j] = Fluids[n]->Fluxes[i][j];
@@ -692,19 +695,19 @@ void CreateFields()
   CreateField(&Pressure, "Pressure", 0, 0, 0, 0);
   CreateField(&Total_Density, "Total_Density", 0, 0, 0, 0);
 
-  //QL      = CREATEFIELDALIAS("QLeft", Pressure, 0);
-  //QR      = CreateField("QRight", 0,0,0,0);
+  CreateField(&QL, "QLeft", 0,0,0,0);
+  CreateField(&QR, "QRight", 0,0,0,0);
 
 #ifdef PPA_STEEPENER
   LapPPA = CreateField("LapPPA", 0, 0, 0, 0);
 #endif
 
 #ifdef DUSTDIFFUSION
-  Sdiffyczc = CREATEFIELDALIAS("Sdiffyczc", Mpx, 0);
-  Sdiffyfzc = CREATEFIELDALIAS("Sdiffyfzc", Mmx, 0);
+  CreateField(&Sdiffyczc,"Sdiffyczc", 0,0,0,0);
+  CreateField(&Sdiffyfzc,"Sdiffyfzc", 0,0,0,0);
 #ifdef Z
-  Sdiffyczf = CREATEFIELDALIAS("Sdiffyczf", Mmy, 0);
-  Sdiffyfzf = CREATEFIELDALIAS("Sdiffyfzf", Mpy, 0);
+  CreateField(&Sdiffyczf,"Sdiffyczf", 0,0,0,0);
+  CreateField(&Sdiffyfzf,"Sdiffyfzf", 0,0,0,0);
 #endif
 #endif
 

@@ -10,11 +10,11 @@
 void DragForce_SumCV(real dt, int option) {
 
   if (option == 0)
-    _DragForce_SumCV(dt, 1, 0, 0, Vx_temp, Mpx);
+    _DragForce_SumCV(dt, 1, 0, 0, Vx_temp, Mmx);
   if (option == 1)
-    _DragForce_SumCV(dt, 0, 1, 0, Vy_temp, Mpy);
+    _DragForce_SumCV(dt, 0, 1, 0, Vy_temp, Mmy);
   if (option == 2)
-    _DragForce_SumCV(dt, 0, 0, 1, Vz_temp, Mpz);
+    _DragForce_SumCV(dt, 0, 0, 1, Vz_temp, Mmz);
   
 }
 
@@ -22,24 +22,26 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
 
 //<USER_DEFINED>
   INPUT(Density);
-  INPUT(Total_Density);
   INPUT(Qs);
   INPUT(V);
+  INPUT(Cv);
   OUTPUT(Cv);
 //<\USER_DEFINED>
 
 //<EXTERNAL>
-  real* dens     = Density->field_cpu;
-  real* dens_gas = Total_Density->field_cpu;
-  real* pref     = Qs->field_cpu;
-  real* v        = V->field_cpu;
-  real* cv       = Cv->field_cpu;
+  real* dens = Density->field_cpu;
+  real* pref = Qs->field_cpu;
+  real* v    = V->field_cpu;
+  real* cv   = Cv->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
   int fluidtype = Fluidtype;
+  real invstokesnumber = Coeffval[0];
+  real invparticlesize = Coeffval[1];
+  real rhosolid        = Coeffval[2];
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -50,8 +52,6 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
   int lm;
   real alphak;
   real sk;
-  real _cv;
-  real epsilon;
 //<\INTERNAL>
 
 
@@ -72,14 +72,18 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
 	ll = l;
 	lm = idx*lxm + idy*lym + idz*lzm;
 	
-	epsilon = (dens[ll]+dens[lm])/(dens_gas[ll]+dens_gas[lm]);
-	alphak  = 0.5*(pref[ll]+pref[lm]);
+#ifdef STOKESNUMBER
+	alphak  = 0.5*(pref[ll]+pref[lm])*invstokesnumber;
+#endif
+#ifdef DUSTSIZE
+	alphak  = 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid;
+#endif
 	sk      = dt*alphak/(1+dt*alphak);
 
-	if (fluidtype == GAS)  _cv = v[ll];
-	else _cv  = sk*epsilon*v[ll];
-	
-	cv[ll] += _cv;
+	if (fluidtype == GAS)  sk = 1.0;
+
+	cv[ll] += 0.5*(dens[ll]+dens[lm])*v[ll]*sk;
+
 //<\#>
 #ifdef X
       }

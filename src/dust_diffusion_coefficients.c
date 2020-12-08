@@ -33,10 +33,10 @@ void DustDiffusion_Coefficients_cpu() {
 #endif
 #ifdef ALPHAVISCOSITY  
 #ifdef ISOTHERMAL
-  real* cs = Energy->field_cpu;
+  real* cs = QRE->field_cpu;
 #endif
 #ifdef ADIABATIC
-  real* e    = Energy->field_cpu;
+  real* e    = QRE->field_cpu;
   real* rhog = QR->field_cpu;
   real gamma = GAMMA;
 #endif

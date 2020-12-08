@@ -113,8 +113,8 @@ void DragForce_b(real dt) {
   MPI_Iallreduce(Mmz->field_gpu, Mpz->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_z); 
 #else
-  INPUT(Mpz);
-  OUTPUT(Mmz);
+  INPUT(Mmz);
+  OUTPUT(Mpz);
   MPI_Iallreduce(Mmz->field_cpu, Mpz->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_z);     
 #endif

@@ -151,6 +151,8 @@ Field *Total_Density=NULL;
 
 Field *QL=NULL;
 Field *QR=NULL;
+Field *QLE=NULL;
+Field *QRE=NULL;
 Field *LapPPA=NULL;
 
 Field *Sdiffyczc=NULL;

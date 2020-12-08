@@ -705,6 +705,10 @@ void CreateFields()
 #ifdef DUSTDIFFUSION
   CreateField(&Sdiffyczc,"Sdiffyczc", 0,0,0,0);
   CreateField(&Sdiffyfzc,"Sdiffyfzc", 0,0,0,0);
+#ifdef ALPHAVISCOSITY
+  CreateField(&QRE,"QRe", 0,0,0,0);
+  CreateField(&QLE,"QLe", 0,0,0,0);
+#endif
 #ifdef Z
   CreateField(&Sdiffyczf,"Sdiffyczf", 0,0,0,0);
   CreateField(&Sdiffyfzf,"Sdiffyfzf", 0,0,0,0);

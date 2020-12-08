@@ -19,13 +19,16 @@ void DustDiffusion_Comm(){
 
 #ifdef ALPHAVISCOSITY  
   //Send Gas Energy to Dust-Fluids
+  Reset_field(QLE);
+  MULTIFLUID( if(Fluidtype == GAS) copy_field(QLE, Energy) );
+
 #ifdef MPICUDA
-  MPI_Iallreduce(MPI_IN_PLACE, Energy->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QLE->field_gpu, QRE->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy); 
 #else
-  INPUT(Energy);
-  OUTPUT(Energy);
-  MPI_Iallreduce(MPI_IN_PLACE, Energy->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  INPUT(QLE);
+  OUTPUT(QRE);
+  MPI_Iallreduce(QLE->field_cpu, QRE->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
   		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy);
 #endif
 #endif
@@ -42,8 +45,6 @@ void DustDiffusion_Main(real dt) {
   //Wait for Gas Energy
   MPI_Wait(&RequestGasEnergy, MPI_STATUS_IGNORE);
   // This copy is needed for a local set of fluids
-  MULTIFLUID( if(Fluidtype == GAS)   copy_field(Pressure, Energy);
-	      if(Fluidtype == DUST)  copy_field(Energy, Pressure););
 #endif
 #endif
 
@@ -56,7 +57,6 @@ void DustDiffusion_Main(real dt) {
 	       FARGO_SAFE(DustDiffusion_Core(dt)); // Updated dust-density is stored in Qs field.
 	       FARGO_SAFE(copy_field(Density,Qs)); // Local copy of Qs to dust-density.
 	       FARGO_SAFE(FillGhosts(DENS));       // Fill ghost with new density.
-	       FARGO_SAFE(Reset_field(Energy));       // Fill ghost with new density.
 	     });
 
 }

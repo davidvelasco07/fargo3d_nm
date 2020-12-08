@@ -1,6 +1,13 @@
 #include "fargo3d.h"
 
 void _CondInit(int id) {
+
+  OUTPUT(Density);
+  OUTPUT(Energy);
+  OUTPUT(Vx);
+  OUTPUT(Vy);
+  OUTPUT(Vz);
+
   int i,j,k, n;
   real *v1;
   real *v2;

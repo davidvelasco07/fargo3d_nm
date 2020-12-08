@@ -103,7 +103,7 @@ void ItereLevel (real dt, long level)
       #ifdef POTENTIAL
       FARGO_SAFE(Reset_field(Total_Density)); 
       MULTIFLUID(ComputeTotalDensity());      
-      MPI_Iallreduce(MPI_IN_PLACE, Total_Density->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+      MPI_Iallreduce(MPI_IN_PLACE, Total_Density->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		     MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
       #endif
       #ifdef DRAGFORCE
@@ -175,7 +175,7 @@ real RecursiveIteration (real dt, long level)
   } 
   else {/* Finest level */
     dt_cfl_loc = CourantLimitGlobal () / (real)BaseStepRatio[level];
-    MPI_Allreduce (&dt_cfl_loc, &dt_cfl, 1, MPI_DOUBLE, MPI_MIN, DomainComm);
+    MPI_Allreduce (&dt_cfl_loc, &dt_cfl, 1, MPI_DOUBLE, MPI_MIN, DomainComm); // This line may be redundant (dt_cfl_loc -> dt_cfl)
     dt = (dt_cfl < dt ? dt_cfl : dt);
     ItereLevel (dt, level);
     LevelDate[level] += dt;

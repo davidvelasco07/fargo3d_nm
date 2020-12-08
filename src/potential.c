@@ -16,7 +16,6 @@ void compute_potential(real dt) {
   real omeganew;
   int i;
   int subcycling = 5;
-  static int alreadycalculated = -1;
 
   if (Corotating && Current_Level == LevMax) GetPsysInfo (MARK);
     

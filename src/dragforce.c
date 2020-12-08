@@ -17,23 +17,23 @@ void DragForce_Comm(){
   MULTIFLUID( if(Fluidtype == GAS) copy_field(QL, Density) );
   
 #ifdef MPICUDA
-  MPI_Iallreduce(QL->field_gpu, QR->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QL->field_gpu, QR->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasDensity); 
 #else
   INPUT(QL);
   OUTPUT(QR);
-  MPI_Iallreduce(QL->field_cpu, QR->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QL->field_cpu, QR->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
   		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasDensity); 
 #endif
   
   //Send Gas Energy to Dust-Fluids
 #ifdef MPICUDA
-  MPI_Iallreduce(MPI_IN_PLACE, Energy->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(MPI_IN_PLACE, Energy->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy); 
 #else
   INPUT(Energy);
   OUTPUT(Energy);
-  MPI_Iallreduce(MPI_IN_PLACE, Energy->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(MPI_IN_PLACE, Energy->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
   		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy);
 #endif
 
@@ -60,12 +60,12 @@ void DragForce_a(real dt) {
   Reset_field(DensStar);  
   MULTIFLUID(DragForce_SumC(dt)); 
 #ifdef MPICUDA
-  MPI_Iallreduce(DensStar->field_gpu, Slope->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(DensStar->field_gpu, Slope->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_c); // obtain C
 #else
   INPUT(DensStar);
   OUTPUT(Slope);
-  MPI_Iallreduce(DensStar->field_cpu, Slope->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(DensStar->field_cpu, Slope->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_c); // obtain C
 #endif
 }
@@ -82,13 +82,13 @@ void DragForce_b(real dt) {
   Reset_field(Mmx);
   MULTIFLUID(DragForce_SumCV(dt,0)); 
 #ifdef MPICUDA
-  MPI_Iallreduce(Mmx->field_gpu, Mpx->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(Mmx->field_gpu, Mpx->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_x); 
 #else
 
   INPUT(Mmx);
   OUTPUT(Mpx);
-  MPI_Iallreduce(Mmx->field_cpu, Mpx->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(Mmx->field_cpu, Mpx->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_x); 
 #endif
 #endif
@@ -97,12 +97,12 @@ void DragForce_b(real dt) {
   Reset_field(Mmy);
   MULTIFLUID(DragForce_SumCV(dt,1)); 
 #ifdef MPICUDA
-  MPI_Iallreduce(Mmy->field_gpu, Mpy->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(Mmy->field_gpu, Mpy->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_y); 
 #else
   INPUT(Mmy);
   OUTPUT(Mpy);
-  MPI_Iallreduce(Mmy->field_cpu, Mpy->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(Mmy->field_cpu, Mpy->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_y);  
 #endif
 #endif
@@ -110,12 +110,12 @@ void DragForce_b(real dt) {
   Reset_field(Mmz); 
   MULTIFLUID(DragForce_SumCV(dt,2)); 
 #ifdef MPICUDA
-  MPI_Iallreduce(Mmz->field_gpu, Mpz->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(Mmz->field_gpu, Mpz->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_z); 
 #else
   INPUT(Mmz);
   OUTPUT(Mpz);
-  MPI_Iallreduce(Mmz->field_cpu, Mpz->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(Mmz->field_cpu, Mpz->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_z);     
 #endif
 #endif

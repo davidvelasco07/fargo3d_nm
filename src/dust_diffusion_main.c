@@ -7,12 +7,12 @@ void DustDiffusion_Comm(){
   MULTIFLUID( if(Fluidtype == GAS) copy_field(QL, Density) );
 
 #ifdef MPICUDA
-  MPI_Iallreduce(QL->field_gpu, QR->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QL->field_gpu, QR->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasDensity); 
 #else
   INPUT(QL);
   OUTPUT(QR);
-  MPI_Iallreduce(QL->field_cpu, QR->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QL->field_cpu, QR->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
   		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasDensity); 
 #endif
 
@@ -23,12 +23,12 @@ void DustDiffusion_Comm(){
   MULTIFLUID( if(Fluidtype == GAS) copy_field(QLE, Energy) );
 
 #ifdef MPICUDA
-  MPI_Iallreduce(QLE->field_gpu, QRE->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QLE->field_gpu, QRE->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy); 
 #else
   INPUT(QLE);
   OUTPUT(QRE);
-  MPI_Iallreduce(QLE->field_cpu, QRE->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+  MPI_Iallreduce(QLE->field_cpu, QRE->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
   		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy);
 #endif
 #endif

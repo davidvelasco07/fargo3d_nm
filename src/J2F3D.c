@@ -97,7 +97,7 @@ void Adapt_for_JUPITER(char *filename)
   {
     splitgrid(grid);
     Ngrids++;
-    printf("Grid %d N(%d,%d)\n",grid->number,grid->ncell[0],grid->ncell[1]);
+    //printf("Grid %d N(%d,%d,%d)\n",grid->number,grid->ncell[0],grid->ncell[1],grid->ncell[2]);
     grid = grid->next;
   }
   //At this point we have built the CPUgrids
@@ -213,15 +213,20 @@ void AdaptFieldsFromJ(tGrid_CPU *grid)
       jstride[2] = grid->gncell[0] * grid->gncell[1];
     else
       jstride[2] = 0;
-    //This should be changed to be called just once, the arrays defined here are global arrays with a fixed size = max_size
-    //and there is no need to asign a descriptor to these fields as they are only used in FARGO3D routines (not involved in NM comms)
-    FARGO_SAFE(CreateFields()); //(Re)alloc work arrays
+    
 
     Ncpu_x = grid->Parent->Ncpus[1];
     Ncpu_y = grid->Parent->Ncpus[2];
 
     Y0 = grid->pcorner_min[1];
     Z0 = grid->pcorner_min[2];
+
+    J = grid->cpu % Ncpu_x;
+    K = grid->cpu / Ncpu_x;
+
+    //This should be changed to be called just once, the arrays defined here are global arrays with a fixed size = max_size
+    //and there is no need to asign a descriptor to these fields as they are only used in FARGO3D routines (not involved in NM comms)
+    FARGO_SAFE(CreateFields()); //(Re)alloc work arrays
   //}
 }
 
@@ -321,6 +326,12 @@ void SelectGrid(tGrid_CPU *grid)
       
     Ncpu_x = grid->Parent->Ncpus[1];
     Ncpu_y = grid->Parent->Ncpus[2];
+
+    Y0 = grid->pcorner_min[1];
+    Z0 = grid->pcorner_min[2];
+
+    J = grid->cpu % Ncpu_x;
+    K = grid->cpu / Ncpu_x;
   }
 }
 

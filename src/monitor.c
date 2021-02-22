@@ -252,3 +252,93 @@ void MonitorGlobal (int bitchoice) {
   }
   if (FluidIndex == NFLUIDS-1) MonCounter++;
 }
+
+void CorrectHidden (Field *input, Field *output, char *hidden) {
+  int i,j,k;
+  for (k = 0; k < Nz+2*NGHZ; k++) {
+    for (j = 0; j < Ny+2*NGHY; j++) {
+      for (i = 0; i < Nx+2*NGHX; i++) {
+	if (hidden[l] == 1) output->field_cpu[l] = 0.0;
+	else output->field_cpu[l] = input->field_cpu[l];
+      }
+    }
+  }
+}
+
+void AllLevelSum (int idx, int r) {
+  int nb, i, j, k;
+  real lsum, gsum;
+  tGrid_CPU *current;
+  char filename[MAXLINELENGTH];
+  FILE *Out;
+  nb = Sys->nb;
+  if (mon_pldp[idx] == INDEP_PLANET) nb = 1;
+  for (i = 0; i < nb; i++) {
+    if (ThereArePlanets) {
+      Xplanet = Sys->x[i];
+      Yplanet  = Sys->y[i];
+      Zplanet  = Sys->z[i];
+      VXplanet = Sys->vx[i];
+      VYplanet = Sys->vy[i];
+      VZplanet = Sys->vz[i];
+      MplanetVirtual = Sys->mass[i];
+    } else {
+      Xplanet = Yplanet = Zplanet = VXplanet = VYplanet = VZplanet = MplanetVirtual = 0.0;
+    }
+    current = Grid_CPU_list;
+    lsum = 0.0;
+    while(current != NULL) {
+      if (current->cpu == CPU_Rank) {
+	AdaptFieldsFromJ (current);
+	mon_func[idx]();
+#ifdef GPU
+	Dev2Host3D (Slope);
+#endif
+	CorrectHidden (Slope, Slope, current->Hidden);
+#ifdef GPU
+	Host2Dev3D (Slope);
+#endif
+	reduction_SUM (Slope, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+	INPUT2D (Reduction2D);
+	for (k = NGHZ; k < Nz+NGHZ; k++) {
+	  for (j = NGHY; j < Ny+NGHY; j++) {
+	    lsum += Reduction2D->field_cpu[l2D];
+	  }
+	}
+      }
+      current = current->next;
+    }
+#ifndef FLOAT
+    MPI_Reduce(&lsum, &gsum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+#else
+    MPI_Reduce(&lsum, &gsum, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+#endif
+    if (mon_pldp[idx] == INDEP_PLANET)
+      sprintf (filename, "%smonitor/%s/%s_all_levels.dat", OUTPUTDIR, Fluids[FluidIndex]->name,mon_name[idx]);
+    else
+      sprintf (filename, "%smonitor/%s/%s_planet_%d_all_levels.dat", OUTPUTDIR, Fluids[FluidIndex]->name,mon_name[idx], i);
+      //sprintf (filename, "%s/%s_planet_%d_all_levels.dat", OUTPUTDIR, mon_name[idx], i);
+    Out = fopen_prs (filename, "a");
+    if (CPU_Rank == 0) {
+      fprintf (Out, "%.12g\t%.12g\n", PhysicalTime, gsum);
+    }
+    fclose (Out);
+  }
+}
+
+void MonitorNested (int bitchoice) {
+  char CurrentFineGrainDir[MAXLINELENGTH];
+  int r=1, idx;
+  if (func_declared == NO) InitMonitoring ();
+  if (bitchoice & REYNOLDS)
+    ComputeVmed (Vx);
+  while (bitchoice) {
+    if (bitchoice & 1) {
+      idx = Index(r);
+      if (r & MONITORSCALAR)
+	AllLevelSum (idx, r);
+    }
+    bitchoice >>= 1;
+    r <<= 1;
+  }
+}

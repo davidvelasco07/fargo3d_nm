@@ -187,6 +187,10 @@ ex void Write1DFile (char *, real *, real *, int);
 ex void InitMonitoring(void);
 ex void MonitorGlobal (int);
 ex void Monitor (int);
+//Prototypes for nested meshes
+ex void CorrectHidden (Field *, Field *, char *);
+ex void MonitorNested (int);
+ex void AllLevelSum (int, int);
 
 ex void Write2D (Field2D *, char *, char *, int);
 ex boolean Read2D (Field2D *, char *, char *, int);

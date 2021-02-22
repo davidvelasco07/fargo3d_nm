@@ -87,8 +87,8 @@ void _CondInit(int id) {
 	real h = ASPECTRATIO*pow(r/R0,FLARINGINDEX)*hd;
 
 	if(Fluidtype == DUST) {
-          v3[l] = -sin(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
-          v2[l] =  cos(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
+          v3[l] =  sin(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
+          v2[l] = -cos(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
         }
 
 	if (FLARINGINDEX == 0.0) {

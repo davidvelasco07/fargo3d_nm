@@ -14,7 +14,7 @@ smin			6.0e-5          size in cm (or Tsmin)
 smax			0.01		size in cm (or Tsmax)
 rhosolid		1.0             in g/cm3
 Sq			3.5		slope of distribution
-Delta			6.0e-5          diffusion coefficient (~alpha)
+Delta			5.0e-3          diffusion coefficient (~alpha)
 
 ### Planet parameters
 PlanetConfig		planets/zero.cfg
@@ -23,7 +23,7 @@ ThicknessSmoothing 	0.1	Smoothing parameters in disk thickness
 
 ### Mesh parameters
 Nx		         16		Azimuthal number of zones 
-Ny                      256		Radial number of zones
+Ny                       64		Radial number of zones
 Nz			 64		Number of zones in colatitude
 Ymin			0.4		Inner boundary radius
 Ymax			2.6		Outer boundary radius
@@ -33,10 +33,10 @@ Xmin			-3.141592653589793
 Xmax			3.141592653589793
 
 ### Output control parameters
-Ntot			200		Total number of time steps
-Ninterm	 		20		Time steps between outputs
+Ntot			1		Total number of time steps
+Ninterm	 		1		Time steps between outputs
 DT			0.314159265359	Time step length. 2PI = 1 orbit
-OutputDir		@outputs/dust3D
+OutputDir		@outputs/dust3D_level0
 
 Field 			gasdens
 PlotLine		field[-1,:,:]

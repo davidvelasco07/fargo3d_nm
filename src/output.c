@@ -301,16 +301,17 @@ void WriteMerging(Field *f, int n) {
   if (CPU_Master) fo = fopen(outname, "w");
   else            fo = fopen(outname, "r+");
 
-  long offset = Nx*Y0 + Nx*NY*Z0;
+  long offset = Nx*Y0 + Nx*Ny*Z0;
 
   for (k=NGHZ; k<Nz+NGHZ; k++) {
     fseek(fo, offset*sizeof(real), SEEK_SET);
     for (j = NGHY; j < Ny+NGHY; j++) {
       fwrite(f->field_cpu+k*Stride+j*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
     }
-    offset += Nx*NY;
+    offset += Nx*Ny;
   }
 
+  
   fclose(fo);
 
   if (CPU_Rank < CPU_Number-1)  // Force sequential write

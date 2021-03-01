@@ -165,31 +165,13 @@ extern "C" int Dev2Host3D(Field *f) {
 }
 
 extern "C" int Host2Dev2D (Field2D *F) {
-  int di;
   tGrid_CPU *grid;
   grid = F->desc;
-  di=0;
-#ifdef X
-  int Nx = grid->ncell[di];
-  di++;
-#else
-  int Nx = 1;
-#endif
-#ifdef Y
-  int Ny = grid->ncell[di];
-  di++;
-#else
-  int Ny = 1;
-#endif
-#ifdef Y
-  int Nz = grid->ncell[di];
-  di++;
-#else
-  int Nz = 1;
-#endif
+  //printf("Host2Dev2D %s: level %d, N (%d,%d,%d) Pitch2D %d\n",F->name, grid->level, Nx, Ny, Nz, grid->Pitch2D);
+  //check_errors("Host2Dev2D");
   if (F->kind == YZ)
-    return (int)cudaMemcpy2D (F->field_gpu, Pitch2D*sizeof(real), F->field_cpu, (Ny+2*NGHY)*sizeof(real), \
-			      (Ny+2*NGHY)*sizeof(real),Nz+2*NGHZ,cudaMemcpyHostToDevice);
+    return (int)cudaMemcpy2D(F->field_gpu, (grid->Pitch2D)*sizeof(real), F->field_cpu, (Ny+2*NGHY)*sizeof(real), \
+          (Ny+2*NGHY)*sizeof(real),Nz+2*NGHZ,cudaMemcpyHostToDevice);
   if (F->kind == ZX)
     return (int)cudaMemcpy2D (F->field_gpu, (F->pitch)*sizeof(real), F->field_cpu, (Nx+2*NGHX)*sizeof(real), \
 			      (Nx+2*NGHX)*sizeof(real), Nz+2*NGHZ, cudaMemcpyHostToDevice);
@@ -197,31 +179,12 @@ extern "C" int Host2Dev2D (Field2D *F) {
 }
 
 extern "C" int Dev2Host2D (Field2D *F) {
-  int di;
   tGrid_CPU *grid;
   grid = F->desc;
-  di=0;
-#ifdef X
-  int Nx = grid->ncell[di];
-  di++;
-#else
-  int Nx = 1;
-#endif
-#ifdef Y
-  int Ny = grid->ncell[di];
-  di++;
-#else
-  int Ny = 1;
-#endif
-#ifdef Y
-  int Nz = grid->ncell[di];
-  di++;
-#else
-  int Nz = 1;
-#endif
+  //printf("Dev2Host2D %s: level %d, N (%d,%d,%d) Pitch2D %d, size %d\n",F->name, grid->level, Nx, Ny, Nz, Pitch2D, F->size);
   if (F->kind == YZ)
-    return (int)cudaMemcpy2D ((F->field_cpu), ((Ny+2*NGHY)*sizeof(real)), (F->field_gpu), (Pitch2D*sizeof(real)), \
-			      ((Ny+2*NGHY)*sizeof(real)),(Nz+2*NGHZ),cudaMemcpyDeviceToHost);
+    return (int)cudaMemcpy2D (F->field_cpu, (Ny+2*NGHY)*sizeof(real), F->field_gpu, (Pitch2D)*sizeof(real), \
+			      (Ny+2*NGHY)*sizeof(real),(Nz+2*NGHZ),cudaMemcpyDeviceToHost);
   if (F->kind == ZX)
     return (int)cudaMemcpy2D (F->field_cpu, (Nx+2*NGHX)*sizeof(real), F->field_gpu, (F->pitch)*sizeof(real), \
 			      (Nx+2*NGHX)*sizeof(real), Nz+2*NGHZ, cudaMemcpyDeviceToHost);

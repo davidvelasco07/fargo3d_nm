@@ -356,29 +356,11 @@ of Metric.
     for (j = 0; j < 3; j++)
       for (k = 0; k < 2; k++)
         F3Dfluid->Fluxes[j][k] = fluid->Fluxes[j][k];
-#ifdef STOCKHOLM
-    F3Dfluid->Density0->field_cpu = fluid->Rho0->Field;
-#ifdef X
-    F3Dfluid->Vx0->field_cpu = fluid->Vx0->Field;
-#endif
-#ifdef Y
-    F3Dfluid->Vy0->field_cpu = fluid->Vy0->Field;
-#endif
-#ifdef Z
-    F3Dfluid->Vz0->field_cpu = fluid->Vz0->Field;
-#endif
-#endif
 
 #ifdef GPU
     F3Dfluid->Density->field_gpu = fluid->Density->Field_gpu;
     F3Dfluid->Density->fresh_cpu = &(fluid->Density->fresh_cpu);
     F3Dfluid->Density->fresh_gpu = &(fluid->Density->fresh_gpu);
-    
-#ifdef STOCKHOLM
-    F3Dfluid->Density0->field_gpu = fluid->Rho0->Field_gpu;
-    F3Dfluid->Density0->fresh_cpu = &(fluid->Rho0->fresh_cpu);
-    F3Dfluid->Density0->fresh_gpu = &(fluid->Rho0->fresh_gpu);
-#endif
 #ifdef X
     F3Dfluid->Vx->field_gpu = fluid->Velocity->Field_gpu[_X_];
     F3Dfluid->Vx->fresh_cpu = &(fluid->Velocity->fresh_cpu[_X_]);
@@ -386,11 +368,6 @@ of Metric.
     F3Dfluid->Vx_temp->field_gpu = fluid->V_temp->Field_gpu[_X_];
     F3Dfluid->Vx_temp->fresh_cpu = &(fluid->V_temp->fresh_cpu[_X_]);
     F3Dfluid->Vx_temp->fresh_gpu = &(fluid->V_temp->fresh_gpu[_X_]);
-#ifdef STOCKHOLM
-    F3Dfluid->Vx0->field_gpu = fluid->Vx0->Field_gpu;
-    F3Dfluid->Vx0->fresh_cpu = &(fluid->Vx0->fresh_cpu);
-    F3Dfluid->Vx0->fresh_gpu = &(fluid->Vx0->fresh_gpu);
-#endif
 #endif
 
 #ifdef Y
@@ -400,11 +377,6 @@ of Metric.
     F3Dfluid->Vy_temp->field_gpu = fluid->V_temp->Field_gpu[_Y_];
     F3Dfluid->Vy_temp->fresh_cpu = &(fluid->V_temp->fresh_cpu[_Y_]);
     F3Dfluid->Vy_temp->fresh_gpu = &(fluid->V_temp->fresh_gpu[_Y_]);
-#ifdef STOCKHOLM
-    F3Dfluid->Vy0->field_gpu = fluid->Vy0->Field_gpu;
-    F3Dfluid->Vy0->fresh_cpu = &(fluid->Vy0->fresh_cpu);
-    F3Dfluid->Vy0->fresh_gpu = &(fluid->Vy0->fresh_gpu);
-#endif
 #endif
 
 #ifdef Z
@@ -414,21 +386,10 @@ of Metric.
     F3Dfluid->Vz_temp->field_gpu = fluid->V_temp->Field_gpu[_Z_];
     F3Dfluid->Vz_temp->fresh_cpu = &(fluid->V_temp->fresh_cpu[_Z_]);
     F3Dfluid->Vz_temp->fresh_gpu = &(fluid->V_temp->fresh_gpu[_Z_]);
-#ifdef STOCKHOLM
-    F3Dfluid->Vz0->field_gpu = fluid->Vz0->Field_gpu;
-    F3Dfluid->Vz0->fresh_cpu = &(fluid->Vz0->fresh_cpu);
-    F3Dfluid->Vz0->fresh_gpu = &(fluid->Vz0->fresh_gpu);
-#endif
 #endif
     F3Dfluid->Energy->field_gpu = fluid->Energy->Field_gpu;
     F3Dfluid->Energy->fresh_cpu = &(fluid->Energy->fresh_cpu);
     F3Dfluid->Energy->fresh_gpu = &(fluid->Energy->fresh_gpu);
-#ifdef STOCKHOLM
-    F3Dfluid->Energy0->field_gpu = fluid->Energy0->Field_gpu;
-    F3Dfluid->Energy0->fresh_cpu = &(fluid->Energy0->fresh_cpu);
-    F3Dfluid->Energy0->fresh_gpu = &(fluid->Energy0->fresh_gpu);
-#endif
-
 #endif
     desc->Fluids[i] = F3Dfluid;
     fluid->FluidRank = global_fluid_id;

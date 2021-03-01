@@ -159,7 +159,7 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
     printf("Maxsize2D_cpu = %d\n", Maxsize2D_cpu);
   }
   nvar = 2 + (2*NDIM); //Density,Energy,Velocity,V_temp
-  StartField = prs_malloc(sizeof(real) * (Size * nvar + Size2D * 5));
+  StartField = prs_malloc(sizeof(real) * (Size * nvar));
   /* Global contiguous allocation */
   patch->StartField = StartField;
   Density = CreateScalarField(desc, "density", StartField); /* Density MUST be the first field (see function ResetPatch below) */
@@ -264,17 +264,6 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   cudaMalloc((void **)&patch->FluxesGPU, 6 * sizeof(real));
   cudaMemcpy(patch->FluxesGPU, &Fluxes, 6 * sizeof(real), cudaMemcpyHostToDevice);
 #endif
-#ifdef X
-  patch->Vx0 = CreateScalarField2D(desc, "vx0", StartField + (2+2*NDIM) * Size);
-#endif
-#ifdef Y
-  patch->Vy0 = CreateScalarField2D(desc, "vy0", StartField + (2+2*NDIM) * Size + Size2D);
-#endif
-#ifdef Z
-  patch->Vz0 = CreateScalarField2D(desc, "vz0", StartField + (2+2*NDIM) * Size + Size2D * 2);
-#endif
-  patch->Rho0 = CreateScalarField2D(desc, "rho0", StartField + (2+2*NDIM) * Size + Size2D * 3);
-  patch->Energy0 = CreateScalarField2D(desc, "energy0", StartField + (2+2*NDIM) * Size + Size2D * 4);
   return patch;
 }
 

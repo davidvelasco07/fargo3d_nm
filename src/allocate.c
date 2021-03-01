@@ -118,11 +118,16 @@ Fluid *CreateFluid(char *name, int fluidtype) {
 #endif
 
 #ifdef STOCKHOLM
-  f->Density0 = CreateFieldEmpty2D ("rho0", YZ);
-  f->Energy0   = CreateFieldEmpty2D ("e0", YZ);
-  f->Vx0  = CreateFieldEmpty2D ("vx0", YZ);
-  f->Vy0  = CreateFieldEmpty2D ("vy0", YZ);
-  f->Vz0  = CreateFieldEmpty2D ("vz0", YZ);
+  f->Density0 = NULL;
+  CreateField2D (&(f->Density0),"rho0", YZ, 0);  
+  f->Energy0 = NULL;
+  CreateField2D (&(f->Energy0),"e0", YZ, 0); 
+  f->Vx0 = NULL; 
+  CreateField2D (&(f->Vx0),"vx0", YZ, 0);  
+  f->Vy0 = NULL;
+  CreateField2D (&(f->Vy0),"vy0", YZ, 0);  
+  f->Vz0 = NULL;
+  CreateField2D (&(f->Vz0),"vz0", YZ, 0);  
 #endif
 
 #ifdef DRAGFORCE
@@ -276,16 +281,16 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
 
   //  masterprint("Field2D %s has been created\n", name);
   //Now on the GPU
-  field->desc = Current_Grid;
+  field->desc = Current_Jupiter_Patch;
   
 #ifdef GPU
-  size = (field->desc->Pitch2D)*size2;
+  size = size1*size2;
   if (field->field_gpu == NULL || size > field->size || field->desc->Pitch2D == -1){
     if(cudaMallocPitch(&arr_gpu, &pitch, size1*sizeof(real), size2) == cudaSuccess){
       field->field_gpu = (real*)arr_gpu;
       field->pitch = pitch; //number of elements
       field->desc->Pitch2D = pitch/sizeof(real);
-      field->size = (field->desc->Pitch2D)*size2;
+      field->size = size1*size2;
     }
     else{
       printf("There was an error allocating %s on the GPU.\n", field->name);
@@ -294,9 +299,8 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
       exit(1);
     }
   }
-  
-  if (dim == YZ) // Backward compatibility (old 2D arrays were only YZ).
-    Pitch2D = field->desc->Pitch2D;
+  //if (dim == YZ) // Backward compatibility (old 2D arrays were only YZ).
+  //  Pitch2D = field->desc->Pitch2D;
   //If the array is not in YZ, we store its pitch in a new field of the 2D structure.
 #endif
   *(field->fresh_gpu)     =  NO;
@@ -316,6 +320,7 @@ void CreateFieldInt2D(FieldInt2D** ptr, char *name) {
     if (field == NULL) 
       prs_error("Insufficient memory for FieldInt2D creation-step1.");
     field->field_cpu = NULL;
+    field->field_gpu = NULL;
     field->fresh_cpu = (boolean *) malloc(sizeof(boolean));
     field->fresh_gpu = (boolean *) malloc(sizeof(boolean));
     field->name = (char *) malloc(sizeof(char) * 80);
@@ -323,13 +328,13 @@ void CreateFieldInt2D(FieldInt2D** ptr, char *name) {
   } else
     field = *ptr;
 #ifndef GPU
-  array = (int *) realloc(field->field_cpu, sizeof(int)*(Ny+2*NGHY)*(Nz+2*NGHZ));
+  array = (int *) realloc(field->field_cpu, sizeof(int)*Maxsize2D_cpu);
 #else
 #ifndef PINNED
-  array = (int *) realloc(field->field_cpu, sizeof(int)*(Ny+2*NGHY)*(Nz+2*NGHZ));
+  array = (int *) realloc(field->field_cpu, sizeof(int)*Maxsize2D_cpu);
 #else
   if (field->field_cpu == NULL)
-    cudaMallocHost((void**)&array,sizeof(int)*(Ny+2*NGHY)*(Nz+2*NGHZ));
+    cudaMallocHost((void**)&array,sizeof(int)*Maxsize2D_cpu);
 #endif
 #endif
 
@@ -342,7 +347,7 @@ void CreateFieldInt2D(FieldInt2D** ptr, char *name) {
   //Now on the GPU
   
 #ifdef GPU
-  if (Current_Grid->level == 0) {
+  if (Current_Jupiter_Patch->level == 0) {
     if (field->field_gpu == NULL) {
       cudaMallocPitch (&arr_gpu, &pitch, (Ny+2*NGHY)*sizeof(int), Nz+2*NGHZ);
       check_errors ("CreateFieldInt2D");

@@ -8,7 +8,7 @@
 //<\INCLUDES>
 
 void _CorrectVtheta(){
-  FARGO_SAFE(CorrectVtheta(Domega));
+  (CorrectVtheta(Domega));
 }
 
 void compute_potential(real dt) {
@@ -31,23 +31,23 @@ void compute_potential(real dt) {
   FARGO_SAFE(ComputeIndirectTerm());
   FARGO_SAFE(Potential()); // Gravitational potential from star and planet(s)
   
-  if (Current_Level == LevMax){ //Only the finest level advances the planet(s)
-    FARGO_SAFE(AdvanceSystemFromDisk(dt));
-
-    if (ThereIsACentralBinary)
-      subcycling = 30;		/* Arbitrary number of subcycles which
-				   should fit most needs */
-    for (i = 0; i < subcycling; i++)
-      FARGO_SAFE(AdvanceSystemRK5(1.0/((double)(subcycling))*dt));
-
-    if (Corotating) {
-      omeganew = GetPsysInfo(GET)/dt;
-      Domega = omeganew-OMEGAFRAME;
-      FARGO_for_all_patches(_CorrectVtheta);
-      OMEGAFRAME = omeganew;
-    }
-    RotatePsys(OMEGAFRAME*dt);
-  }
+//  if (Current_Level == LevMax){ //Only the finest level advances the planet(s)
+//    FARGO_SAFE(AdvanceSystemFromDisk(dt));
+//
+//    if (ThereIsACentralBinary)
+//      subcycling = 30;		/* Arbitrary number of subcycles which
+//				   should fit most needs */
+//    for (i = 0; i < subcycling; i++)
+//      FARGO_SAFE(AdvanceSystemRK5(1.0/((double)(subcycling))*dt));
+//
+//    if (Corotating) {
+//      omeganew = GetPsysInfo(GET)/dt;
+//      Domega = omeganew-OMEGAFRAME;
+//      FARGO_for_all_patches(_CorrectVtheta);
+//      OMEGAFRAME = omeganew;
+//    }
+//    RotatePsys(OMEGAFRAME*dt);
+//  }
 }
 
 void Potential_cpu() {

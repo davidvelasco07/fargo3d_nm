@@ -225,7 +225,7 @@ void ExecCommUpVar(long lev, long nvar, int *fieldtype) /* With slope limiter */
 #if COMM == EXTERNAL
 									icd[h] = (id[h] * dn[h] + (dn[h] >> 1) * centered[le][h] + (com->facedim == h ? (centered[le][h] == 1 ? 0 : side * dn[h]) : 0) + dd->gncorner_min[h]);
 #endif
-#if COMM == ASYMETRIC
+#if COMM == ASYMMETRIC
 									icd[h] = (id[h] * dn[h] + (dn[h] >> 1) * centered[le][h] + dd->gncorner_min[h]); // c like 'canvas'
 #endif
 								}

@@ -284,13 +284,15 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
   field->desc = Current_Jupiter_Patch;
   
 #ifdef GPU
-  size = size1*size2;
+  //size = size1*size2;
+  size = (field->desc->Pitch2D)*size2;
   if (field->field_gpu == NULL || size > field->size || field->desc->Pitch2D == -1){
     if(cudaMallocPitch(&arr_gpu, &pitch, size1*sizeof(real), size2) == cudaSuccess){
       field->field_gpu = (real*)arr_gpu;
       field->pitch = pitch; //number of elements
       field->desc->Pitch2D = pitch/sizeof(real);
       field->size = size1*size2;
+      field->size = (field->desc->Pitch2D)*size2;
     }
     else{
       printf("There was an error allocating %s on the GPU.\n", field->name);
@@ -299,8 +301,12 @@ void CreateField2D(Field2D **ptr, char *name, int dim, boolean reset) {
       exit(1);
     }
   }
-  //if (dim == YZ) // Backward compatibility (old 2D arrays were only YZ).
-  //  Pitch2D = field->desc->Pitch2D;
+  else{
+    if(reset)
+      cudaMemset( field->field_gpu,0, field->size*sizeof(real));
+  }
+  if (dim == YZ) // Backward compatibility (old 2D arrays were only YZ).
+    Pitch2D = field->desc->Pitch2D;
   //If the array is not in YZ, we store its pitch in a new field of the 2D structure.
 #endif
   *(field->fresh_gpu)     =  NO;

@@ -9,13 +9,11 @@ TimeProcess t_sub1_y;
 TimeProcess t_sub1_z;
 
 void FillGhosts (int var) {
-
   InitSpecificTime (&t_Comm, "MPI Communications");
   FARGO_SAFE(ExecCommSame (Current_Level, var));
   GiveSpecificTime (t_Comm);
-  
   FARGO_SAFE(boundaries()); // Always after a comm.
-
+  
 #if defined(Y)
   if (NY == 1)    /* Y dimension is mute */
     CheckMuteY();
@@ -26,6 +24,141 @@ void FillGhosts (int var) {
 #endif
 }
      
+
+void Sources(real dt) {
+     
+  SetupHook1 (); //Setup specific hook. Defaults to empty function.
+  
+    
+  InitSpecificTime (&t_Hydro, "Eulerian Hydro (no transport) algorithms");
+  
+  // REGARDLESS OF WHETHER WE USE FARGO, Vx IS ALWAYS THE TOTAL VELOCITY IN X
+
+#ifdef POTENTIAL
+  MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
+  if(FluidIndex==0){
+    FARGO_SAFE(compute_potential(dt));
+  }
+  else{
+    if (Corotating) {
+      FARGO_SAFE(CorrectVtheta(Domega));
+    }
+  }
+#endif
+
+  //Equations of state-----------------------------------------------------------
+#ifdef ADIABATIC
+  FARGO_SAFE(ComputePressureFieldAd());
+#endif
+#ifdef ISOTHERMAL
+  FARGO_SAFE(ComputePressureFieldIso());
+#endif
+#ifdef POLYTROPIC
+  FARGO_SAFE(ComputePressureFieldPoly());
+#endif
+  //-----------------------------------------------------------------------------
+
+  
+#if ((defined(SHEARINGSHEET2D) || defined(SHEARINGBOX3D)) && !defined(SHEARINGBC))
+  FARGO_SAFE(NonReflectingBC(Vy));
+#endif
+
+#ifdef X
+  FARGO_SAFE(SubStep1_x(dt));
+#endif    
+#ifdef Y
+  FARGO_SAFE(SubStep1_y(dt));
+#endif  
+#ifdef Z
+  FARGO_SAFE(SubStep1_z(dt));
+#endif
+  
+#if (defined(VISCOSITY) || defined(ALPHAVISCOSITY))
+  if (Fluidtype == GAS) viscosity(dt);
+#endif
+  
+#ifndef NOSUBSTEP2
+  FARGO_SAFE(SubStep2_a(dt));
+  FARGO_SAFE(SubStep2_b(dt));
+#endif
+
+  // NOW: Vx INITIAL X VELOCITY, Vx_temp UPDATED X VELOCITY FROM SOURCE TERMS + ARTIFICIAL VISCOSITY
+
+#ifdef ADIABATIC
+  FARGO_SAFE(SubStep3(dt));
+#endif
+  FARGO_SAFE(copy_velocities(VTEMP2V));  
+  GiveSpecificTime (t_Hydro);
+  
+#ifdef MHD //-------------------------------------------------------------------
+  if(Fluidtype == GAS){
+    InitSpecificTime (&t_Mhd, "MHD algorithms");
+    FARGO_SAFE(copy_velocities(VTEMP2V));
+#ifndef STANDARD // WE USE THE FARGO ALGORITHM
+    FARGO_SAFE(ComputeVmed(Vx));
+    FARGO_SAFE(ChangeFrame(-1, Vx, VxMed)); //Vx becomes the residual velocity
+    VxIsResidual = YES;
+#endif
+     
+    ComputeMHD(dt);
+
+#ifndef STANDARD
+    FARGO_SAFE(ChangeFrame(+1, Vx, VxMed)); //Vx becomes the total, updated velocity
+    VxIsResidual = NO;
+#endif //STANDARD
+    FARGO_SAFE(copy_velocities(V2VTEMP));
+    // THIS COPIES Vx INTO Vx_temp
+    GiveSpecificTime (t_Mhd);
+  }
+#endif //END MHD----------------------------------------------------------------
+
+  InitSpecificTime (&t_Hydro, "Transport algorithms");
+
+#if ((defined(SHEARINGSHEET2D) || defined(SHEARINGBOX3D)) && !defined(SHEARINGBC))
+  FARGO_SAFE(NonReflectingBC (Vy_temp));
+#endif
+
+#ifdef MHD //-------------------------------------------------------------------
+  if(Fluidtype == GAS){ //We do MHD only for the gaseous component
+    
+    FARGO_SAFE(UpdateMagneticField(dt,1,0,0));
+    FARGO_SAFE(UpdateMagneticField(dt,0,1,0));
+    FARGO_SAFE(UpdateMagneticField(dt,0,0,1));
+
+#if !defined(STANDARD)
+    FARGO_SAFE(MHD_fargo (dt)); // Perform additional field update with uniform velocity
+#endif
+
+  } 
+#endif //END MHD ---------------------------------------------------------------
+}
+
+void Transport(real dt) {
+
+  //NOTE: V_temp IS USED IN TRANSPORT
+  FARGO_SAFE(copy_velocities(V2VTEMP));
+#ifdef X
+#ifndef STANDARD
+  FARGO_SAFE(ComputeVmed(Vx_temp)); 
+#endif
+#endif
+
+  transport(dt);
+  
+  GiveSpecificTime (t_Hydro);
+  
+  if (ForwardOneStep == YES) prs_exit(EXIT_SUCCESS);
+  
+#ifdef MHD
+  if(Fluidtype == GAS) {   // We do MHD only for the gaseous component
+   *(Emfx->owner) = Emfx;  // EMFs claim ownership of their storage area
+   *(Emfy->owner) = Emfy;
+   *(Emfz->owner) = Emfz;
+ }
+#endif
+
+}
+
 void AlgoGas1(real dt) {
      
   SetupHook1 (); //Setup specific hook. Defaults to empty function.
@@ -55,11 +188,14 @@ int i;
 
 #ifdef POTENTIAL
   MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
-  if(FluidIndex==0)//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
+  if(FluidIndex==0){//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
     FARGO_SAFE(compute_potential(dt));
-  if (Corotating) {
-    FARGO_SAFE(CorrectVtheta(Domega));
   }
+  //else{
+  //  if (Corotating){
+  //    FARGO_for_all_patches(_CorrectVtheta);
+  // }
+  //}
 #endif
 
 #if ((defined(SHEARINGSHEET2D) || defined(SHEARINGBOX3D)) && !defined(SHEARINGBC))
@@ -185,9 +321,4 @@ void AlgoGas2 (real dt) {
   }
 #endif
 
-#ifdef STOCKHOLM
-  if(Current_Level==0)
-    FARGO_SAFE(StockholmBoundary(dt));
-#endif
 }
-

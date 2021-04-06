@@ -110,6 +110,8 @@ ex void AdvanceSystemRK5(real);
 ex void FillGhosts (int);
 ex void AlgoGas1(real);
 ex void AlgoGas2(real);
+ex void Sources(real);
+ex void Transport(real);
 ex void SetupHook1_cpu (void);
 
 //boundary.c Prototypes
@@ -236,6 +238,7 @@ ex void Potential_cpu(void);
 ex Force ComputeForce(real, real, real, real, real);
 ex void  _ComputeForce_cpu(real, real, real, real, real, char*);
 ex void AdvanceSystemFromDisk(real);
+ex void _CorrectVtheta(void);
 ex void CorrectVtheta_cpu(real);
 ex void ComputeIndirectTerm (void);
 

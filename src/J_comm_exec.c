@@ -144,7 +144,7 @@ void ExecComm(long levsrc, long levdest, long type, long nvar, int *fieldtype)
 		            to send the data). See matching comment in
 		            J_comm_fill.c */
                 displacement = 0;
-#if COMM != ASYMETRIC
+#if COMM != ASYMMETRIC
                 if (levdest > levsrc)
                 { //GHOST CASE
 #if COMM == INTERNAL

@@ -79,6 +79,7 @@ void cfl_cpu() {
   real dx = Dx;
   int pitch2d = Pitch2D;
   int fluidtype = Fluidtype;
+  int current_level = Current_Level;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -148,9 +149,14 @@ void cfl_cpu() {
 #ifdef STANDARD
 	vxx = vx[ll];
 	vxxp= vx[llxp];
-#else
-	vxx = vx[ll] - vxmed[l2D];
-	vxxp= vx[llxp] - vxmed[l2D];
+#else  /* Orbital advection on level 0 */
+	if (current_level == 0) {
+	  vxx = vx[ll] - vxmed[l2D];
+	  vxxp= vx[llxp] - vxmed[l2D];
+	} else {
+	  vxx = vx[ll];
+	  vxxp= vx[llxp];
+	}
 #endif
 #endif
 

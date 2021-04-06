@@ -426,7 +426,8 @@ def make_mainloop(mainloop):
         ' && ' + var[1][0] + '<' + var[1][2] + ') {\n'
     second_line += '#endif\n'    
     second_line += '#ifdef X\n'
-    second_line += 'if(' + var[2][0] + '<' + var[2][2] + ') {\n'
+    second_line += 'if(' + var[2][0] + '>=' + var[2][1] + \
+        ' && ' + var[2][0] + '<' + var[2][2] + ') {\n'
     second_line += '#endif\n'    
 
     return first_line, second_line, effective_loop, var

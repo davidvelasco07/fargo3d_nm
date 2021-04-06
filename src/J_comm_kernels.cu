@@ -57,7 +57,7 @@ __global__ void kernel_UPLIL (real **source, real *ymin, real *zmin, real OF, st
 #if COMM == EXTERNAL
 	  icd[h] = ((id[h]+imin[h])*dnd[h]+(dnd[h]>>1)*centered[le*3+h]+(facedim == h ? (centered[le*3+h] == 1 ? 0 : faceside*dnd[h]) : 0)+cornerd[h]);
 #endif
-#if COMM == ASYMETRIC
+#if COMM == ASYMMETRIC
 	  icd[h] = (id[h]+imin[h])*dnd[h]+(dnd[h]>>1)*centered[le*3+h]+cornerd[h];
 #endif
 	  is[h] = (icd[h]-corners[h])/dns[h];

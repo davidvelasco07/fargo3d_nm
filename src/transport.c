@@ -69,8 +69,9 @@ void X_advection (Field *Vx_t, real dt) {
 }
 
 void transport(real dt){
-  //This has to be done here so it can be done for each fluid at a time
   if(Current_Level < LevMax){
+    //This has to be done here so it can be done for each fluid at a time
+    //It is not done in the case of a single mesh
     ExecCommDownFlux (Current_Level+1);
   }
 #ifdef X

@@ -109,6 +109,7 @@ void ItereLevel (real dt, long level)
       #ifdef DRAGFORCE
       FARGO_SAFE(DragForce_a(dt));
       #endif
+      //MULTIFLUID(Sources (.5*dt));
       MULTIFLUID(AlgoGas1 (dt));
       #ifdef DRAGFORCE
       FARGO_SAFE(DragForce_b(dt));
@@ -126,14 +127,16 @@ void ItereLevel (real dt, long level)
   while (item != NULL) {//Transport + Source 2nd half
     if ((level == item->level) && (item->cpu == CPU_Rank)) {
       FARGO_SAFE(AdaptFieldsFromJ (item));
+      //MULTIFLUID(Transport (dt));
+      //MULTIFLUID(Sources (.5*dt));
       MULTIFLUID(AlgoGas2 (dt));
-      #ifdef DRAGFORCE
-      //FARGO_SAFE(DragForce(.5*dt));
+      #ifdef STOCKHOLM
+      if(Current_Level==0)
+        MULTIFLUID(StockholmBoundary(dt));
       #endif
     }
     item = item->next;
   }
-
   LevelHasChangedSinceCFL[level] = YES;
 }
 
@@ -160,16 +163,14 @@ real RecursiveIteration (real dt, long level)
     ItereLevel (time_var, level);
     LevelDate[level] = LevelDate[level+1];
   
-    MULTIFLUID(ExecCommDownMean (level+1,StandardFields()));
-
     //Finer data for "level" at same date
+    MULTIFLUID(ExecCommDownMean (level+1,StandardFields()));
     //MULTIFLUID is called inside this function for FillGhost
     //Which then calls CommSame and boundaries
     TrueBC(level, StandardFields());
-    //Includes comm same and boundaries 
-    
-    MULTIFLUID(ExecCommUp (level,StandardFields()));
+
     //Coarser data for "level+1" at same date
+    MULTIFLUID(ExecCommUp (level,StandardFields()));
 
     return time_var;
   } 

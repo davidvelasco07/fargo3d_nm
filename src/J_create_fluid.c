@@ -165,6 +165,7 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
   Density = CreateScalarField(desc, "density", StartField); /* Density MUST be the first field (see function ResetPatch below) */
   Energy = CreateScalarField(desc, "energy", StartField + Size);
   Velocity = CreateVectorField(desc, "velocity", StartField + 2 * Size);
+  // This leaves room to include communications for Vtemp instead of V during subcycles
   V_temp = CreateVectorField(desc, "v_temp", StartField + (2+NDIM) * Size);
 
   patch->Ptr[_Density_] = Density->Field;
@@ -224,7 +225,6 @@ FluidPatch *CreateFluidPatch(tGrid_CPU *desc, char *name, int fluidtype)
     printf("Maxsize_gpu = %d\n", Maxsize_gpu);
   }
 #endif
-
   patch->Density = Density;
   patch->Energy = Energy;
   patch->Velocity = Velocity;
@@ -275,11 +275,6 @@ void FreeFluidPatch(FluidPatch *patch)
   FreeScalarField(patch->Energy);
   FreeVectorField(patch->Velocity);
   FreeVectorField(patch->V_temp);
-  FreeScalarField(patch->Rho0);
-  FreeScalarField(patch->Energy0);
-  FreeScalarField(patch->Vx0);
-  FreeScalarField(patch->Vy0);
-  FreeScalarField(patch->Vz0);
   free(patch->StartField);
   free(patch);
 }

@@ -307,7 +307,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   else {
     if (ThereArePlanets)
       EmptyPlanetSystemFiles ();
-    NESTEDMESHES(CondInit(););
+    NESTEDMESHES(CondInit());
     // Initialize set up
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
@@ -333,6 +333,12 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #ifdef LONGSUMMARY
   ExtractFromExecutable (NO, ArchFile, 2);
 #endif
+  
+  NESTEDMESHES(MULTIFLUID(FillGhosts(StandardFields() | ENERGY);););
+  
+  for (level = 0; level <= LevMax; level++) {
+    MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
+  }
 #ifdef STOCKHOLM 
   NESTEDMESHES(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
 #endif
@@ -342,16 +348,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #else
   masterprint ("Standard version with no ghost zones in X\n");
 #endif
-
-  NESTEDMESHES(MULTIFLUID(FillGhosts(StandardFields() | ENERGY);););
-
-  for (level = 0; level <= LevMax; level++) {
-    MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
-  }
-#ifdef STOCKHOLM 
-  FARGO_for_all_patches_level (init_stockholm, 0);
-#endif
-
+  
   tGrid_CPU *current;
   real mass, totalmass;
   SubCycling = FULL;

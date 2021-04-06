@@ -65,7 +65,7 @@
 //Communication deployment
 #define INTERNAL 0
 #define EXTERNAL 1
-#define ASYMETRIC 2
+#define ASYMMETRIC 2
 //#define COMM INTERNAL
 
 
@@ -445,7 +445,7 @@
 
 #else //defined __GPU
 
-#ifndef GHOSTSX
+#ifdef NOGHOSTX
 #define lxp (((i)<size_x-1) ? ((l)+1) : ((l)-(size_x-1)))
 #define lxm (((i)>0) ? ((l)-1) : ((l)+(size_x-1)))
 #define ixm ((i)>0 ? ((i)-1) : size_x-1)

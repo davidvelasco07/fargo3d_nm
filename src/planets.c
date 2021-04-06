@@ -41,6 +41,12 @@ Force ComputeForce(real x, real y, real z,
   while(item != NULL) {
     if (item->cpu == CPU_Rank) {
       AdaptFieldsFromJ (item);
+      //This function is called by the fisrt fluid of every domain
+      //We iterate over all the meshes, after adapting everything
+      //we still need to select the fluid to point to the proper arrays,
+      //otherwise they point towards the arrays of the finest level (as it the one calling this function)
+      SelectFluid(Current_Fluid);
+
 #ifdef GPU
       if(EverythingOnCPU){
         FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden));
@@ -56,7 +62,7 @@ Force ComputeForce(real x, real y, real z,
   }
   // Adapt everything back to the calling level (which should be finest level)
   AdaptFieldsFromJ(current);
-  
+  SelectFluid(Current_Fluid);
   /* We restore the total density below by adding back the azimuthal
      average */
 #ifdef BM08

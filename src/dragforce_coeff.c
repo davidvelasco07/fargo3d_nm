@@ -16,7 +16,7 @@ void DragForce_Coeff_cpu () {
 //<USER_DEFINED>
 #ifdef DUSTSIZE
   INPUT(QR);
-  INPUT(DivRho);
+  INPUT(Energy);
 #endif
   OUTPUT(Qs);
 //<\USER_DEFINED>
@@ -25,7 +25,7 @@ void DragForce_Coeff_cpu () {
   real* coeff      = Qs->field_cpu;
 #ifdef DUSTSIZE
   real* dens_gas   = QR->field_cpu;
-  real* energy_gas = DivRho->field_cpu;
+  real* energy_gas = Energy->field_cpu; 
 #endif
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;

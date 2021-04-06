@@ -1,23 +1,15 @@
 #include "fargo3d.h"
 
 void _CondInit(int id) {
-
-  OUTPUT(Density);
-  OUTPUT(Energy);
-  OUTPUT(Vx);
-  OUTPUT(Vy);
-  OUTPUT(Vz);
-
   int i,j,k, n;
   real *v1;
   real *v2;
   real *v3;
   real *e;
   real *rho;
-  real h;
   
   real omega, rho_s, alp;
-  real r, r3;
+  real r, r3, xi, beta, h;
   
   rho = Density->field_cpu;
   e   = Energy->field_cpu;
@@ -67,30 +59,32 @@ void _CondInit(int id) {
   }
 
 
-  if(Fluidtype == DUST) hd = MIN( 1.0, sqrt( DELTA/( stokes[id-1] + DELTA) ));
+  if(Fluidtype == DUST) hd = MIN( 1.0, sqrt( (DELTA+NU)/( stokes[id-1] + (DELTA+NU)) ));
   if(Fluidtype == GAS)  hd = 1.0;
   
+  xi = SIGMASLOPE+1.+FLARINGINDEX;
+  beta = 1.-2*FLARINGINDEX;
+
   for (k=0; k<Nz+2*NGHZ; k++) {
     for (j=0; j<Ny+2*NGHY; j++) {
-      h = ASPECTRATIO*Ymed(j);
       r = Ymed(j);
       r3 = r*r*r;
       omega = sqrt(G*MSTAR/(r3));
+
+      h = ASPECTRATIO*pow(r/R0,FLARINGINDEX);
+
       for (i=NGHX; i<Nx+NGHX; i++) {
-	v2[l] = v3[l] = 0.0;
-	
-	
+	//Dust enery fills with gas energy for the dragforce coeffcient calculation
+	e[l] = h*sqrt(G*MSTAR/r);
+
+	v2[l] = v3[l] = 0.0;        	
 	v1[l] = omega*r;
-
-	real xi = SIGMASLOPE+1.+FLARINGINDEX;
-	real beta = 1.-2*FLARINGINDEX;
-	real h = ASPECTRATIO*pow(r/R0,FLARINGINDEX)*hd;
-
 	if(Fluidtype == DUST) {
           v3[l] =  sin(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
           v2[l] = -cos(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
         }
 
+	h *= hd;
 	if (FLARINGINDEX == 0.0) {
 	  rho[l] = sigma/sqrt(2.0*M_PI)/(R0*ASPECTRATIO*hd)*pow(r/R0,-xi)*pow(sin(Zmed(k)),-beta-xi+1./(h*h));
         } else {
@@ -98,35 +92,47 @@ void _CondInit(int id) {
             pow(sin(Zmed(k)),-xi-beta)*exp((1.-pow(sin(Zmed(k)),-2.*FLARINGINDEX))/2./FLARINGINDEX/(h*h));
         }
 
-        if(rho[l]<FLOORMIN) rho[l] = FLOORMIN;
-		
-	v1[l] *= sqrt(pow(sin(Zmed(k)),-2.*FLARINGINDEX)-(beta+xi)*h*h);
+	if(Fluidtype == GAS) v1[l] *= sqrt(pow(sin(Zmed(k)),-2.*FLARINGINDEX)-(beta+xi)*h*h);       
 	v1[l] -= OMEGAFRAME*r*sin(Zmed(k));
 
 
-	if(Fluidtype == GAS){
-	  
-#ifdef ISOTHERMAL
-	  e[l] = h*sqrt(G*MSTAR/r);
-#else
-	  e[l] = rho[l]*h*h*G*MSTAR/r/(GAMMA-1.0);
-#endif
-	}
-	else{
-	  e[l] = 0.;
-	}
+	if(rho[l]<FLOORMIN) rho[l] = FLOORMIN;        	
 
       }
     }
   }
 }
 
+
+
 void CondInit() {
+
+  
+
+#ifdef ADIABATIC
+      prs_error("WARNING! The gas energy is modified in substep2 and substep3 and therefore it must be communicated to the dust fluids for the DIFFUSION module and DRAGFORCE module when DUSTSIZE is enable. The energy in condinit must be modified accordenly as well.");
+#endif
+  
+  int feedback = YES;
+  char dust_name[MAXNAMELENGTH];
+  int global_index;
   int id;
   
+  
   for (id = 0; id<NFluids_per_rank; id++) {
+    global_index = FluidColor*NFluids_per_rank+id;
+    if (global_index == 0) {
+      Fluids[id] = CreateFluid("gas",GAS);
       SelectFluid(id);
-      _CondInit(Current_Fluid);
+      _CondInit(0);
+    }
+    else {
+      sprintf(dust_name,"dust%d",global_index);
+      Fluids[id]  = CreateFluid(dust_name, DUST);
+      SelectFluid(id);
+      _CondInit(global_index);
+    }
   }
+
 }
 

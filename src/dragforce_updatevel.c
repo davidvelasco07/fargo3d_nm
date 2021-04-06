@@ -42,6 +42,7 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
   real invstokesnumber = Coeffval[0];
   real invparticlesize = Coeffval[1];
   real rhosolid        = Coeffval[2];
+  real tslim           = TSLIM;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -53,7 +54,11 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
   real alphak;
   real sk;
 //<\INTERNAL>
-  
+
+//<CONSTANT>
+// real ymin(Ny+2*NGHY+1);
+//<\CONSTANT>
+
 //<MAIN_LOOP>
 
   i = j = k = 0;
@@ -76,14 +81,18 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
 	alphak  = 0.5*(pref[ll]+pref[lm])*invstokesnumber;
 #endif
 #ifdef DUSTSIZE
-	alphak  = 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid;
+	alphak  = max2( 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid, sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)))/tslim )  ;
 #endif
 	sk     = dt*alphak/(1+dt*alphak);
 
+#ifndef NOFEEDBACK
 	if (fluidtype == GAS)  v[ll] =    cv[ll]/( 0.5*(c[ll]+c[lm]) );
 	else                   v[ll] = sk*cv[ll]/( 0.5*(c[ll]+c[lm]) ) + v[ll]/(1.+ dt*alphak);
 
-
+#else
+	v[ll] =  v[ll]/(1.+ dt*alphak) + cv[ll]*dt*alphak/(1.+ dt*alphak);
+#endif
+	
 //<\#>
 #ifdef X
       }

@@ -29,6 +29,7 @@ void DragForce_SumC_cpu (real dt) {
   real invstokesnumber = Coeffval[0];
   real invparticlesize = Coeffval[1];
   real rhosolid        = Coeffval[2];
+  real tslim           = TSLIM;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -39,6 +40,10 @@ void DragForce_SumC_cpu (real dt) {
   real alphak;
   real sk;
 //<\INTERNAL>
+
+//<CONSTANT>
+// real ymin(Ny+2*NGHY+1);
+//<\CONSTANT>
 
 
 //<MAIN_LOOP>
@@ -61,7 +66,7 @@ void DragForce_SumC_cpu (real dt) {
 	alphak  = pref[ll]*invstokesnumber;
 #endif
 #ifdef DUSTSIZE
-	alphak  = pref[ll]*sqrt(8./M_PI)*invparticlesize/rhosolid;
+	alphak  = max2( pref[ll]*sqrt(8./M_PI)*invparticlesize/rhosolid, sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)))/tslim )  ;
 #endif
 	sk      = dt*alphak/(1+dt*alphak);
 

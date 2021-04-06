@@ -42,6 +42,7 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
   real invstokesnumber = Coeffval[0];
   real invparticlesize = Coeffval[1];
   real rhosolid        = Coeffval[2];
+  real tslim           = TSLIM;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -53,6 +54,10 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
   real alphak;
   real sk;
 //<\INTERNAL>
+
+//<CONSTANT>
+// real ymin(Ny+2*NGHY+1);
+//<\CONSTANT>
 
 
 //<MAIN_LOOP>
@@ -76,8 +81,9 @@ void _DragForce_SumCV_cpu(real dt, int idx, int idy, int idz, Field *V, Field *C
 	alphak  = 0.5*(pref[ll]+pref[lm])*invstokesnumber;
 #endif
 #ifdef DUSTSIZE
-	alphak  = 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid;
+	alphak  = max2( 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid, sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)))/tslim )  ;
 #endif
+
 	sk      = dt*alphak/(1+dt*alphak);
 
 	if (fluidtype == GAS)  sk = 1.0;

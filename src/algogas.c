@@ -47,15 +47,18 @@ void Sources(real dt) {
 #endif
 
   //Equations of state-----------------------------------------------------------
+  if (Fluidtype == GAS){
 #ifdef ADIABATIC
-  FARGO_SAFE(ComputePressureFieldAd());
+    FARGO_SAFE(ComputePressureFieldAd());
 #endif
 #ifdef ISOTHERMAL
-  FARGO_SAFE(ComputePressureFieldIso());
+    FARGO_SAFE(ComputePressureFieldIso());
 #endif
 #ifdef POLYTROPIC
-  FARGO_SAFE(ComputePressureFieldPoly());
+    FARGO_SAFE(ComputePressureFieldPoly());
 #endif
+  }
+  if(Fluidtype==DUST) FARGO_SAFE(Reset_field(Pressure));
   //-----------------------------------------------------------------------------
 
   
@@ -164,15 +167,18 @@ void AlgoGas1(real dt) {
   SetupHook1 (); //Setup specific hook. Defaults to empty function.
   
   //Equations of state-----------------------------------------------------------
+  if (Fluidtype == GAS){
 #ifdef ADIABATIC
-  FARGO_SAFE(ComputePressureFieldAd());
+    FARGO_SAFE(ComputePressureFieldAd());
 #endif
 #ifdef ISOTHERMAL
-  FARGO_SAFE(ComputePressureFieldIso());
+    FARGO_SAFE(ComputePressureFieldIso());
 #endif
 #ifdef POLYTROPIC
-  FARGO_SAFE(ComputePressureFieldPoly());
+    FARGO_SAFE(ComputePressureFieldPoly());
 #endif
+  }
+  if(Fluidtype==DUST) FARGO_SAFE(Reset_field(Pressure));
   //-----------------------------------------------------------------------------
 
 #ifdef X
@@ -187,7 +193,7 @@ void AlgoGas1(real dt) {
 int i;
 
 #ifdef POTENTIAL
-  MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
+ MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
   if(FluidIndex==0){//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
     FARGO_SAFE(compute_potential(dt));
   }
@@ -285,18 +291,19 @@ void AlgoGas2 (real dt) {
     
     transport(dt);
 
+    if (Fluidtype == GAS){
 #ifdef ADIABATIC
-    FARGO_SAFE(ComputePressureFieldAd());
+      FARGO_SAFE(ComputePressureFieldAd());
 #endif
-    
 #ifdef ISOTHERMAL
-    FARGO_SAFE(ComputePressureFieldIso());
+      FARGO_SAFE(ComputePressureFieldIso());
 #endif
-
 #ifdef POLYTROPIC
-    FARGO_SAFE(ComputePressureFieldPoly());
-#endif   
-
+      FARGO_SAFE(ComputePressureFieldPoly());
+#endif
+    }
+    if(Fluidtype==DUST) FARGO_SAFE(Reset_field(Pressure));
+    
 #ifdef X
     FARGO_SAFE(SubStep1_x(.5*dt));
 #endif

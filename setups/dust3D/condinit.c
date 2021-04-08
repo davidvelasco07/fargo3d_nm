@@ -91,15 +91,16 @@ void _CondInit(int id) {
           v2[l] = -cos(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
         }
 
-	h *= hd;
+
 	if (FLARINGINDEX == 0.0) {
-	  rho[l] = sigma/sqrt(2.0*M_PI)/(R0*ASPECTRATIO*hd)*pow(r/R0,-xi)*pow(sin(Zmed(k)),-beta-xi+1./(h*h));
+	  rho[l] = sigma/sqrt(2.0*M_PI)/(R0*ASPECTRATIO*hd)*pow(r/R0,-xi)*pow(sin(Zmed(k)),-beta-xi+1./(h*hd*h*hd));
         } else {
           rho[l] = sigma/sqrt(2.0*M_PI)/(R0*ASPECTRATIO*hd)*pow(r/R0,-xi)* \
-            pow(sin(Zmed(k)),-xi-beta)*exp((1.-pow(sin(Zmed(k)),-2.*FLARINGINDEX))/2./FLARINGINDEX/(h*h));
+            pow(sin(Zmed(k)),-xi-beta)*exp((1.-pow(sin(Zmed(k)),-2.*FLARINGINDEX))/2./FLARINGINDEX/(h*hd*h*hd));
         }
 
-	if(Fluidtype == GAS) v1[l] *= sqrt(pow(sin(Zmed(k)),-2.*FLARINGINDEX)-(beta+xi)*h*h);       
+	if(Fluidtype == GAS) v1[l] *= sqrt(pow(sin(Zmed(k)),-2.*FLARINGINDEX)-(beta+xi)*h*h);
+	
 	v1[l] -= OMEGAFRAME*r*sin(Zmed(k));
 
 

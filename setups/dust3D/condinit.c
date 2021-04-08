@@ -1,6 +1,13 @@
 #include "fargo3d.h"
 
 void _CondInit(int id) {
+
+  OUTPUT(Density);
+  OUTPUT(Energy);
+  OUTPUT(Vx);
+  OUTPUT(Vy);
+  OUTPUT(Vz);
+  
   int i,j,k, n;
   real *v1;
   real *v2;
@@ -130,7 +137,7 @@ void CondInit() {
       sprintf(dust_name,"dust%d",global_index);
       Fluids[id]  = CreateFluid(dust_name, DUST);
       SelectFluid(id);
-      _CondInit(global_index);
+      _CondInit(Current_Fluid);
     }
   }
 

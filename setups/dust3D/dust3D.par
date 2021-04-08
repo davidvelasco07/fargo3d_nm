@@ -32,6 +32,7 @@ Zmin			1.4707963267948965
 Zmax			1.5707963267948966
 Xmin			-3.141592653589793
 Xmax			3.141592653589793
+NFluidColors		1
 
 ### Output control parameters
 Ntot			1		Total number of time steps

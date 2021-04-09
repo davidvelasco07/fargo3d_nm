@@ -17,7 +17,7 @@ void Reset_field_cpu (Field *f) {
   real* faux = f->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
-  int size_x = Nx;
+  int size_x = Nx+2*NGHX;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
 //<\EXTERNAL>

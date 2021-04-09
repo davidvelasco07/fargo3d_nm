@@ -330,7 +330,7 @@ of Metric.
   {
     global_fluid_id = FluidColor * NFluids_per_rank + i;
     if (global_fluid_id == 0)
-      desc->fluid = CreateFluidPatch(desc, "gas", DUST);
+      desc->fluid = CreateFluidPatch(desc, "gas", GAS);
     else
     {
       sprintf(dust_name, "dust%d", global_fluid_id);

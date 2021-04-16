@@ -80,15 +80,15 @@ void _CondInit(int id) {
 
       h = ASPECTRATIO*pow(r/R0,FLARINGINDEX);
 
-      for (i=NGHX; i<Nx+NGHX; i++) {
+      for (i=0; i<Nx+2*NGHX; i++) {
 	//Dust enery fills with gas energy for the dragforce coeffcient calculation
 	e[l] = h*sqrt(G*MSTAR/r);
 
 	v2[l] = v3[l] = 0.0;        	
 	v1[l] = omega*r;
 	if(Fluidtype == DUST) {
-          v3[l] =  sin(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
-          v2[l] = -cos(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)));
+          v3[l] =  sin(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)))*0;
+          v2[l] = -cos(zmin(k))*stokes[id-1]*omega*(r*cos(zmin(k)))*0;
         }
 
 

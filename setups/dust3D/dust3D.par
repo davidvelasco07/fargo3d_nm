@@ -3,7 +3,7 @@ Setup			dust3D
 ### Disk parameters
 AspectRatio     	0.035           Thickness over Radius in the disc
 Sigma0			6.3661977237e-4	Surface Density at r=1
-Alpha			2.0e-5
+Alpha			1.0e-3
 SigmaSlope		0.5		Slope of surface
 FlaringIndex		0.0
 
@@ -11,10 +11,10 @@ FlaringIndex		0.0
 ### Dust parameters
 Epsilon			0.01		Total dust-to-gas mass ratio
 smin			1.0e-4          size in cm (or Tsmin)
-smax			1.0		size in cm (or Tsmax)
+smax			0.01		size in cm (or Tsmax)
 rhosolid		1.6867          in g/cm3
 Sq			3.5		slope of distribution
-Delta			5.0e-5          diffusion coefficient (~alpha)
+Delta			1.0e-3          diffusion coefficient (~alpha)
 Tslim			10.0
 
 ### Planet parameters
@@ -35,7 +35,7 @@ Xmax			3.141592653589793
 NFluidColors		1
 
 ### Output control parameters
-Ntot			1		Total number of time steps
+Ntot			10		Total number of time steps
 Ninterm	 		1		Time steps between outputs
 DT			0.314159265359	Time step length. 2PI = 1 orbit
 OutputDir		@outputs/dust3D_level0

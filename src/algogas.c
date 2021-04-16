@@ -35,7 +35,7 @@ void Sources(real dt) {
   // REGARDLESS OF WHETHER WE USE FARGO, Vx IS ALWAYS THE TOTAL VELOCITY IN X
 
 #ifdef POTENTIAL
-  MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
+
   if(FluidIndex==0){
     FARGO_SAFE(compute_potential(dt));
   }
@@ -193,7 +193,7 @@ void AlgoGas1(real dt) {
 int i;
 
 #ifdef POTENTIAL
- MPI_Wait(&RequestTotalDensity, MPI_STATUS_IGNORE);
+
   if(FluidIndex==0){//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
     FARGO_SAFE(compute_potential(dt));
   }

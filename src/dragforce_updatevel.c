@@ -15,7 +15,8 @@ void DragForce_UpdateVel(real dt, int option) {
     _DragForce_UpdateVel(dt, 0, 1, 0, Vy_temp, Mpy);
   if (option == 2)
     _DragForce_UpdateVel(dt, 0, 0, 1, Vz_temp, Mpz);
-  
+
+
 }
 
 void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Field *Cv) {
@@ -35,7 +36,7 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
   real* pref = Qs->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
-  int size_x = Nx;
+  int size_x = Nx+2*NGHX;
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
   int fluidtype = Fluidtype;
@@ -83,16 +84,10 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
 #ifdef DUSTSIZE
 	alphak  = max2( 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid, sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)))/tslim )  ;
 #endif
-	sk     = dt*alphak/(1+dt*alphak);
 
-#ifndef NOFEEDBACK
-	if (fluidtype == GAS)  v[ll] =    cv[ll]/( 0.5*(c[ll]+c[lm]) );
-	else                   v[ll] = sk*cv[ll]/( 0.5*(c[ll]+c[lm]) ) + v[ll]/(1.+ dt*alphak);
-
-#else
 	v[ll] =  v[ll]/(1.+ dt*alphak) + cv[ll]*dt*alphak/(1.+ dt*alphak);
-#endif
-	
+
+
 //<\#>
 #ifdef X
       }

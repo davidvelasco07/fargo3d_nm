@@ -94,26 +94,22 @@ void ItereLevel (real dt, long level)
       //To make this work Adapt... has to Change Fluids-> to point to the fluids of the grid
       //We also have to include Vi_temp as a particular field for each fluid and each patch
       FARGO_SAFE(AdaptFieldsFromJ (item));
+
       #if (defined(DRAGFORCE) && defined(DUSTSIZE))
       FARGO_SAFE(DragForce_Comm());
       #endif
+
       #if (defined(DUSTDIFFUSION) && !defined(DUSTSIZE))
       FARGO_SAFE(DustDiffusion_Comm());
       #endif
-      #ifdef POTENTIAL
-      FARGO_SAFE(Reset_field(Total_Density)); 
-      MULTIFLUID(ComputeTotalDensity());      
-      MPI_Iallreduce(MPI_IN_PLACE, Total_Density->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
-		     MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestTotalDensity);
-      #endif
-      #ifdef DRAGFORCE
-      FARGO_SAFE(DragForce_a(dt));
-      #endif
+      
       //MULTIFLUID(Sources (.5*dt));
       MULTIFLUID(AlgoGas1 (dt));
+
       #ifdef DRAGFORCE
       FARGO_SAFE(DragForce_b(dt));
       #endif
+
       #ifdef DUSTDIFFUSION
       FARGO_SAFE(DustDiffusion_Main(dt));
       #endif

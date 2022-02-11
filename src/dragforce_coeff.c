@@ -63,7 +63,8 @@ void DragForce_Coeff_cpu () {
 //<#>
 	ll = l;
 
-	
+	coeff[ll] = 1.0;
+
 #ifdef STOKESNUMBER
 	omega    = sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)));
 	coeff[ll] = omega;

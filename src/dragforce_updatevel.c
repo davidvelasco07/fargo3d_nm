@@ -32,7 +32,6 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
 //<EXTERNAL>
   real* v    = V->field_cpu;
   real* cv   = Cv->field_cpu;
-  real* c    = Slope->field_cpu;
   real* pref = Qs->field_cpu;
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
@@ -78,10 +77,9 @@ void _DragForce_UpdateVel_cpu(real dt, int idx, int idy, int idz, Field *V, Fiel
 
 	lm = idx*lxm + idy*lym + idz*lzm;
 
-#ifdef STOKESNUMBER
+#ifndef DUSTSIZE
 	alphak  = 0.5*(pref[ll]+pref[lm])*invstokesnumber;
-#endif
-#ifdef DUSTSIZE
+#else
 	alphak  = max2( 0.5*(pref[ll]+pref[lm])*sqrt(8./M_PI)*invparticlesize/rhosolid, sqrt(G*MSTAR/(ymed(j)*ymed(j)*ymed(j)))/tslim )  ;
 #endif
 

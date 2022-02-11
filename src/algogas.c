@@ -208,7 +208,7 @@ int i;
   FARGO_SAFE(NonReflectingBC(Vy));
 #endif
 #ifdef THDIFFUSION
-  if(Fluidtype==DUST){
+  if(Fluidtype==GAS){
     for(i=0;i<NSUBCYC;i++) {
       FARGO_SAFE(SubStep4_a(dt/NSUBCYC));
       FARGO_SAFE(SubStep4_b(dt/NSUBCYC));

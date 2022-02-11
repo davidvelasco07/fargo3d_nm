@@ -334,14 +334,16 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
   ExtractFromExecutable (NO, ArchFile, 2);
 #endif
   
+#ifdef STOCKHOLM 
+  NESTEDMESHES(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
+#endif
+
   NESTEDMESHES(MULTIFLUID(FillGhosts(StandardFields() | ENERGY);););
   
   for (level = 0; level <= LevMax; level++) {
     MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
   }
-#ifdef STOCKHOLM 
-  NESTEDMESHES(init_stockholm()); //ALREADY IMPLEMENTED MULTIFLUID COMPATIBILITY
-#endif
+
 
 #ifndef NOGHOSTX
   masterprint ("\n\nNew version with ghost zones in X activated\n");
@@ -360,7 +362,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #endif
       if (ThereArePlanets)
 	      WritePlanetSystemFile(TimeStep, NO);
-
+      
 #ifndef NOOUTPUTS
       PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
       

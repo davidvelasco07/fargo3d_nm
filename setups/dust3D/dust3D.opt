@@ -5,9 +5,8 @@
 
 MONITOR_SCALAR = TORQ
 
-
-FLUIDS := 0 1
-NFLUIDS = 2
+FLUIDS := 0 1 2
+NFLUIDS = 3
 
 FARGO_OPT += -DNFLUIDS=${NFLUIDS}
 #-----------------------------------------------------------
@@ -17,13 +16,14 @@ FARGO_OPT +=  -DY
 FARGO_OPT +=  -DZ
 
 #Coordinate System.
-FARGO_OPT +=  -DSPHERICAL
+FARGO_OPT += -DSPHERICAL
+FARGO_OPT += -DSTANDARD
 
 #Equation of State
 FARGO_OPT += -DISOTHERMAL
 
 # Boundaries
-FARGO_OPT += -DSTOCKHOLM
+#FARGO_OPT += -DSTOCKHOLM
 FARGO_OPT += -DHALFDISK
 
 # Viscosity
@@ -45,7 +45,7 @@ FARGO_OPT += -DSTOKESNUMBER
 COMM = INTERNAL
 FARGO_OPT += -DCOMMADAPT
 FARGO_OPT += -DCOMMGPU
-#FARGO_OPT += -DRELNESTING
+FARGO_OPT += -DRELNESTING
 
 
 #Cuda blocks

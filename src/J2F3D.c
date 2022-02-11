@@ -112,7 +112,9 @@ void Adapt_for_JUPITER(char *filename)
   {
     if (item->cpu == CPU_Rank)
     {
-      FARGO_SAFE(AdaptFieldsFromJ(item));
+      SelectGrid(item);
+      Current_Grid = item;
+      CreateFields();
       fluid = item->fluid;
       i=NFluids_per_rank-1;
       while (fluid != NULL){
@@ -288,8 +290,13 @@ void AdaptFieldsFromJ(tGrid_CPU *grid)
   if(grid != Current_Grid){
     SelectGrid(grid);
     Current_Grid = grid;
-    FARGO_SAFE(CreateFields());
     //(Re)alloc work arrays
+    FARGO_SAFE(CreateFields());
+    SelectFluid(Current_Fluid);
+    //This is redudant most of the times,
+    //but it's needeed in case we require 
+    //to iterate over all grids for a given fluid,
+    //like in the case of computing the force.
   }
 }
 

@@ -523,3 +523,5 @@ void (*boundary_ymin[NFLUIDS])();
 void (*boundary_ymax[NFLUIDS])();
 void (*boundary_zmin[NFLUIDS])();
 void (*boundary_zmax[NFLUIDS])();
+
+int j;

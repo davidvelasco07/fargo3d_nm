@@ -197,11 +197,11 @@ int i;
   if(FluidIndex==0){//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
     FARGO_SAFE(compute_potential(dt));
   }
-  //else{
-  //  if (Corotating){
-  //    FARGO_for_all_patches(_CorrectVtheta);
-  // }
-  //}
+  else{
+    if (Corotating && Current_Level == LevMax){
+      FARGO_for_all_patches(_CorrectVtheta);
+   }
+  }
 #endif
 
 #if ((defined(SHEARINGSHEET2D) || defined(SHEARINGBOX3D)) && !defined(SHEARINGBC))
@@ -234,7 +234,7 @@ int i;
 #endif
     
   GiveSpecificTime (t_Hydro);
-  
+
 #ifdef MHD //-------------------------------------------------------------------
   if(Fluidtype == GAS){
     InitSpecificTime (&t_Mhd, "MHD algorithms");

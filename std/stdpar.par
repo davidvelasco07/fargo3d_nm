@@ -116,3 +116,5 @@ PeriodicY		No
 PeriodicX		Yes
 
 NFluidColors    1
+Tslim			10.0
+Amplitude	    1.0e-4

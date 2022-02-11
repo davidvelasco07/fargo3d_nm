@@ -751,7 +751,7 @@ ex void ExecCommUpVar (long,long,int*);
 ex void ExecCommDownMean (long, int);
 ex void ExecCommDownMeanVar (long,long,int*);
 ex void ExecCommDownFlux (long);
-ex void ExecComm (long,long,long,long,int*);
+ex void ExecComm (long,long,long,long,int*,int);
 ex void ExecCommFlux (long);
 ex void CommAll (void);
 ex void ResetFluxesLevel (int);

@@ -52,8 +52,8 @@ void _init_stockholm() {
 
   int i,j,k;
   
-  i = j = k = 0;
-  
+  j = k = 0;
+  i = NGHX;
 #ifdef X
   real* vx  = Vx->field_cpu;
   real* vx0 = Vx0->field_cpu;
@@ -129,8 +129,8 @@ void init_stockholm() {
 
   static boolean init = TRUE;
 
-  if (init && (Current_Level == 0)) MULTIFLUID(_init_stockholm());
-  
-  init = FALSE;
-
+  if (init && (Current_Level == 0)){
+   MULTIFLUID(_init_stockholm());
+   init = FALSE;
+  }
 }

@@ -64,14 +64,14 @@ void BuildCommDest(FluidPatch *fluid, int *fieldtype, int nvar)
   }
 }
 
-void ExecComm(long levsrc, long levdest, long type, long nvar, int *fieldtype)
+void ExecComm(long levsrc, long levdest, long type, long nvar, int *fieldtype, int facedim)
 {
   jCommunicator *com = NULL, *start = NULL;
   long i, nbreq = 0, le, imin[3], imax[3], stride[3];
   long comp[20], j, k, m, n, d, sqz[3], ii[3], h;
   FluidPatch *fluid;
   MPI_Status stat;
-  int field, displacement;
+  int field, displacement=0;
   tGrid_CPU *desc;
   real s, vp;
   if (type == GHOST)
@@ -81,7 +81,7 @@ void ExecComm(long levsrc, long levdest, long type, long nvar, int *fieldtype)
 
   while (com != NULL)
   { /* We initiate non-blocking communications */
-    if ((com->dest_level == levdest) && (com->src_level == levsrc) && (com->type == type))
+    if ((com->dest_level == levdest) && (com->src_level == levsrc) && (com->type == type) && (com->facedim == facedim))
     {
       if (com->CPU_src != com->CPU_dest)
       {
@@ -106,7 +106,7 @@ void ExecComm(long levsrc, long levdest, long type, long nvar, int *fieldtype)
   while (com != NULL)
   { /* We use the buffers to update the
 				   ghost or "mean" values */
-    if ((com->dest_level == levdest) && (com->src_level == levsrc) && (com->type == type))
+    if ((com->dest_level == levdest) && (com->src_level == levsrc) && (com->type == type) && (com->facedim == facedim))
     {
       if (com->CPU_dest == CPU_Rank)
       {

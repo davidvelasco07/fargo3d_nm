@@ -10,14 +10,14 @@ real vanLeer(real slope1, real slope2)
 int BuildFieldType(int *fieldtype, int options)
 {
 	int nb = 0;
+	if (options & DENS)
+		fieldtype[nb++] = _Density_;
 	if (options & VX)
 		fieldtype[nb++] = _Vx_;
 	if (options & VY)
 		fieldtype[nb++] = _Vy_;
 	if (options & VZ)
 		fieldtype[nb++] = _Vz_;
-	if (options & DENS)
-		fieldtype[nb++] = _Density_;
 	if (options & ENERGY)
 		fieldtype[nb++] = _Energy_;
 	return nb;
@@ -94,11 +94,13 @@ void ExecCommSameVar(long lev, long nvar, int *fieldtype)
 	long i, j, k, le, m, n, imin[3], imax[3], stride[3], d;
 	int field;
 	FluidPatch *fluid;
+	//We'll perform the communications one direction at a time
+	for(int dim=0; dim<NDIM; dim++){
 	com = ComListGhost;
 	while (com != NULL)
 	{
-		if ((com->dest_level == lev) && (com->src_level == lev))
-		{
+		if ((com->dest_level == lev) && (com->src_level == lev) && (com->facedim == dim))
+		{//printf("commSame at level %d in a face orthogonal to dim %d \n",lev,dim);
 			if (com->CPU_src == CPU_Rank)
 			{
 				fluid = com->srcg->fluid;
@@ -131,7 +133,8 @@ void ExecCommSameVar(long lev, long nvar, int *fieldtype)
 		}
 		com = com->next;
 	}
-	FARGO_SAFE(ExecComm(lev, lev, GHOST, nvar, fieldtype));
+	FARGO_SAFE(ExecComm(lev, lev, GHOST, nvar, fieldtype, dim));
+	}
 }
 
 void ExecCommUp(long lev, int options)
@@ -167,13 +170,15 @@ void ExecCommUpVar(long lev, long nvar, int *fieldtype) /* With slope limiter */
 	real slope_i, slope_j, slope_k, value_i[9], value_j[3], frac[3];
 	real vp, sr;
 	FluidPatch *fluid;
+	for(int dim=0;dim<NDIM;dim++){
 	com = ComListGhost;
 	while (com != NULL)
 	{
 		if ((com->dest_level == lev + 1) &&
 			(com->src_level == lev) &&
-			(com->type == GHOST))
-		{
+			(com->type == GHOST) &&
+			(com->facedim == dim))
+		{//printf("commUp in a face orthogonal to dim %d \n",dim);
 			if (com->CPU_src == CPU_Rank)
 			{
 				fluid = com->srcg->fluid;
@@ -335,7 +340,8 @@ void ExecCommUpVar(long lev, long nvar, int *fieldtype) /* With slope limiter */
 		}
 		com = com->next;
 	}
-	FARGO_SAFE(ExecComm(lev, lev + 1, GHOST, nvar, fieldtype));
+	FARGO_SAFE(ExecComm(lev, lev + 1, GHOST, nvar, fieldtype, dim));
+	}
 }
 
 void ExecCommDownMean(long lev, int options)
@@ -371,11 +377,11 @@ void ExecCommDownMeanVar(long lev, long nvar, int *fieldtype)
 	int field;
 
 	FluidPatch *fluid;
+	for(int dim=0;dim<NDIM;dim++){
 	com = ComListMean;
-
 	while (com != NULL)
 	{
-		if ((com->dest_level == lev - 1) && (com->src_level == lev) && (com->type == MEAN))
+		if ((com->dest_level == lev - 1) && (com->src_level == lev) && (com->type == MEAN) && (com->facedim == dim))
 		{
 			if (com->CPU_src == CPU_Rank)
 			{
@@ -447,7 +453,8 @@ void ExecCommDownMeanVar(long lev, long nvar, int *fieldtype)
 		}
 		com = com->next;
 	}
-	ExecComm(lev, lev - 1, MEAN, nvar, fieldtype);
+	ExecComm(lev, lev - 1, MEAN, nvar, fieldtype, dim);
+	}
 }
 
 void ExecCommDownFlux_cpu(long lev)

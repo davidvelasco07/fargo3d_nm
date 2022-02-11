@@ -23,7 +23,7 @@ void Save_Face_Flux_X_gpu()
   tGrid_CPU *grid  = Flux->desc;
   int size = grid->ncell[_Y_]*grid->ncell[_Z_];
   kernel_Fluxes_X<<<(size+THREADS-1)/THREADS,THREADS>>>(Flux->field_gpu, Fluxes[_X_][0], Fluxes[_X_][1], size, grid->ncell[_X_], grid->ncell[_Y_], grid->Pitch_gpu, grid->Stride_gpu, FluxIndex);
-  cudaThreadSynchronize();
+  cudaDeviceSynchronize();
 }
 
 __global__ void kernel_Fluxes_Y(real* flux, real* facefluxes_inf, real* facefluxes_sup, int size, int nx, int ny, int pitch, int stride, int FluxIndex) {
@@ -48,7 +48,7 @@ void Save_Face_Flux_Y_gpu()
   tGrid_CPU *grid  = Flux->desc;
   int size = grid->ncell[_X_]*grid->ncell[_Z_];
   kernel_Fluxes_Y<<<(size+THREADS-1)/THREADS,THREADS>>>(Flux->field_gpu, Fluxes[_Y_][0], Fluxes[_Y_][1], size, grid->ncell[_X_], grid->ncell[_Y_], grid->Pitch_gpu, grid->Stride_gpu, FluxIndex);
-  cudaThreadSynchronize();
+  cudaDeviceSynchronize();
 }
 
 __global__ void kernel_Fluxes_Z(real* flux, real* facefluxes_inf, real* facefluxes_sup, int size, int nx, int nz, int pitch, int stride, int FluxIndex) {
@@ -71,7 +71,7 @@ void Save_Face_Flux_Z_gpu()
   tGrid_CPU *grid  = Flux->desc;
   int size = grid->ncell[_X_]*grid->ncell[_Y_];
   kernel_Fluxes_Z<<<(size+THREADS-1)/THREADS,THREADS>>>(Flux->field_gpu, Fluxes[_Z_][0], Fluxes[_Z_][1], size, grid->ncell[_X_], grid->ncell[_Z_], grid->Pitch_gpu, grid->Stride_gpu, FluxIndex);
-  cudaThreadSynchronize();
+  cudaDeviceSynchronize();
 }
 
 

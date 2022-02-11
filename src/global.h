@@ -404,6 +404,8 @@ void (*SubStep1_z)(real);
 void (*SubStep2_a)(real);
 void (*SubStep2_b)(real);
 void (*SubStep3)(real);
+void (*SubStep4_a)(real);
+void (*SubStep4_b)(real);
 void (*DivideByRho)(Field*,Field*);
 void (*VanLeerX_a)(Field*);
 void (*VanLeerX_b)(real,Field*,Field*,Field*);

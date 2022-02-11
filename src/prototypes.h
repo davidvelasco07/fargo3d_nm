@@ -267,6 +267,10 @@ ex void SubStep2_cpu(real);
 //substep3.c Prototypes
 ex void SubStep3_cpu(real);
 
+//substep4.c Prototypes
+ex void SubStep4_a_cpu(real);
+ex void SubStep4_b_cpu(real);
+
 //transport Prototypes
 ex void VanLeerX(Field*, Field*, Field*, real);
 ex void TransportX(Field*, Field*, Field*, real); 
@@ -525,6 +529,8 @@ ex void SubStep1_z_gpu(real);
 ex void SubStep2_a_gpu(real);
 ex void SubStep2_b_gpu(real);
 ex void SubStep3_gpu(real);
+ex void SubStep4_a_gpu(real);
+ex void SubStep4_b_gpu(real);
 ex void DivideByRho_gpu(Field*,Field*);
 
 ex void mon_dens_gpu(void);

@@ -28,6 +28,8 @@ void ChangeArch() {
   SubStep2_a  = SubStep2_a_cpu;
   SubStep2_b  = SubStep2_b_cpu;
   SubStep3    = SubStep3_cpu;
+  SubStep4_a  = SubStep4_a_cpu;
+  SubStep4_b  = SubStep4_b_cpu;
   DivideByRho = DivideByRho_cpu;
   VanLeerX_a  = VanLeerX_a_cpu;
   VanLeerX_b  = VanLeerX_b_cpu;
@@ -205,6 +207,13 @@ void ChangeArch() {
 	if(strval[0] == 'g'){
 	  SubStep3 = SubStep3_gpu;
 	  printf("Substep3 runs on the GPU\n");
+	}
+      }
+      if (strcmp(name, "substep4") == 0) {
+	if(strval[0] == 'g'){
+	  SubStep4_a = SubStep4_a_gpu;
+	  SubStep4_b = SubStep4_b_gpu;
+	  printf("Substep4 runs on the GPU\n");
 	}
       }
       if (strcmp(name, "dividebyrho") == 0) {

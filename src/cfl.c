@@ -71,6 +71,10 @@ void cfl_cpu() {
   real* etaad   = EtaAD->field_cpu;
 #endif
 #endif
+#ifdef THDIFFUSION
+  int nsubc=NSUBCYC;
+  real chi=THDIFFUSIVITY;
+#endif
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
   int size_x = Nx+NGHX;
@@ -110,6 +114,7 @@ void cfl_cpu() {
   real cfl8=0.0;
   real cfl9=0.0;
   real cfl10=0.0;
+  real cfl11=0.0;
   real b;
   real vxx, vxxp;
   real soundspeed;
@@ -252,12 +257,16 @@ void cfl_cpu() {
 	cfl10 = 4.0*etaad[ll]*pow(max3(cfl7_a,cfl7_b,cfl7_c),2);
 #endif
 #endif
+
+#ifdef THDIFFUSION
+  cfl11 = 4.0*chi*pow(max3(cfl7_a,cfl7_b,cfl7_c),2)/nsubc;
+#endif
 	  
 	dtime[ll] = CFL/sqrt(cfl1*cfl1 + cfl2*cfl2 + 
 			     cfl3*cfl3 + cfl4*cfl4 + 
 			     cfl5*cfl5 + cfl6*cfl6 + 
 			     cfl7*cfl7 + cfl8*cfl8 +
-			     cfl9*cfl9 + cfl10*cfl10 );
+			     cfl9*cfl9 + cfl10*cfl10 + cfl11*cfl11 );
 
 //<\#>
 #ifdef X

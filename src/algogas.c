@@ -207,7 +207,14 @@ int i;
 #if ((defined(SHEARINGSHEET2D) || defined(SHEARINGBOX3D)) && !defined(SHEARINGBC))
   FARGO_SAFE(NonReflectingBC(Vy));
 #endif
-
+#ifdef THDIFFUSION
+  if(Fluidtype==DUST){
+    for(i=0;i<NSUBCYC;i++) {
+      FARGO_SAFE(SubStep4_a(dt/NSUBCYC));
+      FARGO_SAFE(SubStep4_b(dt/NSUBCYC));
+    }
+  }
+#endif 
 #ifdef X
   FARGO_SAFE(SubStep1_x(.5*dt));
 #endif    

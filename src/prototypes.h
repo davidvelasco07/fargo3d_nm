@@ -468,6 +468,8 @@ ex boolean CompareField (Field *);
 ex void CondInit(void);
 ex void PostRestartHook(void);
 
+ex void compute_accretion(real);
+ex void Accretion_cpu(real,real,real,real,real,real,real,real);
 
 //CUDA PROTOTYPES-----------------------------------------------------
 
@@ -682,6 +684,7 @@ ex void (_collisions_cpu)(real,int,int,int,int);
 ex void ComputeTotalDensity_cpu(void);
 ex void Floor_cpu(void);
 
+ex void Accretion_gpu(real,real,real,real,real,real,real,real);
 
 
 #endif

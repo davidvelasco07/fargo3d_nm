@@ -60,9 +60,6 @@ void SubStep4_a_cpu (real dt) {
   int llzm;
 #endif
   real e_rho;
-  real e_a;
-  real rho_a;
-  real chi_a;
 //<\INTERNAL>
 
 //<CONSTANT>

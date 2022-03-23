@@ -1,0 +1,61 @@
+# You may enter a description between the BEGIN and END labels.
+# BEGIN
+# END
+#-------------------------------------------------------------------------
+
+MONITOR_SCALAR = TORQ
+
+FLUIDS := 0 1 2
+NFLUIDS = 3
+
+FARGO_OPT += -DNFLUIDS=${NFLUIDS}
+#-----------------------------------------------------------
+
+FARGO_OPT +=  -DX
+FARGO_OPT +=  -DY
+FARGO_OPT +=  -DZ
+
+#Coordinate System.
+FARGO_OPT += -DSPHERICAL
+FARGO_OPT += -DSTANDARD
+
+#Equation of State
+#FARGO_OPT += -DISOTHERMAL
+FARGO_OPT += -DADIABATIC
+
+# Boundaries
+#FARGO_OPT += -DSTOCKHOLM
+FARGO_OPT += -DHALFDISK
+
+# Viscosity
+FARGO_OPT += -DALPHAVISCOSITY
+
+# Potential
+FARGO_OPT += -DPOTENTIAL
+
+# Thermal Diffusion
+FARGO_OPT += -DTHDIFFUSION
+
+FARGO_OPT += -DFLOOR
+
+#Drag force between species
+FARGO_OPT += -DDRAGFORCE
+FARGO_OPT += -DDUSTDIFFUSION
+FARGO_OPT += -DSTOKESNUMBER
+#FARGO_OPT += -DDUSTSIZE
+
+FARGO_OPT += -DACCRETION
+
+#Nested Meshes
+COMM = INTERNAL
+FARGO_OPT += -DCOMMADAPT
+FARGO_OPT += -DCOMMGPU
+FARGO_OPT += -DRELNESTING
+
+
+#Cuda blocks
+ifeq (${GPU}, 1)
+FARGO_OPT += -DBLOCK_X=16
+FARGO_OPT += -DBLOCK_Y=8
+FARGO_OPT += -DBLOCK_Z=4
+endif

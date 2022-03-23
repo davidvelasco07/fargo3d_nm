@@ -75,7 +75,7 @@ void DustDiffusion_Core_cpu(real dt) {
 //<\INTERNAL>
 
 //<CONSTANT>
-// real xmin(Nx+1);
+// real xmin(Nx+2*NGHX+1);
 // real ymin(Ny+2*NGHY+1);
 // real zmin(Nz+2*NGHZ+1);
 //<\CONSTANT>

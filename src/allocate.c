@@ -199,8 +199,8 @@ void CreateField(Field **ptr, char *name, int type, boolean sx, boolean sy, bool
     //printf("Field %s has been created on the GPU with size %d\n", name, Maxsize_gpu);
     field->field_gpu     =  (real *)arr_gpu;
     cudaMemset( field->field_gpu,0, Maxsize_gpu*sizeof(real));
+    *(field->fresh_gpu) = YES;
   }
-  *(field->fresh_gpu) = YES;
 #ifdef DEBUG
   printf("------>>>+++Maxsize of %s = %d\n",field->name,Maxsize_gpu);
 #endif

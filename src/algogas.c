@@ -88,7 +88,8 @@ void Sources(real dt) {
   // NOW: Vx INITIAL X VELOCITY, Vx_temp UPDATED X VELOCITY FROM SOURCE TERMS + ARTIFICIAL VISCOSITY
 
 #ifdef ADIABATIC
-  FARGO_SAFE(SubStep3(dt));
+  if (Fluidtype == GAS)
+    FARGO_SAFE(SubStep3(dt));
 #endif
   FARGO_SAFE(copy_velocities(VTEMP2V));  
   GiveSpecificTime (t_Hydro);
@@ -163,8 +164,8 @@ void Transport(real dt) {
 }
 
 void AlgoGas1(real dt) {
-     
-  SetupHook1 (); //Setup specific hook. Defaults to empty function.
+
+  SetupHook1(); //Setup specific hook. Defaults to empty function.
   
   //Equations of state-----------------------------------------------------------
   if (Fluidtype == GAS){
@@ -193,14 +194,12 @@ void AlgoGas1(real dt) {
 int i;
 
 #ifdef POTENTIAL
-
   if(FluidIndex==0){//The potential is computed one time per timestep (FluidIndex is the local index of a fluid)
     FARGO_SAFE(compute_potential(dt));
   }
   else{
-    if (Corotating && Current_Level == LevMax){
-      FARGO_for_all_patches(_CorrectVtheta);
-   }
+    //Correct Vtheta for a given fluid in all patches.
+    if (Corotating && Current_Level == LevMax)FARGO_for_all_patches(_CorrectVtheta);
   }
 #endif
 
@@ -237,9 +236,11 @@ int i;
   // NOW: Vx INITIAL X VELOCITY, Vx_temp UPDATED X VELOCITY FROM SOURCE TERMS + ARTIFICIAL VISCOSITY
 
 #ifdef ADIABATIC
-  FARGO_SAFE(SubStep3(dt));
+  if(Fluidtype==GAS) FARGO_SAFE(SubStep3(dt));
 #endif
-    
+  
+  if(Fluidtype==DUST)FARGO_SAFE(Reset_field(Energy));
+  
   GiveSpecificTime (t_Hydro);
 
 #ifdef MHD //-------------------------------------------------------------------
@@ -323,6 +324,11 @@ void AlgoGas2 (real dt) {
 
     FARGO_SAFE(copy_velocities(VTEMP2V));
 
+    #ifdef ACCRETION
+    //For the time being let's just allow the finest level to accrete, considering that
+    //it should cointaing up to the Hill sphere in it.
+    if(Fluidtype==DUST && Current_Level==LevMax)compute_accretion(dt);
+    #endif
     GiveSpecificTime (t_Hydro);
   
     if (ForwardOneStep == YES) prs_exit(EXIT_SUCCESS);

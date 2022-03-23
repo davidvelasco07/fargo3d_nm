@@ -12,8 +12,9 @@ void DustDiffusion_Coefficients_cpu() {
 //<USER_DEFINED>
 #ifdef ALPHAVISCOSITY
   INPUT(Energy);
-#ifdef ADIABATIC
   INPUT(QR);
+#ifdef ADIABATIC
+  INPUT(QRE);
 #endif
 #endif
   OUTPUT(Sdiffyczc);
@@ -36,7 +37,7 @@ void DustDiffusion_Coefficients_cpu() {
   real* cs = Energy->field_cpu;
 #endif
 #ifdef ADIABATIC
-  real* e    = Energy->field_cpu;
+  real* e    = QRE->field_cpu;
   real* rhog = QR->field_cpu;
   real gamma = GAMMA;
 #endif
@@ -102,14 +103,20 @@ void DustDiffusion_Coefficients_cpu() {
           soundspeedfz2 = soundspeed2;
         else
           soundspeedfz2 = 0.5*(cs[ll]+cs[llzm])*0.5*(cs[ll]+cs[llzm]);
-#endif //Z
+#endif
 #endif
 #ifdef ADIABATIC
 	soundspeed2 = gamma*(gamma-1.0)*e[ll]/rhog[ll];
 	if(j==0)
 	  soundspeedf2 = soundspeed2;
 	else
-	  soundspeedf2 = gamma*(gamma-1.0)*(e[ll]+e[llym])/(rhog[ll]+rhog[llym]);
+	  soundspeedf2 = 0.5*gamma*(gamma-1.0)*(e[ll]+e[llym])/(rhog[ll]+rhog[llym]);
+#ifdef Z
+	if(k==0)
+    soundspeedfz2 = soundspeed2;
+  else
+    soundspeedfz2 = 0.5*gamma*(gamma-1.0)*(e[ll]+e[llzm])/(rhog[ll]+rhog[llzm]);
+#endif
 #endif
 	r3yczc = ymed(j)*ymed(j)*ymed(j);
 	r3yfzc = ymin(j)*ymin(j)*ymin(j);

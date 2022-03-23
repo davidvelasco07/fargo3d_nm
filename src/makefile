@@ -382,7 +382,7 @@ MAINOBJ  = LowTasks.o psys.o main.o param.o var.o usage.o   	    \
 	   J_Output.o J_comm_exec.o J_comm_fill.o               \
 	   J_faceflux.o J_correct.o J_resetfluxes.o             \
 	   J_subcycling.o J_iter.o J_comm_device.o              \
-	   J_merge_field.o J_merge_desc.o J_readfield.o	substep4_a.o substep4_b.o
+	   J_merge_field.o J_merge_desc.o J_readfield.o	substep4_a.o substep4_b.o accretion.o
 
 #-----------------------#Cuda objects---------------------------------
 GPU_OBJ  =  reduction_sum_device.o reduction_min_device.o	\
@@ -439,7 +439,7 @@ GPU_OBJBLOCKS =  CompPresIso_gpu.o CompPresAd_gpu.o 		\
 	   compute_jx_gpu.o compute_jy_gpu.o compute_jz_gpu.o   \
            dragforce_sumc_gpu.o dragforce_sumcv_gpu.o           \
            dragforce_updatevel_gpu.o dragforce_coeff_gpu.o J_comm_kernels.o	\
-	   J_comm_exec_kernels.o J_correct_kernels.o J_faceflux_kernels.o substep4_a_gpu.o substep4_b_gpu.o
+	   J_comm_exec_kernels.o J_correct_kernels.o J_faceflux_kernels.o substep4_a_gpu.o substep4_b_gpu.o accretion_gpu.o
 #</CUDA OBJECTS>
 #---------------------------------------------------------------------
 

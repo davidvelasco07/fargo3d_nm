@@ -472,6 +472,7 @@ void ExecCommUpVar_gpu(int level, int nvar, int *fieldtype)
     grid = grid->next;
   } /*Now all comms with source "grid" have been filled, next step is to communicate them to the pertinent destination grid*/
   #ifdef MPICUDA
+  //This function handles the MPI_CUDA_AWARE communications
   FARGO_SAFE(ExecComm_gpu(ComListGhost, level, level + 1, nvar, fieldtype));
   #endif
   grid = Grid_CPU_list;
@@ -503,6 +504,7 @@ void ExecCommDownMeanVar_gpu(int level, int nvar, int *fieldtype)
     grid = grid->next;
   } /*Now all comms with source "grid" have been filled, next step is to communicate them to the pertinent destination grid*/
   #ifdef MPICUDA
+  //This function handles the MPI_CUDA_AWARE communications
   FARGO_SAFE(ExecComm_gpu(ComListMean, level, level - 1, nvar, fieldtype));
   #endif
   grid = Grid_CPU_list;

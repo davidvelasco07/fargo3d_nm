@@ -215,6 +215,19 @@ int main(int argc, char *argv[]) {
   
   if ((ParameterFile[0] == 0) || (argc == 1)) PrintUsage (argv[0]);
 
+  #ifdef GPU
+  #ifdef COMMGPU
+  masterprint("Communications activated on the GPU\n");
+  #ifndef MPICUDA
+  if(CPU_Number>1){
+    masterprint("Running in parallel with communications activated on the GPU,\
+     but MPICUDA is not enabled.\n Either enabled MPICUDA or disable COMMGPU\n");
+    prs_exit(0);
+    }
+  #endif
+  #endif
+  #endif
+
 #ifndef MPICUDA
   SelectDevice(CPU_Rank);
 #endif
@@ -273,13 +286,6 @@ int main(int argc, char *argv[]) {
   Adapt_for_JUPITER (ParameterFile);
   PARENTGRID(OutputSpace());
   
-  //split(&Gridd); /*Split mesh over PEs*/
-  //InitSpace();
-  //WriteDim();
-  //InitSurfaces();
-  //LightGlobalDev(); /* Copy light arrays to the device global memory */
-  //CreateFields(); // Allocate all fields.
-  
   Sys = InitPlanetarySystem(PLANETCONFIG);
   ListPlanets();
   if(Corotating)
@@ -290,7 +296,6 @@ the target velocity in Stockholm's damping prescription. We copy the
 value above *after* rescaling, and after any initial correction to
 OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 
-  
   if(Restart == YES || Restart_Full == YES) {
     NESTEDMESHES(CondInit();); //Needed even for restarts: some setups have custom
 		 //definitions (eg potential for setup MRI) or custom
@@ -311,7 +316,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     // Initialize set up
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
-  }
+  }  
   /* This must be placed ***after*** reading the input files in case of a restart */
   if ((ArrayNb) && (EarlyOutputRename == NO)) {
     i = strlen(OUTPUTDIR);
@@ -344,7 +349,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     MULTIFLUID(ExecCommUp (level,StandardFields() | ENERGY));
   }
 
-
+  
 #ifndef NOGHOSTX
   masterprint ("\n\nNew version with ghost zones in X activated\n");
 #else

@@ -526,4 +526,6 @@ void (*boundary_ymax[NFLUIDS])();
 void (*boundary_zmin[NFLUIDS])();
 void (*boundary_zmax[NFLUIDS])();
 
+void (*Accretion)(real,real,real,real,real,real,real,real);
+
 int j;

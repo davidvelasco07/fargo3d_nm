@@ -63,7 +63,7 @@ void X_advection (Field *Vx_t, real dt) {
   TransportX(Mmz, Qs, Vx_t, dt);
 #endif
 #ifdef ADIABATIC
-  TransportX(Energy, Qs, Vx_t, dt);
+  if (Fluidtype == GAS) TransportX(Energy, Qs, Vx_t, dt);
 #endif
   TransportX(Density, DensStar, Vx_t, dt);
 }
@@ -101,7 +101,7 @@ void transport(real dt){
   TransportZ(Mmz, Qs, dt);
 #endif
 #ifdef ADIABATIC
-  TransportZ(Energy, Qs, dt);
+  if (Fluidtype == GAS) TransportZ(Energy, Qs, dt);
 #endif
   TransportZ(Density,DensStar, dt);
 #endif
@@ -123,7 +123,7 @@ void transport(real dt){
   TransportY(Mmz, Qs, dt);
 #endif
 #ifdef ADIABATIC
-  TransportY(Energy, Qs, dt);
+  if (Fluidtype == GAS)  TransportY(Energy, Qs, dt);
 #endif
   TransportY(Density, DensStar, dt);
 #endif
@@ -155,7 +155,7 @@ void transport(real dt){
     AdvectSHIFT(Mmz, Nshift);
 #endif
 #ifdef ADIABATIC
-    AdvectSHIFT(Energy, Nshift);
+    if (Fluidtype == GAS) AdvectSHIFT(Energy, Nshift);
 #endif
     AdvectSHIFT(Density, Nshift);
   }

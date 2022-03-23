@@ -153,6 +153,8 @@ void ChangeArch() {
   VanLeerX_PPA_d    = VanLeerX_PPA_d_cpu;
   VanLeerX_PPA_d_2d = VanLeerX_PPA_d_2d_cpu;
 
+  Accretion  = Accretion_cpu;
+
   while (fgets(s, MAXLINELENGTH-1, func_arch) != NULL) {
     success = sscanf(s, "%s", name);
     if(name[0]!='#' && success == 1){
@@ -490,6 +492,12 @@ void ChangeArch() {
 	  DustDiffusion_Core         = DustDiffusion_Core_gpu;
 	  DustDiffusion_Coefficients = DustDiffusion_Coefficients_gpu;
 	  printf("Dust diffusion runs on the GPU\n");
+	}
+      }
+  if (strcmp(name, "accretion") == 0) {
+	if(strval[0] == 'g'){
+	  Accretion = Accretion_gpu;
+	  printf("Accretion runs on the GPU\n");
 	}
       }
       if (strcmp(name, "communications") == 0) {

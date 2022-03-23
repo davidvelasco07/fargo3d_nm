@@ -9,27 +9,45 @@
 
 
 void DragForce_Comm(){
-
   //Communicate gas density and energy for the drag coefficient calculation
   //Send Gas Density to Dust-Fluids
   Reset_field(QL);
-  MULTIFLUID( if(Fluidtype == GAS) copy_field(QL, Density) );
+  #ifdef ADIABATIC
+  Reset_field(QLE);
+  #endif
+  MULTIFLUID( if(Fluidtype == GAS){
+    copy_field(QL , Density);
+    #ifdef ADIABATIC
+    copy_field(QLE, Energy);
+    #endif
+    }
+    );
   
 #ifdef MPICUDA
   MPI_Iallreduce(QL->field_gpu, QR->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasDensity); 
+#ifdef ADIABATIC
+  MPI_Iallreduce(QLE->field_gpu, QRE->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
+		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy); 
+#endif
 #else
   INPUT(QL);
   OUTPUT(QR);
+  #ifdef ADIABATIC
+  INPUT(QLE);
+  OUTPUT(QRE);
+  #endif
   MPI_Iallreduce(QL->field_cpu, QR->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
   		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasDensity); 
+  #ifdef ADIABATIC
+  MPI_Iallreduce(QLE->field_cpu, QRE->field_cpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
+		 MPI_DOUBLE, MPI_SUM, FluidsComm, &RequestGasEnergy); 
+  #endif
 #endif
   
 }
 
-void DragForce_a(real dt) {
-  
-}
+void DragForce_a(real dt){}
 
 void DragForce_b(real dt) {
 
@@ -40,6 +58,10 @@ void DragForce_b(real dt) {
 #ifdef DUSTSIZE
   //Wait for Gas Density (QR)
   MPI_Wait(&RequestGasDensity, MPI_STATUS_IGNORE);
+#ifdef ADIABATIC
+//Wait for Gas Energy (QRE)
+  MPI_Wait(&RequestGasEnergy, MPI_STATUS_IGNORE);
+#endif
 #endif
 
   // Centered drag coefficient pre-factor

@@ -270,6 +270,25 @@ CUDALIB_MacIntel = -L${CUDA}/lib/ -lcudart
 CUDAINC_MacIntel = -I${CUDA}/include/
 CXX_MacIntel     = g++ -stdlib=libstdc++
 CXXPARA_MacIntel = mpic++ -stdlib=libstdc++
+#---------------------------------------------------------------------                                                                                                                                                                                                    
+#STELLAR PLATFORM AT PRINCETON                                                                                                                                                                                                                                                    
+#FARGO_ARCH must be set to STELLAR                                                                                                                                                                                                                                  
+CC_STELLAR      = gcc
+SEQOPT_STELLAR  = -O3
+PARAOPT_STELLAR = ${SEQOPT_DAINT}
+PARACC_STELLAR  = mpicc
+LIBS_STELLAR    = -lm
+ENVRANK_STELLAR = SLURM_LOCALID
+ENVRANKS_STELLAR= SLURM_STEP_TASKS_PER_NODE
+INC_STELLAR     = -I../include
+NVCC_STELLAR    = nvcc
+CUDAOPT_STELLAR = -O3 -arch=sm_80
+PARAINC_STELLAR =
+PARALIB_STELLAR =
+CUDAINC_STELLAR = 
+CUDALIB_STELLAR = -lcuda -lcudart
+CXX_STELLAR     = g++
+CXXPARA_STELLAR = mpicc++
 #--------------Architecture independent names-------------------------
 CC	 = ${CC_${FARGO_ARCH}}
 SEQOPT   = ${SEQOPT_${FARGO_ARCH}}

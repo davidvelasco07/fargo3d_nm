@@ -78,6 +78,23 @@ void MPI_Reduce (void *ptr, void *ptr2, int count, int type, int foo3, int foo4,
   }
 }
 
+void MPI_Iallreduce (void *ptr, void *ptr2, int count, int type, int foo3, int foo4, int foo5) {
+  int i;
+  for (i = 0; i < count; i++) {
+    switch (type) {
+    case MPI_FLOAT:
+      *(((float *)ptr2)+i) = (float)(*(((float *)ptr)+i));
+      break;
+    case MPI_DOUBLE:
+      *(((double *)ptr2)+i) = (double)(*(((double *)ptr)+i));
+      break;
+    case MPI_INT:
+      *(((int *)ptr2)+i) = (int)(*(((int *)ptr)+i));
+      break;
+    }
+  }
+}
+
 //do nothing...
 void MPI_Finalize(){}
 void MPI_Bcast(){}
@@ -86,6 +103,7 @@ void MPI_Irecv(){}
 void MPI_Send(){}
 void MPI_Recv(){}
 void MPI_Barrier(){}
+void MPI_Abort(){}
 void MPI_Wait(){}
 void MPI_Scan(){} //In place scans require no special action
 void MPI_Comm_split(){}

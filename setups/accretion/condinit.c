@@ -17,6 +17,7 @@ void _CondInit(int id)
 
   real omega, rho_s, alp;
   real r, r3, xi, beta, h;
+  real latitud_m, latitud_p, h_local, efm, efp;
 
   rho = Density->field_cpu;
   e = Energy->field_cpu;
@@ -53,6 +54,7 @@ void _CondInit(int id)
       epsilons[n] *= EPSILON / log(smax / smin);
     }
     stokes[n] = stokes_plus[n + 1];
+    printf ("Para el polvo %d tenemos el eps %g\n", n, epsilons[n]);
     if (NFLUIDS == 2)
       stokes[n] = SMAX;
   }
@@ -104,6 +106,15 @@ void _CondInit(int id)
           rho[l] = sigma / sqrt(2.0 * M_PI) / (R0 * ASPECTRATIO * hd) * pow(r / R0, -xi) *
                    pow(sin(Zmed(k)), -xi - beta) * exp((1. - pow(sin(Zmed(k)), -2. * FLARINGINDEX)) / 2. / FLARINGINDEX / (h * hd * h * hd));
         }
+	if (Fluidtype == DUST) { /* We overwrite the density with an implementation that will correctly handle vertically unresolved discs */
+	  h_local = ASPECTRATIO * pow(Ymed(j)/R0, FLARINGINDEX);
+	  h_local *= hd;
+	  latitud_m = M_PI/2.-Zmin[k+1];
+	  latitud_p = M_PI/2.-Zmin[k];
+	  efm = erf(latitud_m/h_local/sqrt(2.));
+	  efp = erf(latitud_p/h_local/sqrt(2.));
+	  rho[l] = sigma*pow(Ymed(j)/R0,-SIGMASLOPE) * (efp-efm) / zone_size_z(j,k) / 2.0;
+	}
 
         if (Fluidtype == GAS)
           v1[l] *= sqrt(pow(sin(Zmed(k)), -2. * FLARINGINDEX) - (beta + xi) * h * h);

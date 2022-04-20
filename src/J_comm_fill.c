@@ -91,11 +91,11 @@ void ExecCommSameVar(long lev, long nvar, int *fieldtype)
 	/* Execute intra-level communications, for level lev. These are
   	GHOST type communications */
 	jCommunicator *com;
-	long i, j, k, le, m, n, imin[3], imax[3], stride[3], d;
+	long i, j, k, le, m, n, imin[3], imax[3], stride[3], d, dim;
 	int field;
 	FluidPatch *fluid;
 	//We'll perform the communications one direction at a time
-	for(int dim=0; dim<NDIM; dim++){
+	for(dim=0; dim<NDIM; dim++){
 	com = ComListGhost;
 	while (com != NULL)
 	{
@@ -161,7 +161,7 @@ void ExecCommUpVar(long lev, long nvar, int *fieldtype) /* With slope limiter */
 	long g, h, i, j, k, le, ms, mc, n, imind[3], imaxd[3], stridec[3], imaxs[3];
 	long imins[3], strides[3], is[3], iid[3], size, sizec[3], msm, msp, d, isl[3];
 	real s, src, srcp, srcm, loc_slope[3], ic[3];
-	int field;
+	int field, dim;
 	FILE *hdl;
 	long comp[20];
 	tGrid_CPU *ds, *dd;
@@ -170,7 +170,7 @@ void ExecCommUpVar(long lev, long nvar, int *fieldtype) /* With slope limiter */
 	real slope_i, slope_j, slope_k, value_i[9], value_j[3], frac[3];
 	real vp, sr;
 	FluidPatch *fluid;
-	for(int dim=0;dim<NDIM;dim++){
+	for(dim=0;dim<NDIM;dim++){
 	com = ComListGhost;
 	while (com != NULL)
 	{
@@ -374,10 +374,10 @@ void ExecCommDownMeanVar(long lev, long nvar, int *fieldtype)
 	real coef2, coef1, coef0;
 	long d, nb = 2, comp[20];
 	long stridecr[3], iread, iwrite;
-	int field;
+	int field, dim;
 
 	FluidPatch *fluid;
-	for(int dim=0;dim<NDIM;dim++){
+	for(dim=0;dim<NDIM;dim++){
 	com = ComListMean;
 	while (com != NULL)
 	{

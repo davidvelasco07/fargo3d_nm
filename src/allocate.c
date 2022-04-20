@@ -132,8 +132,9 @@ Fluid *CreateFluid(char *name, int fluidtype) {
 
 #ifdef DRAGFORCE
   real *coeffvalues;
+  int n;
   coeffvalues = (real*)malloc(sizeof(real)*(3));
-  for(int n=0; n<3;n++) coeffvalues[n]=0.0;
+  for(n=0; n<3;n++) coeffvalues[n]=0.0;
   f->Coeffval = coeffvalues;
   //Coeffval[0] = Stokesnumber;                                                                                                                         //Coeffval[1] = PaeticleSize;                                                                                                                         //Coeffval[2] = RhoSolid;
 #endif

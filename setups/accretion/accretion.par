@@ -15,7 +15,7 @@ smin			1.0e-4  size in cm (or Tsmin)
 smax			0.01    size in cm (or Tsmax)
 rhosolid		1.6867  in g/cm3
 Sq			    3.5		slope of distribution
-Delta			1.0e-8  diffusion coefficient (~alpha)
+Delta			1.0e-3  diffusion coefficient (~alpha)
 Tslim			10.0
 ThDiffusivity   4.5E-5  Thermal Diffusion coefficient
 NsubCyc         1       Number of subcycles to use when diffusing heat
@@ -41,7 +41,7 @@ NFluidColors    1
 Ntot			20		Total number of time steps
 Ninterm	 		1		Time steps between outputs
 DT		    	0.314159265359	Time step length. 2PI = 1 orbit
-OutputDir		/scratch/snx3000/dvelasco/earth_accretion
+OutputDir		@earth_accretion
 
 Field 			gasdens
 PlotLine		field[-1,:,:]

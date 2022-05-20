@@ -421,6 +421,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     
     MULTIFLUID(MonitorGlobal (MONITOR2D  | MONITORY | MONITORY_RAW|	MONITORSCALAR  | MONITORZ | MONITORZ_RAW));
     MULTIFLUID(MonitorNested (MONITORSCALAR));
+    if (CPU_Master)MULTIFLUID(MonitorAccretion());
   }
   MPI_Finalize();
   masterprint("End of the simulation!\n");

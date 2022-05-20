@@ -123,6 +123,7 @@ struct fluid {
   real *Coeffval;
 #endif
   real *Fluxes[3][2];
+  real *M_acc[10];
 };
 
 struct field2D { //Multiple 2D fields on code (azimuthal averages, etc.)

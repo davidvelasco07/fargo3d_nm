@@ -646,6 +646,9 @@ void SelectFluid(int n)
 #ifdef DRAGFORCE
   Coeffval = Fluids[n]->Coeffval;
 #endif
+#ifdef ACCRETION
+  M_acc = Fluids[n]->M_acc;
+#endif
   for (i = 0; i < 3; i++){
     for (j = 0; j < 2; j++){
       Fluxes[i][j] = Fluids[n]->Fluxes[i][j];

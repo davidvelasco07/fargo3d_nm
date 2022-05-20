@@ -216,6 +216,8 @@ Field2D *Vy0=NULL;
 Field2D *Vz0=NULL;
 Field2D *Energy0=NULL;
 
+real *M_acc=NULL;
+
 //Communications variables
 
 int Ncpu_x; // Numbers of cpus in x-axis;

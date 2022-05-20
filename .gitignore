@@ -18,3 +18,4 @@ std/.lastflags.old
 *tests.log
 mp.pro
 *~
+log*.txt

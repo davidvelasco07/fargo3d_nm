@@ -16,21 +16,11 @@ void compute_accretion(real dt) {
   real* vyp = Sys->vy;
   real* vzp = Sys->vz;
   real* mp = Sys->mass;
-  real M_acc[10];
-  char filename[MAXLINELENGTH];
-  FILE *Out;
   int nb = Sys->nb;
 
   for (n=0;n<nb;n++){
     Accretion(xp[n], yp[n], zp[n], vxp[n], vyp[n], vzp[n], mp[n], dt);
-    M_acc[n] = reduction_full_SUM(Energy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
-  }
-  if (CPU_Master)
-  {
-    sprintf(filename, "%smonitor/%s/M_acc.dat", OUTPUTDIR, Fluids[FluidIndex]->name);
-    Out = fopen_prs(filename, "a+");
-    fprintf(Out, "%.12g\t%.12g\n", PhysicalTime, M_acc[0]);
-    fclose(Out);
+    M_acc[n] += reduction_full_SUM(Energy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
   }
 }
 
@@ -187,13 +177,12 @@ void Accretion_cpu (real xp, real yp, real zp, real vxp, real vyp, real vzp, rea
     t_enc = 2*b/v_hw;
   }
   b = MIN(b, y*pow(Mp/MSTAR/3.0,1./3.));
-  b = y*pow(Mp/MSTAR/3.0,1./3.);
-  //printf("v_hw=%lf, M_Ormel=%lf, b=%lf\n",v_hw, M_Ormel, b);
-  t_enc = 1.01*dt;//MAX(1.01*dt,t_enc);
+  //b = y*pow(Mp/MSTAR/3.0,1./3.);
+  t_enc = MAX(1.01*dt,t_enc);
   dist = sqrt(dx*dx+dy*dy+dz*dz);
   
-  //if(dist < b){
-  if ((i == ip) && (j == jp) && (k == kp)) {
+  if(dist < b){
+  //if ((i == ip) && (j == jp) && (k == kp)) {
     accreted[ll] = dt/t_enc*rho_d[ll];
     rho_d[ll] -= accreted[ll];
     accreted[ll] = Vol(j,k)*accreted[ll];//*(1-hidden[ll])

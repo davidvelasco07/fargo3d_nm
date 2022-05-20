@@ -342,3 +342,17 @@ void MonitorNested (int bitchoice) {
     r <<= 1;
   }
 }
+
+void MonitorAccretion () {
+  int n;
+  char filename[MAXLINELENGTH];
+  FILE *Out;
+  for (n=0;n<Sys->nb;n++){
+    sprintf(filename, "%smonitor/%s/M_acc_%d.dat", OUTPUTDIR, Fluids[FluidIndex]->name,n);
+    Out = fopen_prs(filename, "a+");
+    fprintf(Out, "%.12g\t%.12g\n", PhysicalTime, M_acc[n]);
+    fclose(Out);
+    //Reset the accreted mass
+    //M_acc[n]=0;
+  }
+}

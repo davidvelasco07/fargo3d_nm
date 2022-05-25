@@ -418,10 +418,17 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     if (FluidColor == 0)
       if(CPU_Master)
 	      printf("%s", "\n");
-    
+
     MULTIFLUID(MonitorGlobal (MONITOR2D  | MONITORY | MONITORY_RAW|	MONITORSCALAR  | MONITORZ | MONITORZ_RAW));
     MULTIFLUID(MonitorNested (MONITORSCALAR));
-    if (CPU_Master)MULTIFLUID(MonitorAccretion());
+    if (ThereArePlanets)
+    {
+      WritePlanetSystemFile(TimeStep, YES);
+      SolveOrbits(Sys);
+      #ifdef ACCRETION
+      MULTIFLUID(MonitorAccretion());
+      #endif
+    }
   }
   MPI_Finalize();
   masterprint("End of the simulation!\n");

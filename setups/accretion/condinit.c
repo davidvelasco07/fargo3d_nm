@@ -54,7 +54,6 @@ void _CondInit(int id)
       epsilons[n] *= EPSILON / log(smax / smin);
     }
     stokes[n] = stokes_plus[n + 1];
-    printf ("Para el polvo %d tenemos el eps %g\n", n, epsilons[n]);
     if (NFLUIDS == 2)
       stokes[n] = SMAX;
   }

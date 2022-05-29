@@ -308,6 +308,9 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
       OMEGAFRAME  = GetfromPlanetFile (NbRestart, 10, 0);
       RestartPlanetarySystem (NbRestart, Sys);
     }
+    #ifdef ACCRETION
+    PARENTGRID(MULTIFLUID(RestartAccretion(PhysicalTime)));
+    #endif
   }
   else {
     if (ThereArePlanets)

@@ -194,6 +194,7 @@ ex void CorrectHidden (Field *, Field *, char *);
 ex void MonitorNested (int);
 ex void AllLevelSum (int, int);
 ex void MonitorAccretion (void);
+ex void RestartAccretion (real);
 ex void Write2D (Field2D *, char *, char *, int);
 ex boolean Read2D (Field2D *, char *, char *, int);
 

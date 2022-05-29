@@ -81,17 +81,19 @@ void Adapt_for_JUPITER(char *filename)
   if (AddSubPatch)
     refine();
 
-  if (!Restart)
-  {
-    FARGO_SAFE(ScanGridFile(filename));
-    printf("\nGrid File Scanned \n");
-  }
-  else
-  {
-    ReadGrids(NbRestart, grids);
-    printf("\nRead Grids \n");
-    ConstructGrids(grids);
-  }
+  //if (!Restart)
+  //{
+  //  FARGO_SAFE(ScanGridFile(filename));
+  //  printf("\nGrid File Scanned \n");
+  //}
+  //else
+  //{
+  //  ReadGrids(NbRestart, grids);
+  //  printf("\nRead Grids \n");
+  //  ConstructGrids(grids);
+  //}
+  FARGO_SAFE(ScanGridFile(filename));
+  printf("\nGrid File Scanned \n");
   
   grid = GridList;
   //At this point we have built the tgrids
@@ -280,6 +282,9 @@ void SelectGrid(tGrid_CPU *grid)
 
     Y0 = grid->pcorner_min[1];
     Z0 = grid->pcorner_min[2];
+
+    y0cell = grid->pcorner_min[1];
+    z0cell = grid->pcorner_min[2];
 
     J = grid->cpu % Ncpu_x;
     K = grid->cpu / Ncpu_x;

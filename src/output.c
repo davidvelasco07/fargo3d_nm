@@ -301,14 +301,14 @@ void WriteMerging(Field *f, int n) {
   if (CPU_Master) fo = fopen(outname, "w");
   else            fo = fopen(outname, "r+");
 
-  long offset = Nx*Y0 + Nx*Ny*Z0;
+  long offset = Nx*Y0 + Nx*NY*Z0;
 
   for (k=NGHZ; k<Nz+NGHZ; k++) {
     fseek(fo, offset*sizeof(real), SEEK_SET);
     for (j = NGHY; j < Ny+NGHY; j++) {
       fwrite(f->field_cpu+k*Stride+j*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
     }
-    offset += Nx*Ny;
+    offset += Nx*NY;
   }
 
   
@@ -720,4 +720,35 @@ if (type == ALL){ //We recover the .par variables' value
 
   if (OnlyInit) 
     prs_exit(EXIT_SUCCESS);
+}
+
+void RestartAccretion(real PhysicalTime)
+{
+  if (Fluidtype == DUST){
+  FILE *input;
+  char name[256];
+  char testline[256];
+  real time, mass;
+  char *pt;
+  int n;
+  for (n=0;n<Sys->nb;n++){
+    sprintf (name, "%smonitor/%s/M_acc_%d.dat", OUTPUTDIR, Fluids[FluidIndex]->name,n);
+    input = fopen (name, "r");
+    if (input == NULL) {
+      mastererr ("Can't read accretion file. Aborting restart.\n",n);
+      prs_exit (1);
+    }
+    printf("Reading %s/M_acc_%d.dat\n", Fluids[FluidIndex]->name,n);
+    do {
+      //fscanf (input,"%.12g\t%.12g\n", &time, &mass);
+      fscanf (input,"%lf %lf", &time, &mass);
+    } while ((time < PhysicalTime) && input != NULL );
+    if (input == NULL) {
+      mastererr ("Can't read entry in accretion file. Aborting restart.\n");
+      prs_exit (1);
+    }
+    fclose (input);
+    M_acc[n] = mass;
+  }
+  }
 }

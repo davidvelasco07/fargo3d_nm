@@ -1150,13 +1150,13 @@ void RestartDat(Field *field, int n)
       exit(1);
     }
     masterprint("Reading %s\n", filename);
-
-    origin = (z0cell)*NX * NY + (y0cell)*NX; //z0cell and y0cell are global variables.
+    
+    origin = Nx*Y0 + Nx*NY*Z0; //z0cell and y0cell are global variables.
     for (k = NGHZ; k < Nz + NGHZ; k++)
     {
-      fseek(fi, (origin + (k - NGHZ) * NX * NY) * sizeof(real), SEEK_SET); // critical part
+      fseek(fi, (origin + Nx*NY*(k - NGHZ)) * sizeof(real), SEEK_SET); // critical part
       for (j = NGHY; j < Ny + NGHY; j++)
-        temp = fread(f + k * Stride + j * (Nx + 2 * NGHX) + NGHX, sizeof(real), Nx, fi);
+        temp = fread(f + k*Stride + j * (Nx + 2 * NGHX) + NGHX, sizeof(real), Nx, fi);
     }
     masterprint("%s OK\n", filename);
     fclose(fi);

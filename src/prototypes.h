@@ -691,7 +691,7 @@ ex void ComputeTotalDensity_cpu(void);
 ex void Floor_cpu(void);
 
 ex void Accretion_gpu(real,real,real);
-ex void PlanetHeating_gpu(real,real,real);
+ex void PlanetHeating_gpu(real,real,real,real);
 
 #endif
 

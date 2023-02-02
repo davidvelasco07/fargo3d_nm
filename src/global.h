@@ -531,6 +531,6 @@ void (*boundary_zmin[NFLUIDS])();
 void (*boundary_zmax[NFLUIDS])();
 
 void (*Accretion)(real,real,real);
-void (*PlanetHeating)(real,real,real);
+void (*PlanetHeating)(real,real,real,real);
 
 int Grid_id;

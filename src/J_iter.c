@@ -130,7 +130,7 @@ void ItereLevel (real dt, long level)
       #ifdef PLANET_HEATING
       if(Current_Level==LevMax){
         SelectFluid(0);
-        compute_planetheating(real dt);
+        compute_planetheating(dt);
       }
       #endif
       #ifdef STOCKHOLM

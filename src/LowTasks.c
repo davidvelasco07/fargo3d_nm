@@ -646,9 +646,6 @@ void SelectFluid(int n)
 #ifdef DRAGFORCE
   Coeffval = Fluids[n]->Coeffval;
 #endif
-#ifdef ACCRETION
-  M_acc = Fluids[n]->M_acc;
-#endif
   for (i = 0; i < 3; i++){
     for (j = 0; j < 2; j++){
       Fluxes[i][j] = Fluids[n]->Fluxes[i][j];
@@ -716,6 +713,9 @@ void CreateFields()
   CreateField(&Sdiffyczf,"Sdiffyczf", 0,0,0,0);
   CreateField(&Sdiffyfzf,"Sdiffyfzf", 0,0,0,0);
 #endif
+#endif
+#ifdef THDIFFUSION
+  CreateField(&ThermalDiff, "ThermalDiff", 0, 0, 0, 0);
 #endif
 
 #ifdef MHD
@@ -1106,12 +1106,12 @@ void RestartDat(Field *field, int n)
   char filename[200];
   FILE *fi;
   int origin;
-
+  
   int temp;
-
+  
   f = field->field_cpu;
   name = field->name;
-
+  OUTPUT(field);
   if (Restart == YES)
   {
     sprintf(filename, "%s%s%d_%d.dat", OUTPUTDIR, name, n, CPU_Rank);
@@ -1142,7 +1142,8 @@ void RestartDat(Field *field, int n)
   MPI_Barrier(DomainComm);
   if (Restart_Full == YES)
   {
-    sprintf(filename, "%s%s%d_grid%d.dat", OUTPUTDIR, name, n, Current_Jupiter_Patch->parent);
+    setout(n);
+    sprintf(filename, "%s%s%d_grid%d.dat", OutputDir, name, n, Current_Jupiter_Patch->level);
     fi = fopen(filename, "r");
     if (fi == NULL)
     {
@@ -1179,16 +1180,23 @@ void OutputSpace()
   real temp1;
   int temp, relay;
   int init = 0;
-
-  //Linear
-  masterprint("Warning: The spacing for Nested-Meshes is linear (default).\n");
-  if (CPU_Master && FluidColor == 0)
-  {
-    sprintf(domain_out, "%s%s%d_x.dat", OUTPUTDIR, "domain_" ,Current_Jupiter_Patch->parent);
+  int Nx, Ny, Nz, Ncpu_x, Ncpu_y;
+  tGrid *grid = GridList;
+  while (grid != NULL) {
+    //Linear
+    masterprint("Warning: The spacing for Nested-Meshes is linear (default).\n");
+    Nx = grid->ncell[_X_];
+    Ny = grid->ncell[_Y_];
+    Nz = grid->ncell[_Z_];
+    Ncpu_x = grid->Ncpus[_Y_];
+    Ncpu_y = grid->Ncpus[_Z_];
+    if (CPU_Master && FluidColor == 0)
+    {
+    sprintf(domain_out, "%s%s%d_x.dat", OUTPUTDIR, "domain_" ,grid->level);
     domain = fopen(domain_out, "w");
     for (i = 0; i < Nx + 2 * NGHX + 1; i++)
     {
-      fprintf(domain, "%#.18lf\n", Xmin(i));
+      fprintf(domain, "%#.18lf\n",grid->Edges[0][i]);
       fflush(domain);
     }
   }
@@ -1198,7 +1206,7 @@ void OutputSpace()
     { // Force sequential read
       MPI_Recv(&relay, 1, MPI_INT, CPU_Rank - 1, 42, DomainComm, MPI_STATUS_IGNORE);
     }
-    sprintf(domain_out, "%s%s%d_y.dat", OUTPUTDIR, "domain_" ,Current_Jupiter_Patch->parent);
+    sprintf(domain_out, "%s%s%d_y.dat", OUTPUTDIR, "domain_" ,grid->level);
     if (CPU_Master)
     {
       domain = fopen(domain_out, "w");
@@ -1220,7 +1228,7 @@ void OutputSpace()
     {
       for (j = jmin; j < jmax; j++)
       {
-        fprintf(domain, "%#.18lf\n", Ymin(j));
+        fprintf(domain, "%#.18lf\n", grid->Edges[1][j]);
       }
       fclose(domain);
     }
@@ -1233,7 +1241,7 @@ void OutputSpace()
     { // Force sequential read
       MPI_Recv(&relay, 1, MPI_INT, CPU_Rank - 1, 43, DomainComm, MPI_STATUS_IGNORE);
     }
-    sprintf(domain_out, "%s%s%d_z.dat", OUTPUTDIR, "domain_" ,Current_Jupiter_Patch->parent);
+    sprintf(domain_out, "%s%s%d_z.dat", OUTPUTDIR, "domain_" ,grid->level);
     if (CPU_Master)
     {
       domain = fopen(domain_out, "w");
@@ -1255,7 +1263,7 @@ void OutputSpace()
     {
       for (j = jmin; j < jmax; j++)
       {
-        fprintf(domain, "%#.18lf\n", Zmin(j));
+        fprintf(domain, "%#.18lf\n", grid->Edges[2][j]);
       }
       fclose(domain);
     }
@@ -1263,5 +1271,7 @@ void OutputSpace()
     { // Force sequential read
       MPI_Send(&relay, 1, MPI_INT, CPU_Rank + 1, 43, DomainComm);
     }
+  }
+   grid = grid->next;
   }
 }

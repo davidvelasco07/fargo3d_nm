@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     }
     if (*(argv[i]) == '-') {
       if (strspn (argv[i], \
-		  "-tofCmkspSVBD0#") \
+		  "-tofCmksrpSVBD0#") \
 	  != strlen (argv[i]))
 	PrintUsage (argv[0]);
       if (strchr (argv[i], 't'))
@@ -96,6 +96,12 @@ int main(int argc, char *argv[]) {
 	  masterprint ("Incorrect restart number\n");
 	  PrintUsage (argv[0]);
 	}
+      }
+      if (strchr(argv[i], 'r'))
+      {
+        AddSubPatch = YES;
+        sprintf(SubPatchInfo, "%s", argv[i + 1]);
+        d = 2;
       }
       if (strchr (argv[i], '#')) {
 	d=2;
@@ -228,7 +234,7 @@ int main(int argc, char *argv[]) {
   #endif
   #endif
 
-#ifndef MPICUDA
+#ifdef MPICUDA
   SelectDevice(CPU_Rank);
 #endif
 
@@ -284,7 +290,7 @@ int main(int argc, char *argv[]) {
 		  ChangeArch adds _cpu or _gpu if GPU is activated.*/
   
   Adapt_for_JUPITER (ParameterFile);
-  PARENTGRID(OutputSpace());
+  OutputSpace();
   
   Sys = InitPlanetarySystem(PLANETCONFIG);
   ListPlanets();
@@ -296,21 +302,27 @@ the target velocity in Stockholm's damping prescription. We copy the
 value above *after* rescaling, and after any initial correction to
 OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 
-  if(Restart == YES || Restart_Full == YES) {
+  if(Restart || Restart_Full) {
     NESTEDMESHES(CondInit();); //Needed even for restarts: some setups have custom
 		 //definitions (eg potential for setup MRI) or custom
 		 //scaling laws (eg. setup planetesimalsRT).
 
     PARENTGRID(MULTIFLUID( begin_i  = RestartSimulation(NbRestart)));
-    
     if (ThereArePlanets) {
-      PhysicalTime  = GetfromPlanetFile (NbRestart, 9, 0);
-      OMEGAFRAME  = GetfromPlanetFile (NbRestart, 10, 0);
-      RestartPlanetarySystem (NbRestart, Sys);
+      if(NbRestart>0){
+        PhysicalTime  = GetfromPlanetFile (NbRestart, 9, 0);
+        OMEGAFRAME  = GetfromPlanetFile (NbRestart, 10, 0);
+        RestartPlanetarySystem (NbRestart, Sys);
+        #ifdef ACCRETION
+        PARENTGRID(MULTIFLUID(RestartAccretion(PhysicalTime)));
+        #endif
+      }
+      else{
+        EmptyPlanetSystemFiles ();
+      }
     }
-    #ifdef ACCRETION
-    PARENTGRID(MULTIFLUID(RestartAccretion(PhysicalTime)));
-    #endif
+    //Warning: This is only for the accretion ring setup
+    //PARENTGRID(MULTIFLUID(CorrectVtheta(OMEGAFRAME-1)));
   }
   else {
     if (ThereArePlanets)
@@ -320,19 +332,23 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }  
+
+  if (StretchOldOutput) StretchOutput(StretchNumber);
+  
+
   /* This must be placed ***after*** reading the input files in case of a restart */
-  if ((ArrayNb) && (EarlyOutputRename == NO)) {
-    i = strlen(OUTPUTDIR);
-    if (OUTPUTDIR[i-1] == '/') OUTPUTDIR[i-1] = 0;//Remove trailing slash if any
-    sprintf (OUTPUTDIR, "%s%06d/", OUTPUTDIR, ArrayNb); //Append numerical suffix
-    /* There is no need to perform the wildcard (@) substitution. This has already been done */
-    printf ("\n\n***\n\nNew Output Directory is %s\n\n***\n\n", OUTPUTDIR);
-    MakeDir(OUTPUTDIR); /*Create the output directory*/
-    ListVariables ("variables.par"); //Writes all variables defined in set up
-    ListVariablesIDL ("IDL.var");
-    InitSpace();
-    WriteDim ();
-  }
+  //if ((ArrayNb) && (EarlyOutputRename == NO)) {
+  //  i = strlen(OUTPUTDIR);
+  //  if (OUTPUTDIR[i-1] == '/') OUTPUTDIR[i-1] = 0;//Remove trailing slash if any
+  //  sprintf (OUTPUTDIR, "%s%06d/", OUTPUTDIR, ArrayNb); //Append numerical suffix
+  //  /* There is no need to perform the wildcard (@) substitution. This has already been done */
+  //  printf ("\n\n***\n\nNew Output Directory is %s\n\n***\n\n", OUTPUTDIR);
+  //  MakeDir(OUTPUTDIR); /*Create the output directory*/
+  //  ListVariables ("variables.par"); //Writes all variables defined in set up
+  //  ListVariablesIDL ("IDL.var");
+  //  InitSpace();
+  //  WriteDim ();
+  //}
 
   GetHostsList ();
   DumpToFargo3drc(argc, argv);
@@ -358,7 +374,7 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #else
   masterprint ("Standard version with no ghost zones in X\n");
 #endif
-  
+
   tGrid_CPU *current;
   real mass, totalmass;
   SubCycling = FULL;
@@ -368,26 +384,16 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
 #if defined(MHD) && defined(DEBUG)
       FARGO_SAFE(ComputeDivergence(Bx, By, Bz));
 #endif
-      if (ThereArePlanets)
-	      WritePlanetSystemFile(TimeStep, NO);
-      
-#ifndef NOOUTPUTS
-      PARENTGRID(MULTIFLUID(WriteOutputs(ALL)));
-      
-#ifdef MATPLOTLIB
-      Display();
-#endif
+      if (ThereArePlanets)WritePlanetSystemFile(TimeStep, NO);
 
-      if (FluidColor == 0 && CPU_Master)
-        printf("OUTPUTS %d at date t = %f OK\n", TimeStep, PhysicalTime);
-#endif
-      
+      WriteOutputsNM(TimeStep);
+
       if (TimeInfo == YES) GiveTimeInfo (TimeStep);
     }
     
     if (NSNAP != 0) {
       if (NSNAP * (TimeStep = (i / NSNAP)) == i) {
-	      MULTIFLUID(WriteOutputs(SPECIFIC));
+	      MULTIFLUID(WriteOutputs(SPECIFIC,TimeStep));
 #ifdef MATPLOTLIB
 	      Display();
 #endif
@@ -395,7 +401,6 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     }
     if (i>=NTOT)
       break;
-
     dtemp = PhysicalTime+DT;
     while (PhysicalTime < dtemp-DT/1e10){
       PhysicalTime += RecursiveIteration (dtemp-PhysicalTime, 0L);

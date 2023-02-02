@@ -327,7 +327,7 @@ void AlgoGas2 (real dt) {
     #ifdef ACCRETION
     //For the time being let's just allow the finest level to accrete, considering that
     //it should cointaing up to the Hill sphere in it.
-    if(Fluidtype==DUST && Current_Level==LevMax)compute_accretion(dt);
+    if(Fluidtype==DUST && Current_Level==LevMax && ThereArePlanets)compute_accretion(dt);
     #endif
     GiveSpecificTime (t_Hydro);
   

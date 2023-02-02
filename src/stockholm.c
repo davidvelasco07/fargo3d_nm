@@ -104,6 +104,8 @@ void StockholmBoundary_cpu(real dt) {
   real ramp;
   real tau;
   real taud;
+  real T;
+  real T0;
 //<\INTERNAL>
 
 //<CONSTANT>
@@ -163,7 +165,15 @@ void StockholmBoundary_cpu(real dt) {
 	tau = ds*sqrt(ymed(j)*ymed(j)*ymed(j)/G/MSTAR);
 	if(ramp>0.0) {
 	  taud = tau/ramp;
-	  rho[l] = (rho[l]*taud+rho0[l2D]*dt)/(dt+taud);
+#ifdef ADIABATIC
+    T = e[l]/rho[l];
+    T0 = e0[l2D]/rho0[l2D];
+    T = (T*taud+T0*dt)/(dt+taud);
+#endif
+    rho[l] = (rho[l]*taud+rho0[l2D]*dt)/(dt+taud);
+#ifdef ADIABATIC
+    e[l] = rho[l]*T;
+#endif
 #ifdef X
 	  vx0_target = vx0[l2D];
 	  radius = ymed(j);

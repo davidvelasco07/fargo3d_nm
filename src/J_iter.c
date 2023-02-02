@@ -50,6 +50,10 @@ void UpdateCourantLimit (long level)
 	      if (level == 0)
 	        MULTIFLUID(ComputeVmed(Vx)); // FARGO algorithm
 #endif
+        #ifdef THDIFFUSION
+          SelectFluid(0);//For the gas
+          Compute_ThermalDiffusion();
+        #endif
         MULTIFLUID(cfl());
         CflFluidsMin();
 	      //cfl works with the 'StepTime' global variable.
@@ -123,6 +127,12 @@ void ItereLevel (real dt, long level)
     if ((level == item->level) && (item->cpu == CPU_Rank)) {
       FARGO_SAFE(AdaptFieldsFromJ (item));
       MULTIFLUID(AlgoGas2 (dt));
+      #ifdef PLANET_HEATING
+      if(Current_Level==LevMax){
+        SelectFluid(0);
+        compute_planetheating(real dt);
+      }
+      #endif
       #ifdef STOCKHOLM
       if(Current_Level==0){
         MULTIFLUID(StockholmBoundary(dt));

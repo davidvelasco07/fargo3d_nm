@@ -349,7 +349,7 @@ void MonitorAccretion () {
   real lsum, gsum;
   FILE *Out;
   for (n=0;n<Sys->nb;n++){
-    lsum = M_acc[n];
+    lsum = M_acc[FluidIndex][n];
     #ifndef FLOAT
     MPI_Reduce(&lsum, &gsum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     #else
@@ -358,7 +358,7 @@ void MonitorAccretion () {
     if(CPU_Master){
       sprintf(filename, "%smonitor/%s/M_acc_%d.dat", OUTPUTDIR, Fluids[FluidIndex]->name,n);
       Out = fopen_prs(filename, "a+");
-      fprintf(Out, "%.12g\t%.12g\n", PhysicalTime, gsum);
+      fprintf(Out, "%.18g\t%.18g\n", PhysicalTime, gsum);
       fclose(Out);
     }
     //Reset the accreted mass

@@ -3,11 +3,13 @@
 void refine () {
   long output, nbgrid, ng, gtr=0, i, j, k;	/* ng : number of grids */
   long resol[3], levelmax=0;
+  int fluidindex;
   tGrid *grid;
   tGrid_CPU *cgrid, *descsp=NULL, *descp=NULL;
 				/* gtr : grid to refine */
   GridFileInfo grids[MAXGRIDS];
   char field_name[MAXLINELENGTH];
+  char fluid_name[MAXLINELENGTH];
   real pos[6];
   sscanf (SubPatchInfo, "%ld %ld %lf %lf %lf %lf %lf %lf",\
 	  &output, &nbgrid, &pos[0], &pos[1], &pos[2], &pos[3], &pos[4], &pos[5]);
@@ -16,6 +18,7 @@ void refine () {
   masterprint ("Intended physical limits of subpatch:\n");
   masterprint ("(%g, %g, %g) ==> (%g, %g, %g)\n",\
 	      pos[0],  pos[1],  pos[2],  pos[3],  pos[4],  pos[5]);
+  
   ReadGrids (output, grids);
   ng=0;
   
@@ -115,7 +118,9 @@ void refine () {
   ConstructGrids (grids);
   grid = GridList;
   while (grid != NULL) {splitgrid (grid); grid = grid->next;}
+  WriteDimNM(grids);
   WriteDescriptor (output);
+  OutputSpace();
   cgrid = Grid_CPU_list;
   while (cgrid) {
     if (cgrid->number == nbgrid) {
@@ -127,13 +132,22 @@ void refine () {
     cgrid = cgrid->next;
   }
   
-  for (k = 0; k < NbFluids; k++) {
-    sprintf (field_name, "%s%s","gas", "density");
+  fluidindex = FluidColor*NFluids_per_rank;
+  for (k = fluidindex; k < fluidindex + NFluids_per_rank; k++) {
+    if(k==0)
+       sprintf (fluid_name, "%s","gas");
+    else
+       sprintf (fluid_name, "%s%d","dust",k);
+    sprintf (field_name, "%s%s",fluid_name, "dens");
+    refine_field (field_name, output, nbgrid, grids, gtr, ng, 1L, descsp, descp);
+    sprintf (field_name, "%s%s",fluid_name, "energy");
     refine_field (field_name,  output, nbgrid, grids, gtr, ng, 1L, descsp, descp);
-    sprintf (field_name, "%s%s","gas", "energy");
+    sprintf (field_name, "%s%s",fluid_name, "vx");
     refine_field (field_name,  output, nbgrid, grids, gtr, ng, 1L, descsp, descp);
-    sprintf (field_name, "%s%s","gas", "velocity");
-    refine_field (field_name,  output, nbgrid, grids, gtr, ng, 3L, descsp, descp);
+    sprintf (field_name, "%s%s",fluid_name, "vy");
+    refine_field (field_name,  output, nbgrid, grids, gtr, ng, 1L, descsp, descp);
+    sprintf (field_name, "%s%s",fluid_name, "vz");
+    refine_field (field_name,  output, nbgrid, grids, gtr, ng, 1L, descsp, descp);
   }
   /* nbgrid : CPUgrid number of grid to refine */
 				/* grids : the grid array */
@@ -141,4 +155,5 @@ void refine () {
 				/* The refined grid has number 0 */
 				/* ng is the CPU-grid number of grid to refine */
   prs_end ("Subpatch creation completed.");
+
 }

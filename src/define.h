@@ -442,7 +442,7 @@
 #endif
 #define l2D ((j)+((k)*(Ny+2*NGHY)))
 #define l2D_int ((j)+((k)*(Ny+2*NGHY)))
-
+#define l_mid ((i)+(j)*(Nx+2*NGHX)+((size_z-NGHZ-1)*Stride))
 #else //defined __GPU
 
 #ifdef NOGHOSTX
@@ -479,6 +479,7 @@
 #define l   ((i)+((j)*pitch)+((k)*stride))
 #define l2D ((j)+((k)*pitch2d))
 #define l2D_int ((j)+((k)*pitch2d_int))
+#define l_mid ((i)+((j)*pitch)+((size_z-NGHZ-1)*stride))
 
 #endif
 
@@ -638,7 +639,7 @@ a bug and obtain hints about its origin. */
 #define DUMP_PPVAR( var) {fprintf (sum, "%s = %s = %g\n", #var, xstr(var), (double)var);} // To be used in summary.c only
 #define MULTIFLUID( call)						\
   for (FluidIndex=0;FluidIndex<NFluids_per_rank;FluidIndex++) {		\
-    SelectFluid(FluidIndex);						\
+    SelectFluid(FluidIndex); \
     call;}
 
 #define NESTEDMESHES( call) \
@@ -652,17 +653,16 @@ a bug and obtain hints about its origin. */
   } while (Grid_item != NULL); 
 
 #define PARENTGRID( call) \
-  for(j=0;j<Ngrids;j++){ \
+  for(Grid_id=0;Grid_id<Ngrids;Grid_id++){ \
     Grid_item = Grid_CPU_list; \
     do {   \
-      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == j) { \
+      if (Grid_item->cpu == CPU_Rank && Grid_item->parent == Grid_id) { \
         AdaptFieldsFromJ (Grid_item); \
         call; \
       } \
       Grid_item= Grid_item->next; \
     } while (Grid_item != NULL); \
   }
-
 
 #define index(i,j) j+i*NFLUIDS
 

@@ -9,9 +9,9 @@
 
 void compute_accretion(real dt) {
   int i,j,k,n;
-  real* xp = Sys->x_cpu;
-  real* yp = Sys->y_cpu;
-  real* zp = Sys->z_cpu;
+  real* xp = Sys->x;
+  real* yp = Sys->y;
+  real* zp = Sys->z;
   real* vxp = Sys->vx;
   real* vyp = Sys->vy;
   real* vzp = Sys->vz;
@@ -19,12 +19,13 @@ void compute_accretion(real dt) {
   int nb = Sys->nb;
 
   for (n=0;n<nb;n++){
-    Accretion(xp[n], yp[n], zp[n], vxp[n], vyp[n], vzp[n], mp[n], dt);
-    M_acc[n] += reduction_full_SUM(Energy, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
+    Accretion(xp[n], yp[n], zp[n]);
+    M_dot[FluidIndex][n] = reduction_full_SUM(Energy, NGHY, Ny+NGHY, 0, Nz+2*NGHZ);
+    M_acc[FluidIndex][n] += M_dot[FluidIndex][n];
   }
 }
 
-void Accretion_cpu (real xp, real yp, real zp, real vxp, real vyp, real vzp, real Mp, real dt) {
+void Accretion_cpu (real xp, real yp, real zp) {
 //<USER_DEFINED>
   INPUT(Density);
   OUTPUT(Density);
@@ -78,12 +79,13 @@ void Accretion_cpu (real xp, real yp, real zp, real vxp, real vyp, real vzp, rea
   real dx;
   real dy;
   real dz;
+  real dxp;
+  real dyp;
+  real dzp;
   real r_polar;
   real dist;
-  real v_hw;
-  real M_Ormel;
-  real b;
-  real t_enc;
+  real frac;
+  real removed;
 //<\INTERNAL>
 
 //<CONSTANT>
@@ -103,7 +105,6 @@ void Accretion_cpu (real xp, real yp, real zp, real vxp, real vyp, real vzp, rea
 //<MAIN_LOOP>
 
   i = j = k = 0;
-
 #ifdef Z
   for(k=1; k<size_z; k++) {
 #endif
@@ -117,77 +118,38 @@ void Accretion_cpu (real xp, real yp, real zp, real vxp, real vyp, real vzp, rea
 	ll = l;
   r_polar = sqrt(xp*xp+yp*yp);
 #ifdef CARTESIAN
-	dx = xmed(i)-xp;
-	dy = ymed(j)-yp;
-	dz = zmed(k)-zp;
   x = xp;
   y = yp;
   z = zp;
-  vx = vxp;
-  vy = vyp;
-  vz = vzp;
 #endif
 #ifdef CYLINDRICAL
-	dx = ymed(j)*cos(xmed(i))-xp;
-	dy = ymed(j)*sin(xmed(i))-yp;
-	dz = zmed(k)-z;
   x = atan2(yp,xp);
   y = sqrt(xp*xp+yp*yp);
   z = zp;
-  //v_phi
-  vx = (xp*vyp-vxp*yp)/y + OMEGAFRAME*ymed(j);
-  //v_r
-  vy = (xp*vxp+yp*vyp)/y;
-  //v_z
-  vz = vzp;
 #endif
 #ifdef SPHERICAL
-	dx = ymed(j)*cos(xmed(i))*sin(zmed(k))-xp;
-	dy = ymed(j)*sin(xmed(i))*sin(zmed(k))-yp;
-	dz = ymed(j)*cos(zmed(k))-zp;
   x = atan2(yp,xp);
   y = sqrt(xp*xp+yp*yp+zp*zp);
   z = atan2(sqrt(xp*xp+yp*yp),zp);
-  //v_phi
-  vx = (xp*vyp-vxp*yp)/r_polar;
-  //v_r
-  vy = (xp*vxp + yp*vyp + zp*vzp)/y;
-  //v_theta
-  vz = ((xp*vxp + yp*vyp)*zp/r_polar - r_polar*vzp)/y;
 #endif
-  //Indices of cell hosting the planet
-  ip = (x-xmed(0))/(xmed(1)-xmed(0));
-  jp = (y-ymed(0))/(ymed(1)-ymed(0));
-  kp = (z-zmed(0))/(zmed(1)-zmed(0));
-  lp = ip + jp*pitch + kp*stride;
-#ifdef ACCRETION
-  //Headwind velocity
-  v_hw = sqrt(pow(vx_d[lp]+OMEGAFRAME*ymed(jp)*sin(zmed(kp))-vx,2)+pow(vy_d[lp]-vy,2)+pow(vz_d[lp]-vz,2));
-  //printf("vp=(%lf,%lf,%lf), vd=(%lf,%lf,%lf), vhw=%lf\n",vx,vy,vz,vx_d[lp]+OMEGAFRAME*ymed(jp)*sin(zmed(kp)),vy_d[lp],vz_d[lp],v_hw);
-  //printf("v_phi=%lf, OmegaFrame=%lf,r=%lf, sin(theta)=%lf\n",vx_d[lp],OMEGAFRAME,ymed(jp),sin(zmed(kp)));
-  M_Ormel = pow(v_hw,3)/(8*G*OMEGAFRAME*stokes)/MSTAR;
-  if(Mp > M_Ormel){
-    //Shear regime
-    b = pow(G*Mp*stokes,1./3);
-    t_enc = 1/OMEGAFRAME;
+  dx = xmed(1)-xmed(0);
+  dy = ymed(1)-ymed(0);
+  dz = zmed(1)-zmed(0);
+  dxp=fabs(x-xmed(i));
+	dyp=fabs(y-ymed(j));
+	dzp=fabs(z-zmed(k));
+  frac=1;
+  //Just in case let's clean whatever was in this field
+  accreted[ll] = 0;
+	if(dxp<dx && dyp<dy && dzp<dz){
+	    frac *= 1-dxp/dx;
+	    frac *= 1-dyp/dy;
+	    frac *= 1-dzp/dz;
+      removed = frac*rho_d[ll];
+      rho_d[ll] -= removed;
+      accreted[ll] = Vol(j,k)*removed;
+      //printf("(%d,%d,%d)->%g, dens=%lf, removed=%lf, Vol=%.18g, Macc=%.18g\n",i,j,k,frac,rho_d[ll],removed,Vol(j,k),accreted[ll]);
   }
-  else{
-    //Headwind regime
-    b = sqrt(2*G*Mp*OMEGAFRAME*stokes/v_hw);
-    t_enc = 2*b/v_hw;
-  }
-  b = MIN(b, y*pow(Mp/MSTAR/3.0,1./3.));
-  //b = y*pow(Mp/MSTAR/3.0,1./3.);
-  t_enc = MAX(1.01*dt,t_enc);
-  dist = sqrt(dx*dx+dy*dy+dz*dz);
-  
-  if(dist < b){
-  //if ((i == ip) && (j == jp) && (k == kp)) {
-    accreted[ll] = dt/t_enc*rho_d[ll];
-    rho_d[ll] -= accreted[ll];
-    accreted[ll] = Vol(j,k)*accreted[ll];//*(1-hidden[ll])
-  }
-#endif
 //<\#>
 #ifdef X
       }

@@ -271,6 +271,7 @@ ex void SubStep3_cpu(real);
 //substep4.c Prototypes
 ex void SubStep4_a_cpu(real);
 ex void SubStep4_b_cpu(real);
+ex void Compute_ThermalDiffusion_cpu();
 
 //transport Prototypes
 ex void VanLeerX(Field*, Field*, Field*, real);
@@ -324,7 +325,8 @@ ex void WriteFieldInt2D(FieldInt2D*, int);
 ex void WriteField2D(Field2D*, int);
 ex void WriteFieldGhost(Field*, int);
 ex void WriteBinFile(int, int, int, real*, char*);
-ex void WriteOutputs(int);
+ex void WriteOutputs(int,int);
+ex void WriteOutputsNM(int);
 ex void Display(void);
 ex void DumpAllFields (int);
 
@@ -470,7 +472,9 @@ ex void CondInit(void);
 ex void PostRestartHook(void);
 
 ex void compute_accretion(real);
-ex void Accretion_cpu(real,real,real,real,real,real,real,real);
+ex void Accretion_cpu(real,real,real);
+ex void compute_planetheating(real);
+ex void PlanetHeating_cpu(real,real,real,real);
 
 //CUDA PROTOTYPES-----------------------------------------------------
 
@@ -534,6 +538,7 @@ ex void SubStep2_b_gpu(real);
 ex void SubStep3_gpu(real);
 ex void SubStep4_a_gpu(real);
 ex void SubStep4_b_gpu(real);
+ex void Compute_ThermalDiffusion_gpu();
 ex void DivideByRho_gpu(Field*,Field*);
 
 ex void mon_dens_gpu(void);
@@ -685,8 +690,8 @@ ex void (_collisions_cpu)(real,int,int,int,int);
 ex void ComputeTotalDensity_cpu(void);
 ex void Floor_cpu(void);
 
-ex void Accretion_gpu(real,real,real,real,real,real,real,real);
-
+ex void Accretion_gpu(real,real,real);
+ex void PlanetHeating_gpu(real,real,real);
 
 #endif
 
@@ -698,6 +703,7 @@ ex void ScanGridFile(char*);
 ex void GridAbs(GridFileInfo*);
 ex void GridPos(GridFileInfo*);
 ex void GridBuild(GridFileInfo*);
+ex void WriteDimNM(GridFileInfo*);
 //Prototypes for functions coming from J_low.c
 ex void prs_end (const char*, ...);
 ex void prs_stderr (const char *, ...);

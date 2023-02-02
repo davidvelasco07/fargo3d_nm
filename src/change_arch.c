@@ -30,6 +30,7 @@ void ChangeArch() {
   SubStep3    = SubStep3_cpu;
   SubStep4_a  = SubStep4_a_cpu;
   SubStep4_b  = SubStep4_b_cpu;
+  Compute_ThermalDiffusion = Compute_ThermalDiffusion_cpu;
   DivideByRho = DivideByRho_cpu;
   VanLeerX_a  = VanLeerX_a_cpu;
   VanLeerX_b  = VanLeerX_b_cpu;
@@ -154,6 +155,7 @@ void ChangeArch() {
   VanLeerX_PPA_d_2d = VanLeerX_PPA_d_2d_cpu;
 
   Accretion  = Accretion_cpu;
+  PlanetHeating = PlanetHeating_cpu;
 
   while (fgets(s, MAXLINELENGTH-1, func_arch) != NULL) {
     success = sscanf(s, "%s", name);
@@ -215,6 +217,7 @@ void ChangeArch() {
 	if(strval[0] == 'g'){
 	  SubStep4_a = SubStep4_a_gpu;
 	  SubStep4_b = SubStep4_b_gpu;
+    Compute_ThermalDiffusion = Compute_ThermalDiffusion_gpu;
 	  printf("Substep4 runs on the GPU\n");
 	}
       }
@@ -498,6 +501,8 @@ void ChangeArch() {
 	if(strval[0] == 'g'){
 	  Accretion = Accretion_gpu;
 	  printf("Accretion runs on the GPU\n");
+    PlanetHeating = PlanetHeating_gpu;
+	  printf("PlanetHeating runs on the GPU\n");
 	}
       }
       if (strcmp(name, "communications") == 0) {

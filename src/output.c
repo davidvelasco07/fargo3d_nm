@@ -293,8 +293,8 @@ void WriteMerging(Field *f, int n) {
   char outname[MAXLINELENGTH];
   int relay;
   int i, j, k;
-  
-  sprintf(outname, "%s%s%d_grid%d.dat", OUTPUTDIR, f->name, n, Current_Jupiter_Patch->parent);
+  setout(n);
+  sprintf(outname, "%s%s%d_grid%d.dat", OutputDir, f->name, n, Current_Jupiter_Patch->level);
   if (CPU_Rank > 0) // Force sequential write
     MPI_Recv (&relay, 1, MPI_INT, CPU_Rank-1, 42, DomainComm, MPI_STATUS_IGNORE);
 
@@ -302,13 +302,12 @@ void WriteMerging(Field *f, int n) {
   else            fo = fopen(outname, "r+");
 
   long offset = Nx*Y0 + Nx*NY*Z0;
-
   for (k=NGHZ; k<Nz+NGHZ; k++) {
     fseek(fo, offset*sizeof(real), SEEK_SET);
-    for (j = NGHY; j < Ny+NGHY; j++) {
+    for (j = NGHY; j<Ny+NGHY; j++) {
       fwrite(f->field_cpu+k*Stride+j*(Nx+2*NGHX)+NGHX, sizeof(real)*Nx, 1, fo);
     }
-    offset += Nx*NY;
+    offset += NX*NY;
   }
 
   
@@ -552,13 +551,23 @@ void DumpAllFields (int number) {
   printf ("\n");
 }
 
-void WriteOutputs(int type) {
+void WriteOutputsNM(int output){
+#ifndef NOOUTPUTS
+    WriteDescriptor(output);
+    PARENTGRID(MULTIFLUID(WriteOutputs(ALL,output);));
+#ifdef MATPLOTLIB
+    Display();
+#endif
+    if (FluidColor == 0 && CPU_Master) printf("OUTPUT %d at date t = %f OK\n", output, PhysicalTime);
+#endif
+}
 
+void WriteOutputs(int type, int timestep) {
  /* If type=ALL, all fields are dumped (This is the old fashion
      style). If type=SPECIFIC, this routine only dumps specific
      fields, given by the .par variables WRITE+FIELD. By default all
      WRITE parameters are NO. */ 
-    
+
   boolean writedensity;
   boolean writeenergy;
   boolean writedivergence;
@@ -578,7 +587,7 @@ void WriteOutputs(int type) {
   MPI_Offset offset;
 
   FILE *fp;
-  char filename[MAXNAMELENGTH];
+  char filename[MAXLINELENGTH];
 
   //Summary (TimeStep);
   
@@ -613,12 +622,12 @@ void WriteOutputs(int type) {
     }
   }
   // we truncate the output.dat file
-  if(CPU_Master && (writeoffset == TRUE)) {
-    sprintf(filename, "%s/output%s.dat", OUTPUTDIR, Fluids[FluidIndex]->name);
-    fp = fopen(filename,"w");
-    fclose(fp);
-  }
-  
+  //if(CPU_Master && (writeoffset == TRUE)) {
+  //  sprintf(filename, "%s/output%s.dat", OUTPUTDIR, Fluids[FluidIndex]->name);
+  //  fp = fopen(filename,"w");
+  //  fclose(fp);
+  //}
+
   /// MPIIO ouput version
 #ifdef MPIIO
   offset = 0; //We start at the begining of the file  
@@ -670,9 +679,9 @@ void WriteOutputs(int type) {
   /// Standard ouput version
 #ifndef MPIIO
   if (WRITEDENSITY)
-    __WriteField(Density, TimeStep);
+    __WriteField(Density, timestep);
   if (WRITEENERGY)
-    __WriteField(Energy, TimeStep);
+    __WriteField(Energy, timestep);
 #ifdef MHD //MHD is 3D.
   if(Fluidtype == GAS){
     if (WRITEDIVERGENCE)
@@ -687,18 +696,18 @@ void WriteOutputs(int type) {
 #endif
 #ifdef X
   if (WRITEVX)
-    __WriteField(Vx, TimeStep);
+    __WriteField(Vx, timestep);
 #endif
 #ifdef Y
   if (WRITEVY)
-    __WriteField(Vy, TimeStep);
+    __WriteField(Vy, timestep);
 #endif
 #ifdef Z
   if (WRITEVZ)
-    __WriteField(Vz, TimeStep);
+    __WriteField(Vz, timestep);
 #endif
 #endif
-  
+
 if (type == ALL){ //We recover the .par variables' value
     WRITEDENSITY = writedensity;
     WRITEENERGY = writeenergy;
@@ -740,15 +749,14 @@ void RestartAccretion(real PhysicalTime)
     }
     printf("Reading %s/M_acc_%d.dat\n", Fluids[FluidIndex]->name,n);
     do {
-      //fscanf (input,"%.12g\t%.12g\n", &time, &mass);
-      fscanf (input,"%lf %lf", &time, &mass);
-    } while ((time < PhysicalTime) && input != NULL );
+      fscanf (input,"%.18g %.18g", &time, &mass);
+    } while (((PhysicalTime-time)/PhysicalTime > 1E-10) && input != NULL );
     if (input == NULL) {
       mastererr ("Can't read entry in accretion file. Aborting restart.\n");
       prs_exit (1);
     }
     fclose (input);
-    M_acc[n] = mass;
+    M_acc[FluidIndex][n] = mass;
   }
   }
 }

@@ -59,40 +59,8 @@ void ScanGridFile (char *filename) {
   if (line > 0) grids[line-1].last = FALSE;
   line++;
 
-
-  
   input = fopen(filename, "r");
 
-  if (!CPU_Rank) {
-    sprintf (gridfilename, "%s/nested_meshes.txt", OUTPUTDIR);
-    output = fopen (gridfilename, "w");
-    if (output == NULL)
-      printf ("Could not write grid file %s\n", gridfilename);
-
-    switch (NDIM) {
-    case 1: 
-      fprintf (output, "# %s_min %s_max level\n\n",	\
-	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[0]]);
-      break;
-    case 2: 
-      fprintf (output, "# %s_min %s_min %s_max %s_max level\n\n", \
-	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[1]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[1]]);
-      break;
-    case 3: 
-      fprintf (output, "# %s_min %s_min %s_min %s_max %s_max %s_max level\n\n", \
-	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[1]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[2]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[1]],			\
-	       SCoordNames[CoordType*3+InvCoordNb[2]]);
-      break;
-    }
-  }
   expect = 1+2*NDIM;
   while (!feof(input)) {
     if (fgets (string, MAXLINELENGTH, input) != NULL) {
@@ -152,7 +120,46 @@ void ScanGridFile (char *filename) {
     }
   }
   fclose (input);
-  i = 0;
+  WriteDimNM(grids);
+  GridAbs (grids);
+  GridPos (grids);
+  GridBuild (grids);
+}
+
+void WriteDimNM(GridFileInfo *grids){
+  FILE *output;
+  char gridfilename[MAXLINELENGTH];
+  int i = 0;
+  if (!CPU_Rank) {
+    sprintf (gridfilename, "%s/nested_meshes.txt", OUTPUTDIR);
+    output = fopen (gridfilename, "w");
+    if (output == NULL)
+      printf ("Could not write grid file %s\n", gridfilename);
+
+    switch (NDIM) {
+    case 1: 
+      fprintf (output, "# %s_min %s_max level\n\n",	\
+	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[0]]);
+      break;
+    case 2: 
+      fprintf (output, "# %s_min %s_min %s_max %s_max level\n\n", \
+	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[1]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[1]]);
+      break;
+    case 3: 
+      fprintf (output, "# %s_min %s_min %s_min %s_max %s_max %s_max level\n\n", \
+	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[1]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[2]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[0]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[1]],			\
+	       SCoordNames[CoordType*3+InvCoordNb[2]]);
+      break;
+    }
+  }
   do {
     if (!CPU_Rank)
       if (NDIM == 3)
@@ -166,7 +173,5 @@ void ScanGridFile (char *filename) {
 		 grids[i].xmax[0], grids[i].level);
   } while (!(grids[i++].last));
   if (!CPU_Rank) fclose (output);
-  GridAbs (grids);
-  GridPos (grids);
-  GridBuild (grids);
+
 }

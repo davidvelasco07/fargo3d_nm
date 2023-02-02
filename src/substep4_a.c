@@ -12,6 +12,7 @@ void SubStep4_a_cpu (real dt) {
 //<USER_DEFINED>
   INPUT(Density);
   INPUT(Energy);
+  INPUT(ThermalDiff);
 #ifdef X
   OUTPUT(Mmx);
 #endif
@@ -27,6 +28,7 @@ void SubStep4_a_cpu (real dt) {
 //<EXTERNAL>
   real* rho = Density->field_cpu;
   real* e = Energy->field_cpu;
+  real* thd = ThermalDiff->field_cpu;
 #ifdef X
   real* fx = Mmx->field_cpu;
 #endif
@@ -41,7 +43,7 @@ void SubStep4_a_cpu (real dt) {
   int size_x = Nx+2*NGHX; 
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
-  real constant = (1.-GAMMA)*THDIFFUSIVITY/R_MU;
+  real constant = (1.-GAMMA)/R_MU;
   real dx = Dx;
 //<\EXTERNAL>
   
@@ -93,15 +95,15 @@ void SubStep4_a_cpu (real dt) {
 #ifdef THDIFFUSION
 #ifdef X
 	llxm = lxm;
-	fx[ll] = constant * SurfX(j,k) * 0.5 * (rho[ll]+rho[llxm]) * (e_rho - e[llxm]/rho[llxm]) / zone_size_x(j,k);
+	fx[ll] = constant *(thd[ll]+thd[llxm]) * SurfX(j,k) * 0.5 * (rho[ll]+rho[llxm]) * (e_rho - e[llxm]/rho[llxm]) / zone_size_x(j,k);
 #endif
 #ifdef Y
 	llym = lym;
-	fy[ll] = constant * SurfY(j,k) * 0.5 * (rho[ll]+rho[llym]) * (e_rho - e[llym]/rho[llym]) / zone_size_y(j,k);
+	fy[ll] = constant *(thd[ll]+thd[llym]) * SurfY(j,k) * 0.5 * (rho[ll]+rho[llym]) * (e_rho - e[llym]/rho[llym]) / zone_size_y(j,k);
 #endif
 #ifdef Z
 	llzm = lzm;
-	fz[ll] = constant * SurfZ(j,k) * 0.5 * (rho[ll]+rho[llzm]) *  (e_rho - e[llzm]/rho[llzm]) / zone_size_z(j,k);
+	fz[ll] = constant *(thd[ll]+thd[llzm]) * SurfZ(j,k) * 0.5 * (rho[ll]+rho[llzm]) *  (e_rho - e[llzm]/rho[llzm]) / zone_size_z(j,k);
 #endif
 #endif
 //<\#>

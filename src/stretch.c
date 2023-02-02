@@ -14,8 +14,8 @@ void RestartStretch (Field *field, int n) {
 
   f = field->field_cpu;
   name = field->name;
-
-  sprintf(filename, "%s%s%d.dat", OUTPUTDIR, name, n);
+  setout(n);
+  sprintf(filename, "%s%s%d_grid%d.dat", OutputDir, name, n, Current_Jupiter_Patch->level);
   fi = fopen(filename, "r");
   if(fi == NULL) {
     masterprint("Error reading %s\n", filename);
@@ -36,21 +36,22 @@ void RestartStretch (Field *field, int n) {
 
   masterprint("Expanding %s a factor %dx in X\n", filename, (int)size_ratio);
 
+  origin = Nxp*Y0 + Nxp*NY*Z0;
 
-  origin = (z0cell)*Nxp*NY + (y0cell)*Nxp; //z0cell and y0cell are global variables.
   for (k = NGHZ; k < Nz+NGHZ; k++) {
     for (j = NGHY; j < Ny+NGHY; j++) {
       fseek(fi, (origin+(k-NGHZ)*Nxp*NY+(j-NGHY)*Nxp)*sizeof(real), SEEK_SET); 
       temp = fread(f+j*(Nx+2*NGHX)+k*Stride+NGHX, sizeof(real), Nxp, fi);
-      for (i = NX+NGHX-1; i>=0; i--) //backward sweep as we overwrite data
-	f[l] = f[(i-NGHX)/size_ratio + j*(Nx+2*NGHX) + k*Stride+NGHX];
+      for (i = Nx+NGHX-1; i>=NGHX; i--){ //backward sweep as we overwrite data
+	      f[l] = f[(i-NGHX)/size_ratio + j*(Nx+2*NGHX) + k*Stride+NGHX];
+      }
     }
   }
   masterprint("%s OK\n", filename);
   fclose(fi);
 }
-
-void StretchOutput (int n) {
+  
+void StretchFluid(int n){
   RestartStretch(Density, n);
 #ifdef X	
   RestartStretch(Vx, n);
@@ -67,4 +68,10 @@ void StretchOutput (int n) {
   RestartStretch(By, n);
   RestartStretch(Bz, n);
 #endif
+}
+
+void StretchOutput (int n) {
+  MULTIFLUID(StretchFluid(n));
+  WriteOutputsNM(TimeStep);
+  prs_end("Output %d was streched and written as output %d\n",n,TimeStep);
 }

@@ -81,27 +81,24 @@ void Adapt_for_JUPITER(char *filename)
   if (AddSubPatch)
     refine();
 
-  //if (!Restart)
-  //{
-  //  FARGO_SAFE(ScanGridFile(filename));
-  //  printf("\nGrid File Scanned \n");
-  //}
-  //else
-  //{
-  //  ReadGrids(NbRestart, grids);
-  //  printf("\nRead Grids \n");
-  //  ConstructGrids(grids);
-  //}
-  FARGO_SAFE(ScanGridFile(filename));
-  printf("\nGrid File Scanned \n");
-  
+  if (Restart || Restart_Full)
+  {
+    ReadGrids(NbRestart, grids);
+    printf("\nRead Grids \n");
+    ConstructGrids(grids);
+  }
+  else
+  {
+    FARGO_SAFE(ScanGridFile(filename));
+    printf("\nGrid File Scanned \n");
+  }  
   grid = GridList;
   //At this point we have built the tgrids
   while (grid != NULL)
   {
     splitgrid(grid);
     Ngrids++;
-    printf("Grid %d N(%d,%d,%d)\n",grid->number,grid->ncell[0],grid->ncell[1],grid->ncell[2]);
+    printf("Grid %d level %d N(%d,%d,%d)\n",grid->number,grid->level,grid->ncell[0],grid->ncell[1],grid->ncell[2]);
     grid = grid->next;
   }
 
@@ -191,6 +188,7 @@ void SelectGrid(tGrid_CPU *grid)
     int di, i, j, k;
     size_t pitch;
     Current_Jupiter_Patch = grid;
+    tGrid *parent = grid->Parent;
     for (i = 0; i < 3; i++)
     {
       for (j = 0; j < 2; j++)
@@ -201,6 +199,7 @@ void SelectGrid(tGrid_CPU *grid)
     
 #ifdef X
     Nx = grid->ncell[_X_];
+    NX = parent->ncell[_X_];
     XMIN = grid->corner_min[_X_];
     XMAX = grid->corner_max[_X_];
 #else
@@ -210,6 +209,7 @@ void SelectGrid(tGrid_CPU *grid)
 #ifdef Y
     Pitch_cpu = grid->stride[_Y_];
     Ny = grid->ncell[_Y_];
+    NY = parent->ncell[_Y_];
     YMIN = grid->corner_min[_Y_];
     YMAX = grid->corner_max[_Y_];
 #else
@@ -220,6 +220,7 @@ void SelectGrid(tGrid_CPU *grid)
 #ifdef Z
     Stride = Stride_cpu = grid->stride[_Z_];
     Nz = grid->ncell[_Z_];
+    NZ = parent->ncell[_Z_];
     ZMIN = grid->corner_min[_Z_]; /**< Absolute position (min corner) */
     ZMAX = grid->corner_max[_Z_]; /**< Absolute position (max corner) */
 #else

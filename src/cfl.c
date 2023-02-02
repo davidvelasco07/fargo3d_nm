@@ -12,6 +12,9 @@ void cfl_cpu() {
 //<USER_DEFINED>
   INPUT(Energy);
   INPUT(Density);
+#ifdef THDIFFUSION
+  INPUT(ThermalDiff);
+#endif
   OUTPUT(DensStar);
 #ifdef X
   INPUT(Vx);
@@ -73,7 +76,7 @@ void cfl_cpu() {
 #endif
 #ifdef THDIFFUSION
   int nsubc=NSUBCYC;
-  real chi=THDIFFUSIVITY;
+  real* chi = ThermalDiff->field_cpu;
 #endif
   int pitch  = Pitch_cpu;
   int stride = Stride_cpu;
@@ -259,7 +262,8 @@ void cfl_cpu() {
 #endif
 
 #ifdef THDIFFUSION
-  cfl11 = 4.0*chi*pow(max3(cfl7_a,cfl7_b,cfl7_c),2)/nsubc;
+  if (fluidtype == GAS)
+    cfl11 = 4.0*chi[ll]*pow(max3(cfl7_a,cfl7_b,cfl7_c),2)/nsubc;
 #endif
 	  
 	dtime[ll] = CFL/sqrt(cfl1*cfl1 + cfl2*cfl2 + 

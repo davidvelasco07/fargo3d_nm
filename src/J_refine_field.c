@@ -12,8 +12,8 @@ void refine_field (char radix[MAXLINELENGTH],long nboutput,long nbgrid,GridFileI
   real interm;
   vartype = _other_;
   setout  (nboutput);
-  sprintf (srcfile,  "%s%ld_%ld_%ld.dat", radix, nboutput, nbgrid, grids[gtr].level);
-  sprintf (destfile, "%s%ld_%ld_%ld.dat", radix, nboutput, cpugpatch, grids[0].level);
+  sprintf (srcfile,  "%s%ld_grid%ld.dat", radix, nboutput, grids[gtr].level);
+  sprintf (destfile, "%s%ld_grid%ld.dat", radix, nboutput, grids[0].level);
   in  = prs_openrd (srcfile);
   out = prs_opend (destfile);
   for (i = 0; i < 3; i++) {

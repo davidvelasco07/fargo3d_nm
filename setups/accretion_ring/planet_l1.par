@@ -1,0 +1,55 @@
+Setup			accretion_ring
+
+### Disk parameters
+AspectRatio     0.05           Thickness over Radius in the disc
+Sigma0			6.3661977237e-4	Surface Density at r=1
+Alpha			1.0e-4
+SigmaSlope		0.5		Slope of surface
+FlaringIndex	0.0
+Nu              0.0
+
+
+### Dust parameters
+Epsilon			0.01	Total dust-to-gas mass ratio
+smin			1.0e-4  size in cm (or Tsmin)
+smax			0.05    size in cm (or Tsmax)
+rhosolid		1.6867  in g/cm3
+Sq			    3.5		slope of distribution
+Delta			1.0e-4  diffusion coefficient (~alpha)
+Tslim			10.0
+ThDiffusivity   4.5E-5  Thermal Diffusion coefficient
+NsubCyc         2       Number of subcycles to use when diffusing heat
+
+### Planet parameters
+PlanetConfig		planets/earth.cfg
+ThicknessSmoothing 	0.1	Smoothing parameters in disk thickness
+OmegaFrame          1.0
+Frame               C
+
+### Mesh parameters
+Nx		        800    Azimuthal number of zones 
+Ny              200	    Radial number of zones
+Nz			     30		Number of zones in colatitude
+Ymin			0.4		Inner boundary radius
+Ymax			1.6		Outer boundary radius
+Zmin			1.4707963267948965
+Zmax			1.5707963267948965
+Xmin			-3.141592653589793
+Xmax			3.141592653589793
+NFluidColors    1
+
+### Output control parameters
+Ntot			8000	Total number of time steps
+Ninterm	 		20		Time steps between outputs
+DT		    	0.3141592653589793	Time step length. 2PI = 1 orbit
+OutputDir		/scratch/gpfs/dv9346/fargo3d/test
+
+Field 			gasdens
+PlotLine		field[-1,:,:]
+
+#GRIDINFO
+#xmin ymin zmin xmax ymax zmax level
+-0.7853981633974483 0.8 1.510796267948965 0.7853981633974483 1.2 1.570796267948965 1
+#-0.25 -0.5 0.0 0.25 0.5 1.0 1
+#-0.125 -0.25 0.5 0.125 0.25 1.0 2
+#-0.0625 -0.125 0.75 0.0625 0.125 1.0 3

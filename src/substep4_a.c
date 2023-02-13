@@ -95,15 +95,15 @@ void SubStep4_a_cpu (real dt) {
 #ifdef THDIFFUSION
 #ifdef X
 	llxm = lxm;
-	fx[ll] = constant *(thd[ll]+thd[llxm]) * SurfX(j,k) * 0.5 * (rho[ll]+rho[llxm]) * (e_rho - e[llxm]/rho[llxm]) / zone_size_x(j,k);
+	fx[ll] = constant * 0.25*(thd[ll]+thd[llxm])*(rho[ll]+rho[llxm])*(e_rho-e[llxm]/rho[llxm]) * SurfX(j,k)/zone_size_x(j,k);
 #endif
 #ifdef Y
 	llym = lym;
-	fy[ll] = constant *(thd[ll]+thd[llym]) * SurfY(j,k) * 0.5 * (rho[ll]+rho[llym]) * (e_rho - e[llym]/rho[llym]) / zone_size_y(j,k);
+	fy[ll] = constant * 0.25*(thd[ll]+thd[llym])*(rho[ll]+rho[llym])*(e_rho-e[llym]/rho[llym]) * SurfY(j,k)/zone_size_y(j,k);
 #endif
 #ifdef Z
 	llzm = lzm;
-	fz[ll] = constant *(thd[ll]+thd[llzm]) * SurfZ(j,k) * 0.5 * (rho[ll]+rho[llzm]) *  (e_rho - e[llzm]/rho[llzm]) / zone_size_z(j,k);
+	fz[ll] = constant * 0.25*(thd[ll]+thd[llzm])*(rho[ll]+rho[llzm])*(e_rho-e[llzm]/rho[llzm]) * SurfZ(j,k)/zone_size_z(j,k);
 #endif
 #endif
 //<\#>

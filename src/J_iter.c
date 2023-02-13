@@ -128,10 +128,8 @@ void ItereLevel (real dt, long level)
       FARGO_SAFE(AdaptFieldsFromJ (item));
       MULTIFLUID(AlgoGas2 (dt));
       #ifdef PLANET_HEATING
-      if(Current_Level==LevMax){
         SelectFluid(0);
         compute_planetheating(dt);
-      }
       #endif
       #ifdef STOCKHOLM
       if(Current_Level==0){

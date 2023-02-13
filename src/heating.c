@@ -10,21 +10,20 @@
 void compute_planetheating(real dt) {
   int n;
   int i;
-  real heat;
+  real heat,mdot;
   real* xp = Sys->x;
   real* yp = Sys->y;
   real* zp = Sys->z;
   real* Mp = Sys->mass;
-  real rhop = 706118396.1461967; //3g/cm^3 -> c.u
+  real rhop = 3*(MSTAR/(R0*R0*R0))/(MSTAR_CGS/(R0_CGS*R0_CGS*R0_CGS)); //3g/cm^3 -> c.u
   real Rp;
   int nb = Sys->nb;  
   for (n=0;n<nb;n++){
-    heat=0;
-    for(i=0;i<NbFluids;i++){
-        //L = G Mp M'p/Rp
-        Rp = pow(.25*3*Mp[n]/(M_PI*rhop),1./3);
-        heat += G*Mp[n]*M_dot[FluidIndex][n]/Rp;
-    }
+    mdot=0;
+    for(i=0;i<NFLUIDS;i++)mdot += M_dot[i][n];
+    //L = G Mp M'p/Rp
+    Rp = pow(3*Mp[n]/(4*M_PI*rhop),1./3);
+    heat = G*Mp[n]*mdot/Rp;
     FARGO_SAFE(PlanetHeating(xp[n],yp[n],zp[n],heat*dt));
   }
 }
@@ -118,6 +117,7 @@ void PlanetHeating_cpu(real xp, real yp, real zp, real heat) {
         dxp=fabs(x-xmed(i));
 	      dyp=fabs(y-ymed(j));
 	      dzp=fabs(z-zmed(k));
+        frac=1;
 #if PLANET_HEATING==0
 	      if(dxp<dx && dyp<dy && dzp<dz){
 	        frac *= 1-dxp/dx;
@@ -131,7 +131,7 @@ void PlanetHeating_cpu(real xp, real yp, real zp, real heat) {
         smoothing = ASPECTRATIO*pow(rp/R0,FLARINGINDEX)*rp*THICKNESSSMOOTHING;
         dist = sqrt(dxp*dxp+dyp*dyp+dzp*dzp);
         frac = exp(-dist/smoothing)/(8*M_PI*smoothing*smoothing*smoothing);
-	      e[l] += heat*frac*InvVol(j, k);
+	      e[l] += heat*frac;
 #endif
 	  //}
 //<\#>

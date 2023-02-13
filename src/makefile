@@ -275,7 +275,7 @@ CXXPARA_MacIntel = mpic++ -stdlib=libstdc++
 #FARGO_ARCH must be set to STELLAR                                                                                                                                                                                                                                  
 CC_STELLAR      = gcc
 SEQOPT_STELLAR  = -O3
-PARAOPT_STELLAR = ${SEQOPT_DAINT}
+PARAOPT_STELLAR = ${SEQOPT_STELLAR}
 PARACC_STELLAR  = mpicc
 LIBS_STELLAR    = -lm
 ENVRANK_STELLAR = SLURM_LOCALID

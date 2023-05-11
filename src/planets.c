@@ -24,7 +24,7 @@ Force ComputeForce(real x, real y, real z,
   tGrid_CPU *item, *current;
   item = Grid_CPU_list;
   current = Current_Jupiter_Patch;
-  memset(localforce, 0.0, 12*sizeof(real));
+  memset(localforce, 0, 12*sizeof(real));
 
   /* The trick below, which uses VxMed as a 2D temporary array,
      amounts to subtracting the azimuthally averaged density prior to
@@ -111,7 +111,7 @@ void AdvanceSystemFromDisk(real dt) {
   real r, m, smoothing;
   NbPlanets = Sys->nb;
   for (k = 0; k < NbPlanets; k++) {
-    if (Sys->FeelDisk[k] == YES) {
+    if (Sys->FeelDisk[k] == YES  && PhysicalTime > RELEASETIME) {
       m = Sys->mass[k];
       x = Sys->x[k];
       y = Sys->y[k];

@@ -615,6 +615,7 @@ void SelectFluid(int n)
 {
   int i, j;
   //Function for selecting the current fluid
+  Total_Density = Current_Jupiter_Patch->Total_Density;
   Fluids[n] = Current_Jupiter_Patch->Fluids[n];
   Current_Fluid = Fluids[n]->FluidRank;
   Fluidtype = Fluids[n]->Fluidtype;
@@ -660,8 +661,8 @@ void CreateFields()
 
 #if (defined(X) || defined(MHD))
 
-  CreateField(&Mpx, "Moment_Plus_X", 0, 1, 0, 0);
-  CreateField(&Mmx, "Moment_Minus_X", 0, 1, 0, 0);
+  CreateField_ALL(&Mpx, "Moment_Plus_X", 0, 1, 0, 0);
+  CreateField_ALL(&Mmx, "Moment_Minus_X", 0, 1, 0, 0);
 
   CreateField2D(&Vxhy, "Vxhy", YZ, 1);
   CreateField2D(&Vxhyr, "Vxhyr", YZ, 1);
@@ -674,48 +675,48 @@ void CreateFields()
 #endif
 
 #if (defined(Y) || defined(MHD))
-  CreateField(&Mpy, "Moment_Plus_Y", 0, 0, 1, 0);
-  CreateField(&Mmy, "Moment_Minus_Y", 0, 0, 1, 0);
+  CreateField_ALL(&Mpy, "Moment_Plus_Y", 0, 0, 1, 0);
+  CreateField_ALL(&Mmy, "Moment_Minus_Y", 0, 0, 1, 0);
 #endif
 
 #if (defined(Z) || defined(MHD))
-  CreateField(&Mpz, "Moment_Plus_Z", 0, 0, 0, 1);
-  CreateField(&Mmz, "Moment_Minus_Z", 0, 0, 0, 1);
+  CreateField_ALL(&Mpz, "Moment_Plus_Z", 0, 0, 0, 1);
+  CreateField_ALL(&Mmz, "Moment_Minus_Z", 0, 0, 0, 1);
 #endif
-  CreateField(&Flux, "Flux", 0, 0, 0, 0);
-  CreateField(&Pot, "potential", 0, 0, 0, 0);
-  CreateField(&Slope, "Slope", 0, 0, 0, 0);
-  CreateField(&DivRho, "DivRho", 0, 0, 0, 0); // This field cannot
+  CreateField_ALL(&Flux, "Flux", 0, 0, 0, 0);
+  CreateField_ALL(&Pot, "potential", 0, 0, 0, 0);
+  CreateField_ALL(&Slope, "Slope", 0, 0, 0, 0);
+  CreateField_ALL(&DivRho, "DivRho", 0, 0, 0, 0); // This field cannot
                                               // be aliased wherever
                                               // reductions are
                                               // needed
 
-  CreateField(&DensStar, "DensStar", 0, 0, 0, 0);
-  CreateField(&Qs, "Qs", 0, 0, 0, 0);
-  CreateField(&Pressure, "Pressure", 0, 0, 0, 0);
-  CreateField(&Total_Density, "Total_Density", 0, 0, 0, 0);
+  CreateField_ALL(&DensStar, "DensStar", 0, 0, 0, 0);
+  CreateField_ALL(&Qs, "Qs", 0, 0, 0, 0);
+  CreateField_ALL(&Pressure, "Pressure", 0, 0, 0, 0);
+  //CreateField(&Total_Density, "Total_Density", 0, 0, 0, 0);
 
-  CreateField(&QL, "QLeft", 0,0,0,0);
-  CreateField(&QR, "QRight", 0,0,0,0);
+  CreateField_ALL(&QL, "QLeft", 0,0,0,0);
+  CreateField_ALL(&QR, "QRight", 0,0,0,0);
 
 #ifdef PPA_STEEPENER
   LapPPA = CreateField("LapPPA", 0, 0, 0, 0);
 #endif
 
 #ifdef DUSTDIFFUSION
-  CreateField(&Sdiffyczc,"Sdiffyczc", 0,0,0,0);
-  CreateField(&Sdiffyfzc,"Sdiffyfzc", 0,0,0,0);
+  CreateField_ALL(&Sdiffyczc,"Sdiffyczc", 0,0,0,0);
+  CreateField_ALL(&Sdiffyfzc,"Sdiffyfzc", 0,0,0,0);
 #ifdef ALPHAVISCOSITY
-  CreateField(&QRE,"QRe", 0,0,0,0);
-  CreateField(&QLE,"QLe", 0,0,0,0);
+  CreateField_ALL(&QRE,"QRe", 0,0,0,0);
+  CreateField_ALL(&QLE,"QLe", 0,0,0,0);
 #endif
 #ifdef Z
-  CreateField(&Sdiffyczf,"Sdiffyczf", 0,0,0,0);
-  CreateField(&Sdiffyfzf,"Sdiffyfzf", 0,0,0,0);
+  CreateField_ALL(&Sdiffyczf,"Sdiffyczf", 0,0,0,0);
+  CreateField_ALL(&Sdiffyfzf,"Sdiffyfzf", 0,0,0,0);
 #endif
 #endif
 #ifdef THDIFFUSION
-  CreateField(&ThermalDiff, "ThermalDiff", 0, 0, 0, 0);
+  CreateField_ALL(&ThermalDiff, "ThermalDiff", 0, 0, 0, 0);
 #endif
 
 #ifdef MHD

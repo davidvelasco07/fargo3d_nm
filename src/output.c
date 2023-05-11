@@ -739,7 +739,7 @@ void RestartAccretion(real PhysicalTime)
   char testline[256];
   real time, mass;
   char *pt;
-  int n;
+  int n,i=0;
   for (n=0;n<Sys->nb;n++){
     sprintf (name, "%smonitor/%s/M_acc_%d.dat", OUTPUTDIR, Fluids[FluidIndex]->name,n);
     input = fopen (name, "r");
@@ -749,8 +749,8 @@ void RestartAccretion(real PhysicalTime)
     }
     printf("Reading %s/M_acc_%d.dat\n", Fluids[FluidIndex]->name,n);
     do {
-      fscanf (input,"%.18g %.18g", &time, &mass);
-    } while (((PhysicalTime-time)/PhysicalTime > 1E-10) && input != NULL );
+      fscanf (input,"%lf\t%lf", &time, &mass);
+    } while (((PhysicalTime-time)/PhysicalTime > 1E-10) && input != NULL);
     if (input == NULL) {
       mastererr ("Can't read entry in accretion file. Aborting restart.\n");
       prs_exit (1);

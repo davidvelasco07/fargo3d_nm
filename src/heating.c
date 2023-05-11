@@ -10,7 +10,7 @@
 void compute_planetheating(real dt) {
   int n;
   int i;
-  real heat,mdot;
+  real heatrate;
   real* xp = Sys->x;
   real* yp = Sys->y;
   real* zp = Sys->z;
@@ -19,12 +19,13 @@ void compute_planetheating(real dt) {
   real Rp;
   int nb = Sys->nb;  
   for (n=0;n<nb;n++){
-    mdot=0;
-    for(i=0;i<NFLUIDS;i++)mdot += M_dot[i][n];
-    //L = G Mp M'p/Rp
-    Rp = pow(3*Mp[n]/(4*M_PI*rhop),1./3);
-    heat = G*Mp[n]*mdot/Rp;
-    FARGO_SAFE(PlanetHeating(xp[n],yp[n],zp[n],heat*dt));
+    #ifdef ACCRETION
+    heatrate=0;
+    for(i=0;i<NFLUIDS;i++)heatrate += Lum[i][n];
+    #else
+    heatrate = LUMINOSITY;
+    #endif
+    FARGO_SAFE(PlanetHeating(xp[n],yp[n],zp[n],heatrate*dt));
   }
 }
 

@@ -56,7 +56,8 @@ ex FILE *master_fopen (char*, char*);
 ex void masterprint(const char*, ...);
 ex void masterfprintf(FILE*,const char*, ...);
 ex void mastererr(const char*, ...);
-ex void CreateField(Field**, char*, int, boolean, boolean, boolean);
+ex void CreateField_ALL(Field**, char*, int, boolean, boolean, boolean);
+ex Field *CreateField(char*, int, boolean, boolean, boolean);
 ex Field *CreateFieldAlias(char*, Field*, int);
 ex void CreateField2D(Field2D**, char*,int, boolean);
 ex void CreateFieldInt2D(FieldInt2D**, char*);
@@ -472,7 +473,7 @@ ex void CondInit(void);
 ex void PostRestartHook(void);
 
 ex void compute_accretion(real);
-ex void Accretion_cpu(real,real,real);
+ex void Accretion_cpu(real,real,real,real,real,real,real,real);
 ex void compute_planetheating(real);
 ex void PlanetHeating_cpu(real,real,real,real);
 
@@ -690,7 +691,7 @@ ex void (_collisions_cpu)(real,int,int,int,int);
 ex void ComputeTotalDensity_cpu(void);
 ex void Floor_cpu(void);
 
-ex void Accretion_gpu(real,real,real);
+ex void Accretion_gpu(real,real,real,real,real,real,real,real);
 ex void PlanetHeating_gpu(real,real,real,real);
 
 #endif

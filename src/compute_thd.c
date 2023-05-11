@@ -25,6 +25,7 @@ void Compute_ThermalDiffusion_cpu() {
   int size_y = Ny+2*NGHY;
   int size_z = Nz+2*NGHZ;
   real gamma = GAMMA;
+  real c_thd = THDIFFUSIVITY;
 //<\EXTERNAL>
 
 //<INTERNAL>
@@ -199,7 +200,13 @@ void Compute_ThermalDiffusion_cpu() {
 	// convert it back to the current units
 	opacity = opacity/(R0_CGS*R0_CGS/MSTAR_CGS)*R0*R0/MSTAR;
     chi = 16*(gamma-1)*(STEFANK)*pow(e[ll]/dens[ll],3.)/(3*pow(dens[ll],2)*R_MU*opacity);
-    thd[l] = MIN(chi,1E-3);
+	#if THDIFFUSION==0
+	thd[l] = MIN(chi,1E-3);
+	#endif
+	#if THDIFFUSION==1
+	thd[l] = c_thd;
+	#endif
+    
 //<\#>
 #ifdef X
       }

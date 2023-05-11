@@ -101,7 +101,6 @@ void Adapt_for_JUPITER(char *filename)
     printf("Grid %d level %d N(%d,%d,%d)\n",grid->number,grid->level,grid->ncell[0],grid->ncell[1],grid->ncell[2]);
     grid = grid->next;
   }
-
   //At this point we have built the CPUgrids
   FARGO_SAFE(BuildCommunicators());
   //At this point we have built the COMMUNICATORS
@@ -113,6 +112,7 @@ void Adapt_for_JUPITER(char *filename)
     {
       SelectGrid(item);
       Current_Grid = item;
+      item->Total_Density = CreateField("Total_Density", 0, 0, 0, 0);
       CreateFields();
       fluid = item->fluid;
       i=NFluids_per_rank-1;
@@ -295,6 +295,7 @@ void AdaptFieldsFromJ(tGrid_CPU *grid)
 {
   if(grid != Current_Grid){
     SelectGrid(grid);
+    Total_Density = grid->Total_Density;
     Current_Grid = grid;
     //(Re)alloc work arrays
     FARGO_SAFE(CreateFields());

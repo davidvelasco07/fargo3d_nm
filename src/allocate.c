@@ -141,7 +141,114 @@ Fluid *CreateFluid(char *name, int fluidtype) {
   return f;
 }
 
-void CreateField(Field **ptr, char *name, int type, boolean sx, boolean sy, boolean sz) {
+Field *CreateField(char *name, int type, boolean sx, boolean sy, boolean sz) {
+  /*sx = YES ==> Field is staggered in X. Useful for determining the
+    domain of each field.*/
+
+  Field *field;
+  real *array;
+  void *arr_gpu;
+  char *string;
+  int i,j,k;
+  size_t pitch;
+
+  field = (Field *) malloc(sizeof(Field));
+  if (field == NULL) 
+    prs_error("Insufficient memory for Field creation-step1.");
+  field->desc = Current_Jupiter_Patch;
+  field->level = Current_Level;
+#ifndef GPU
+  array = (real *) malloc(sizeof(real)*(Ny+2*NGHY)*(Nx+2*NGHX)*(Nz+2*NGHZ)+sizeof(Field*));
+#else
+#ifndef PINNED
+  array = (real *) malloc(sizeof(real)*(Ny+2*NGHY)*(Nx+2*NGHX)*(Nz+2*NGHZ)+sizeof(Field*));
+#else
+  cudaMallocHost((void**)&array,sizeof(real)*(Ny+2*NGHY)*(Nx+2*NGHX)*(Nz+2*NGHZ)+sizeof(Field*));
+#endif
+#endif
+
+  if (array == NULL) 
+    prs_error("Insufficient memory for Field creation-step2.");
+  string = (char *) malloc(sizeof(char) * 80);
+  if (string == NULL) 
+    prs_error("Insufficient memory for Field creation-step3.");
+  sprintf(string, "%s", name);
+  field->field_cpu = array;
+  field->backup = NULL;
+  field->secondary_backup = NULL;
+  field->name = string;
+  field->owner = (Field **)(array+(Ny+2*NGHY)*(Nx+2*NGHX)*(Nz+2*NGHZ));
+  *(field->owner) = field;
+  field->line_origin = __LINE__;
+  strncpy (field->file_origin, __FILE__, MAXLINELENGTH-1);
+  field->fresh_cpu = (boolean *) malloc(sizeof(boolean));
+  field->fresh_gpu = (boolean *) malloc(sizeof(boolean));
+  field->next = ListOfGrids;     //Linkedlist
+  ListOfGrids = field;
+
+  memset(field->field_cpu,0,(Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ)*sizeof(real));
+
+  masterprint("Field %s has been created\n", name);
+  //Now on the GPU
+#ifdef GPU
+  if (Nx+2*NGHX > 1 ) {
+    #ifndef NOPITCH
+      cudaMallocPitch (&arr_gpu, &pitch, (Nx+2*NGHX)*sizeof(real), (Ny+2*NGHY)*(Nz+2*NGHZ));
+    #else
+      cudaMalloc (&arr_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ)*sizeof(real));
+      pitch = (Nx+2*NGHX)*sizeof(real);
+    #endif
+    field->gpu_pp = make_cudaPitchedPtr (arr_gpu, pitch, (Nx+2*NGHX), Ny+2*NGHY);
+  } else {
+    #ifndef NOPITCH
+      cudaMallocPitch (&arr_gpu, &pitch, (Ny+2*NGHY)*sizeof(real), Nz+2*NGHZ);
+    #else
+      cudaMalloc (&arr_gpu, (Ny+2*NGHY)*(Nz+2*NGHZ)*sizeof(real));
+      pitch = (Ny+2*NGHY)*sizeof(real);
+    #endif
+  }
+  check_errors ("CreateField");
+  field->cpu_pp = make_cudaPitchedPtr (array, (Nx+2*NGHX)*sizeof(real), (Nx+2*NGHX), Ny+2*NGHY);
+  masterprint("Field %s has been created on the GPU\n", name);
+  
+  *(field->fresh_cpu)     =  YES;
+  for (i = 0; i < 4; i++) {
+    field->fresh_inside_contour_cpu[i] = YES;
+    field->fresh_outside_contour_cpu[i] = YES;
+  }
+  *(field->fresh_gpu)     =  NO;
+  for (i = 0; i < 4; i++) {
+    field->fresh_inside_contour_gpu[i] = NO;
+    field->fresh_outside_contour_gpu[i] = NO;
+  }
+  
+  field->field_gpu     =  (real *)arr_gpu;
+  
+#ifdef DEBUG
+  masterprint("------>>>Pitch of %s = %d\n",field->name,pitch);
+#endif
+  Host2Dev3D(field); // Do NOT remove this
+#endif
+
+  field->type = type;
+
+  if (sx)
+    field->x = Xmin;
+  else 
+    field->x = Xmed;
+  if (sy)
+    field->y = Ymin;
+  else 
+    field->y = Ymed;
+  if (sz)
+    field->z = Zmin;
+  else 
+    field->z = Zmed;
+
+  return field;
+}
+
+void CreateField_ALL(Field **ptr, char *name, int type, boolean sx, boolean sy, boolean sz) {
   /*sx = YES ==> Field is staggered in X. Useful for determining the
     domain of each field.*/
   Field *field;
@@ -188,7 +295,6 @@ void CreateField(Field **ptr, char *name, int type, boolean sx, boolean sy, bool
   field->line_origin = __LINE__;
   strncpy (field->file_origin, __FILE__, MAXLINELENGTH-1);
 
-
   field->desc = Current_Jupiter_Patch;
   field->level = Current_Level;
 
@@ -201,6 +307,7 @@ void CreateField(Field **ptr, char *name, int type, boolean sx, boolean sy, bool
     field->field_gpu     =  (real *)arr_gpu;
     cudaMemset( field->field_gpu,0, Maxsize_gpu*sizeof(real));
     *(field->fresh_gpu) = YES;
+    //*(field->fresh_cpu) = NO;
   }
 #ifdef DEBUG
   printf("------>>>+++Maxsize of %s = %d\n",field->name,Maxsize_gpu);

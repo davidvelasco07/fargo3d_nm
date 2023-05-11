@@ -90,6 +90,7 @@ OrbitalRadius		0.0
 ReleaseDate		0.0
 ReleaseRadius		0.0
 SemiMajorAxis		0.0
+ReleaseTime     0.0
 
 FuncArchFile		std/func_arch.cfg
 Setup			Undefined
@@ -120,3 +121,6 @@ Tslim			10.0
 Amplitude	    1.0e-4
 
 ThDiffusivity   4.5e-5
+Luminosity      1.0e-11
+CorrectV        No
+Heating         No

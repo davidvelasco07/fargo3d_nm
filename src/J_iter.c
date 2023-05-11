@@ -46,6 +46,9 @@ void UpdateCourantLimit (long level)
     if (item->cpu == CPU_Rank) {
       if (level == item->level) {
         FARGO_SAFE(AdaptFieldsFromJ (item));
+        FARGO_SAFE(Reset_field(Total_Density)); 
+        MULTIFLUID(ComputeTotalDensity()); 
+        //WriteField(Total_Density,level);
 #ifndef STANDARD
 	      if (level == 0)
 	        MULTIFLUID(ComputeVmed(Vx)); // FARGO algorithm
@@ -128,8 +131,9 @@ void ItereLevel (real dt, long level)
       FARGO_SAFE(AdaptFieldsFromJ (item));
       MULTIFLUID(AlgoGas2 (dt));
       #ifdef PLANET_HEATING
-        SelectFluid(0);
-        compute_planetheating(dt);
+      if(HEATING){
+        MULTIFLUID(if(Fluidtype==GAS)compute_planetheating(dt));
+      }
       #endif
       #ifdef STOCKHOLM
       if(Current_Level==0){

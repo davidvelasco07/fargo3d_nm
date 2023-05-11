@@ -338,7 +338,7 @@ real *Coeffval;
 real Min[NFLUIDS];      //Comment: NFLUIDS is the upper bound for the size of the array.
 Fluid *Fluids[NFLUIDS]; //Comment: NFLUIDS is the upper bound for the size of the array.
 real M_acc[NFLUIDS][100];
-real M_dot[NFLUIDS][100];
+real Lum[NFLUIDS][100];
 
 //Nested Meshes variables
 char CoordNames[9][80] = {"X", "Y", "Z", "Radius", "Azimuth", "Z", "Radius", "Azimuth", "Co-latitude"};
@@ -530,7 +530,7 @@ void (*boundary_ymax[NFLUIDS])();
 void (*boundary_zmin[NFLUIDS])();
 void (*boundary_zmax[NFLUIDS])();
 
-void (*Accretion)(real,real,real);
+void (*Accretion)(real,real,real,real,real,real,real,real);
 void (*PlanetHeating)(real,real,real,real);
 
 int Grid_id;

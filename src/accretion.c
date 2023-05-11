@@ -17,15 +17,19 @@ void compute_accretion(real dt) {
   real* vzp = Sys->vz;
   real* mp = Sys->mass;
   int nb = Sys->nb;
+  real rhop = 3*(MSTAR/(R0*R0*R0))/(MSTAR_CGS/(R0_CGS*R0_CGS*R0_CGS)); //3g/cm^3 -> c.u
+  real Rp,dM;
 
   for (n=0;n<nb;n++){
-    Accretion(xp[n], yp[n], zp[n]);
-    M_dot[FluidIndex][n] = reduction_full_SUM(Energy, NGHY, Ny+NGHY, 0, Nz+2*NGHZ);
-    M_acc[FluidIndex][n] += M_dot[FluidIndex][n];
+    Accretion(xp[n], yp[n], zp[n], vxp[n], vyp[n], vzp[n], mp[n], dt);
+    dM = reduction_full_SUM(Energy, NGHY, Ny+NGHY, 0, Nz+2*NGHZ);
+    M_acc[FluidIndex][n] += dM;
+    Rp = pow(3*mp[n]/(4*M_PI*rhop),1./3);
+    Lum[FluidIndex][n] = G*mp[n]*dM/dt/Rp; 
   }
 }
 
-void Accretion_cpu (real xp, real yp, real zp) {
+void Accretion_cpu (real xp, real yp, real zp, real vxp, real vyp, real vzp, real Mp, real dt) {
 //<USER_DEFINED>
   INPUT(Density);
   OUTPUT(Density);
@@ -86,6 +90,8 @@ void Accretion_cpu (real xp, real yp, real zp) {
   real dist;
   real frac;
   real removed;
+  real v_hw;
+  real Mdot;
 //<\INTERNAL>
 
 //<CONSTANT>
@@ -131,20 +137,40 @@ void Accretion_cpu (real xp, real yp, real zp) {
   x = atan2(yp,xp);
   y = sqrt(xp*xp+yp*yp+zp*zp);
   z = atan2(sqrt(xp*xp+yp*yp),zp);
+  //v_phi
+  vx = (xp*vyp-vxp*yp)/r_polar;
+  //v_r
+  vy = (xp*vxp + yp*vyp + zp*vzp)/y;
+  //v_theta
+  vz = ((xp*vxp + yp*vyp)*zp/r_polar - r_polar*vzp)/y;
 #endif
   dx = xmed(1)-xmed(0);
   dy = ymed(1)-ymed(0);
   dz = zmed(1)-zmed(0);
+  
+  //Indices of cell hosting the planet
+  //ip = floor((x-xmed(0))/dx+.5);
+  //jp = floor((y-ymed(0))/dy+.5);
+  //kp = floor((z-zmed(0))/dz+.5);
+  //lp = ip + jp*pitch + kp*stride;
+  //This should be an average over the nearest cells to the planet
+  //v_hw = sqrt(pow((vx_d[lp]+OMEGAFRAME*ymed(j)*sin(zmed(k)))-vx,2)+pow(vy_d[lp]-vy,2)+pow(vz_d[lp]-vz,2));
+  //RB = G*Mp/v_hw/v_hw;
+
   dxp=fabs(x-xmed(i));
 	dyp=fabs(y-ymed(j));
 	dzp=fabs(z-zmed(k));
+  //drp=sqrt(dxp*dxp+dyp*dyp+dzp*dzp);
+  
   frac=1;
   //Just in case let's clean whatever was in this field
   accreted[ll] = 0;
 	if(dxp<dx && dyp<dy && dzp<dz){
+      //Mdot = rho_d[ll]*M_PI*RB*RB/v_hw;
 	    frac *= 1-dxp/dx;
 	    frac *= 1-dyp/dy;
 	    frac *= 1-dzp/dz;
+      //removed = frac*Mdot*dt;
       removed = frac*rho_d[ll];
       rho_d[ll] -= removed;
       accreted[ll] = Vol(j,k)*removed;

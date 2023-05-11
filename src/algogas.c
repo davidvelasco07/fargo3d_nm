@@ -37,10 +37,12 @@ void Sources(real dt) {
 #ifdef POTENTIAL
 
   if(FluidIndex==0){
+    //We compute the potential only once per timestep
     FARGO_SAFE(compute_potential(dt));
   }
   else{
     if (Corotating) {
+      //We correct for the rest of the fluids
       FARGO_SAFE(CorrectVtheta(Domega));
     }
   }

@@ -215,7 +215,10 @@ int i;
       FARGO_SAFE(SubStep4_b(dt/NSUBCYC));
     }
   }
-#endif 
+#endif
+//SubStep1 is divided in two halfs
+//the first one performed here before,
+//the second one performed afer transport
 #ifdef X
   FARGO_SAFE(SubStep1_x(.5*dt));
 #endif    
@@ -282,6 +285,9 @@ int i;
 
 void AlgoGas2 (real dt) {
  int i,j,k,ll;
+  //At this stage V and Vtemp have the same solution,
+  //except for the ghost cells, which have been properly
+  //updated for V. So we copy back to Vtemp
   FARGO_SAFE(copy_velocities(V2VTEMP));
 #ifdef MHD
     FARGO_SAFE(UpdateMagneticField(dt,1,0,0));
@@ -313,7 +319,7 @@ void AlgoGas2 (real dt) {
 #endif
     }
     if(Fluidtype==DUST) FARGO_SAFE(Reset_field(Pressure));
-    
+    //Peform second half of SubStep 1
 #ifdef X
     FARGO_SAFE(SubStep1_x(.5*dt));
 #endif
@@ -323,7 +329,8 @@ void AlgoGas2 (real dt) {
 #ifdef Z
     FARGO_SAFE(SubStep1_z(.5*dt));
 #endif
-
+    //Vtemp has now been updated by transport and substep1
+    //We now copy this final update to V
     FARGO_SAFE(copy_velocities(VTEMP2V));
 
     #ifdef ACCRETION

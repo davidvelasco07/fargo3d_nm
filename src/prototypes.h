@@ -180,6 +180,7 @@ ex void mon_torq_cpu(void);
 ex void mon_reynolds_cpu(void);
 ex void mon_maxwell_cpu(void);
 ex void mon_bxflux_cpu(void);
+ex void Correct_Hidden_cpu(Field*,Field*);
 
 //Monitoring management Prototypes
 ex void MonitorFunction (int, int, char*, int);
@@ -191,7 +192,6 @@ ex void InitMonitoring(void);
 ex void MonitorGlobal (int);
 ex void Monitor (int);
 //Prototypes for nested meshes
-ex void CorrectHidden (Field *, Field *, char *);
 ex void MonitorNested (int);
 ex void AllLevelSum (int, int);
 ex void MonitorAccretion (void);
@@ -238,7 +238,7 @@ ex void compute_potential(real);
 //planets.c Prototypes
 ex void Potential_cpu(void);
 ex Force ComputeForce(real, real, real, real, real);
-ex void  _ComputeForce_cpu(real, real, real, real, real, char*);
+ex void  _ComputeForce_cpu(real, real, real, real, real);
 ex void AdvanceSystemFromDisk(real);
 ex void _CorrectVtheta(void);
 ex void CorrectVtheta_cpu(real);
@@ -550,6 +550,7 @@ ex void mon_torq_gpu(void);
 ex void mon_reynolds_gpu(void);
 ex void mon_maxwell_gpu(void);
 ex void mon_bxflux_gpu(void);
+ex void Correct_Hidden_gpu(Field*,Field*);
 
 ex void VanLeerX_a_gpu(Field*);
 ex void VanLeerX_b_gpu(real,Field*,Field*,Field*);
@@ -584,7 +585,7 @@ ex void Potential_gpu(void);
 ex void CorrectVtheta_gpu(real);
 ex void cfl_gpu(void);
 
-ex void  _ComputeForce_gpu(real, real, real, real, real, char*);
+ex void  _ComputeForce_gpu(real, real, real, real, real);
 
 ex void Fill_GhostsX_gpu(void);
 
@@ -722,7 +723,6 @@ ex FILE *prs_openrd (char *);
 ex void getgridsize (tGrid_CPU*,long[3],long[3]);
 ex void getgridsizes (tGrid_CPU*,long[3],long[3],long[3],long[3]);
 ex void mpiwarning (void);
-ex void CorrectHidden (Field *, Field *, char *);
 //Prototypes for functions coming from J_log.c
 ex void pInfo (const char *, ...);
 ex void pWarning (const char*, ...);

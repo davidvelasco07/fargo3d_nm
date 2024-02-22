@@ -33,7 +33,9 @@ void Compute_ThermalDiffusion_cpu() {
   int j;
   int k;
   int ll;
+  int lm;
   real temp;
+  real temp_cu;
   real rho;
   real power1;
   real power2;
@@ -93,11 +95,13 @@ void Compute_ThermalDiffusion_cpu() {
 	ts4 = 0.0;
 	ts42 = 0.0;
 	opacity = 0.0;
-	ll = l_mid;
+	lm = l_mid;
+	ll = l;
 
 	// In the module below we need the temperature and density in cgs units
-    rho  = dens[ll]/(MSTAR/(R0*R0*R0))*(MSTAR_CGS/(R0_CGS*R0_CGS*R0_CGS));
-	temp = e[ll]/dens[ll]/(G*MSTAR/(R0*R_MU))*(G_CGS*MSTAR_CGS/(R0_CGS*R_MU_CGS));
+    rho  = dens[lm]/(MSTAR/(R0*R0*R0))*(MSTAR_CGS/(R0_CGS*R0_CGS*R0_CGS));
+	temp_cu = (gamma-1)/R_MU*e[lm]/dens[lm];
+	temp = temp_cu/(G*MSTAR/(R0*R_MU))*(G_CGS*MSTAR_CGS/(R0_CGS*R_MU_CGS));
 	
 	//  The subroutine below has been taken from the JUPITER code,
 	//  itself inherited from FARGOCA, probably itself inherited
@@ -199,12 +203,12 @@ void Compute_ThermalDiffusion_cpu() {
 	// The opacity thus obtained was in cgs units (cm^2/g). We
 	// convert it back to the current units
 	opacity = opacity/(R0_CGS*R0_CGS/MSTAR_CGS)*R0*R0/MSTAR;
-    chi = 16*(gamma-1)*(STEFANK)*pow(e[ll]/dens[ll],3.)/(3*pow(dens[ll],2)*R_MU*opacity);
+    chi = 16*(gamma-1)*(STEFANK)*pow(temp_cu,3.)/(3*pow(dens[lm],2)*R_MU*opacity);
 	#if THDIFFUSION==0
-	thd[l] = MIN(chi,1E-3);
+	thd[ll] = MIN(chi,1E-3);
 	#endif
 	#if THDIFFUSION==1
-	thd[l] = c_thd;
+	thd[ll] = c_thd;
 	#endif
     
 //<\#>

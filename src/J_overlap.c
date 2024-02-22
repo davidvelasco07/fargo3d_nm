@@ -7,7 +7,7 @@ void SetOverlapFlag()
   long imin[3], imax[3];
   long gncell[3], stride[3];
   tGrid_CPU *g, *r;
-  char *flags;
+  real *flags;
   int nx, ny, nz, N;
   g = Grid_CPU_list;
   while (g != NULL)
@@ -18,10 +18,10 @@ void SetOverlapFlag()
       size = 1;
       for (i = 0; i < NDIM; i++)
         size *= gncell[i];
-      flags = (char *)prs_malloc(size * sizeof(char));
+      flags = (real *)prs_malloc(size * sizeof(real));
       for (i = 0; i < size; i++)
         flags[i] = 0;
-      g->Hidden = flags;
+      g->hidden = flags;
       r = Grid_CPU_list;
       diff = 1;
       while (r != NULL)
@@ -62,18 +62,6 @@ void SetOverlapFlag()
         }
         r = r->next;
       }
-#ifdef GPU
-      masterprint("Allocating and copying Hidden to device\n");
-      cudaMalloc((void **)&g->Hidden_d, Maxsize_gpu * sizeof(char));
-      nx = gncell[0];
-      ny = gncell[1];
-      nz = gncell[2];
-      if (nx == 1)
-        cudaMemcpy2D(g->Hidden_d, g->Stride_gpu * sizeof(char), g->Hidden, ny * sizeof(char), ny * sizeof(char), nz, cudaMemcpyHostToDevice);
-      else
-        cudaMemcpy2D(g->Hidden_d, g->Pitch_gpu * sizeof(char), g->Hidden, nx * sizeof(char), nx * sizeof(char), ny * nz, cudaMemcpyHostToDevice);
-      check_errors("cudaMemcpy2D");
-#endif
     }
     g = g->next;
   }

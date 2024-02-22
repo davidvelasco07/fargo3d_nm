@@ -33,24 +33,18 @@ Force ComputeForce(real x, real y, real z,
      location of resonances in a non self-gravitating disk. See
      Baruteau & Masset 2008, ApJ, 678, 483 (arXiv:0801.4413) for
      details. */
-#ifdef BM08
-  ComputeVmed (Total_Density);
-  ChangeFrame (-1, Total_Density, VxMed);
-#endif
   /* The density is now the perturbed density */
   while(item != NULL) {
     if (item->cpu == CPU_Rank) {
       AdaptFieldsFromJ (item);
-#ifdef GPU
-      if(EverythingOnCPU){
-        FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden));
-      }
-      else{
-        FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden_d));
-      }
-#else
-      FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass, item->Hidden));
-#endif
+      #ifdef BM08
+      ComputeVmed (Total_Density);
+      ChangeFrame (-1, Total_Density, VxMed);
+      #endif
+      FARGO_SAFE(_ComputeForce(x, y, z, rsmoothing, mass));
+      #ifdef BM08
+      ChangeFrame (+1, Total_Density, VxMed);
+      #endif
     }
     item = item->next;
   }
@@ -58,11 +52,7 @@ Force ComputeForce(real x, real y, real z,
   AdaptFieldsFromJ(current);
   /* We restore the total density below by adding back the azimuthal
      average */
-#ifdef BM08
-  ChangeFrame (+1, Total_Density, VxMed);
-#endif
 
-  
 #ifdef FLOAT
   MPI_Allreduce (&localforce, &globalforce, 12, MPI_FLOAT, MPI_SUM, DomainComm);
 #else
@@ -81,7 +71,7 @@ Force ComputeForce(real x, real y, real z,
   Force.fx_ex_outer = globalforce[9];
   Force.fy_ex_outer = globalforce[10];
   Force.fz_ex_outer = globalforce[11];
-
+  //printf("Fx = %.g15 \n",Force.fx_inner+Force.fx_outer);
   return Force;
 
 }
@@ -111,7 +101,7 @@ void AdvanceSystemFromDisk(real dt) {
   real r, m, smoothing;
   NbPlanets = Sys->nb;
   for (k = 0; k < NbPlanets; k++) {
-    if (Sys->FeelDisk[k] == YES  && PhysicalTime > RELEASETIME) {
+    if (Sys->FeelDisk[k] == YES  && PhysicalTime >= RELEASETIME) {
       m = Sys->mass[k];
       x = Sys->x[k];
       y = Sys->y[k];

@@ -15,17 +15,15 @@ void compute_planetheating(real dt) {
   real* yp = Sys->y;
   real* zp = Sys->z;
   real* Mp = Sys->mass;
-  real rhop = 3*(MSTAR/(R0*R0*R0))/(MSTAR_CGS/(R0_CGS*R0_CGS*R0_CGS)); //3g/cm^3 -> c.u
-  real Rp;
   int nb = Sys->nb;  
   for (n=0;n<nb;n++){
     #ifdef ACCRETION
     heatrate=0;
     for(i=0;i<NFLUIDS;i++)heatrate += Lum[i][n];
-    #else
-    heatrate = LUMINOSITY;
     #endif
-    FARGO_SAFE(PlanetHeating(xp[n],yp[n],zp[n],heatrate*dt));
+    //if(FIXEDLUMINOSITY)
+    //  heatrate = LUMINOSITY;
+    FARGO_SAFE(PlanetHeating(xp[n],yp[n],zp[n],heatrate*dt*EFFICIENCY));
   }
 }
 

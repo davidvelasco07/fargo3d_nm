@@ -13,10 +13,11 @@
 
 // Fills forces arrays of the force experienced by the planet
 
-void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass, char* hidden) {
+void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass) {
 
 //<USER_DEFINED>
   INPUT(Total_Density);
+  INPUT(Hidden);
   OUTPUT(Mmx);
   OUTPUT(Mpx);
   OUTPUT(Mmy);
@@ -27,6 +28,7 @@ void _ComputeForce_cpu(real x, real y, real z, real rsmoothing, real mass, char*
 
 //<EXTERNAL>
   real* dens = Total_Density->field_cpu;
+  real* hidden = Hidden->field_cpu;
   real* fxi  = Mmx->field_cpu;
   real* fyi  = Mpx->field_cpu;
   real* fzi  = Mmy->field_cpu;

@@ -253,18 +253,6 @@ void MonitorGlobal (int bitchoice) {
   if (FluidIndex == NFLUIDS-1) MonCounter++;
 }
 
-void CorrectHidden (Field *input, Field *output, char *hidden) {
-  int i,j,k;
-  for (k = 0; k < Nz+2*NGHZ; k++) {
-    for (j = 0; j < Ny+2*NGHY; j++) {
-      for (i = 0; i < Nx+2*NGHX; i++) {
-	if (hidden[l] == 1) output->field_cpu[l] = 0.0;
-	else output->field_cpu[l] = input->field_cpu[l];
-      }
-    }
-  }
-}
-
 void AllLevelSum (int idx, int r) {
   int nb, i, j, k;
   real lsum, gsum;
@@ -291,13 +279,7 @@ void AllLevelSum (int idx, int r) {
       if (current->cpu == CPU_Rank) {
 	AdaptFieldsFromJ (current);
 	mon_func[idx]();
-#ifdef GPU
-	Dev2Host3D (Slope);
-#endif
-	CorrectHidden (Slope, Slope, current->Hidden);
-#ifdef GPU
-	Host2Dev3D (Slope);
-#endif
+	Correct_Hidden (Slope, Slope);
 	reduction_SUM (Slope, NGHY, Ny+NGHY, NGHZ, Nz+NGHZ);
 	INPUT2D (Reduction2D);
 	for (k = NGHZ; k < Nz+NGHZ; k++) {
@@ -347,18 +329,22 @@ void MonitorAccretion () {
   int n;
   char filename[MAXLINELENGTH];
   real lsum, gsum;
+  real llum, glum;
   FILE *Out;
   for (n=0;n<Sys->nb;n++){
     lsum = M_acc[FluidIndex][n];
+    llum = Lum[FluidIndex][n];
     #ifndef FLOAT
     MPI_Reduce(&lsum, &gsum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&llum, &glum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     #else
     MPI_Reduce(&lsum, &gsum, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&llum, &glum, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
     #endif
     if(CPU_Master){
       sprintf(filename, "%smonitor/%s/M_acc_%d.dat", OUTPUTDIR, Fluids[FluidIndex]->name,n);
       Out = fopen_prs(filename, "a+");
-      fprintf(Out, "%.18g\t%.18g\n", PhysicalTime, gsum);
+      fprintf(Out, "%.18g\t%.18g\t%.18g\n", PhysicalTime, gsum, glum);
       fclose(Out);
     }
     //Reset the accreted mass

@@ -363,7 +363,8 @@ struct tgrid_cpu {
   real *InvMetric[3][2];	/**< 1D Arrays for metric coefficients */
   real *InterSurface[3];	/**< Surface of interfaces in each dimension */
   real *Edges[3];		/**< Interface position in each dimension */
-  char *Hidden;			/**< A set of flags which says if the zone lies behind another */
+  real *hidden;			/**< A set of flags which says if the zone lies behind another */
+  struct field *Hidden; 
   struct field *Total_Density; /** Field to store the total density of a cpu patch*/
   FluidPatch *fluid;		/**< Pointer to the first fluid patch (follow with ->next for multifluid) */
   struct fluid *Fluids[NFLUIDS];
@@ -411,7 +412,6 @@ struct tgrid_cpu {
   real *Szj_d;
   real *Szk_d;
   real *InvVj_d;
-  char *Hidden_d;
 #endif
 };
 

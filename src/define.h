@@ -1,6 +1,6 @@
 //Max-Min define
 #define MAXVARIABLES  500
-#define MAXLINELENGTH 500
+#define MAXLINELENGTH 1000
 #define MAXNAMELENGTH 80
 #define WIDESCREEN 80
 #define MAX1D 16384
@@ -442,7 +442,11 @@
 #endif
 #define l2D ((j)+((k)*(Ny+2*NGHY)))
 #define l2D_int ((j)+((k)*(Ny+2*NGHY)))
+#ifdef HALFDISK
 #define l_mid ((i)+(j)*(Nx+2*NGHX)+((size_z-NGHZ-1)*Stride))
+#else
+#define l_mid ((i)+(j)*(Nx+2*NGHX)+((size_z/2)*Stride))
+#endif
 #else //defined __GPU
 
 #ifdef NOGHOSTX
@@ -479,8 +483,11 @@
 #define l   ((i)+((j)*pitch)+((k)*stride))
 #define l2D ((j)+((k)*pitch2d))
 #define l2D_int ((j)+((k)*pitch2d_int))
+#ifdef HALFDISK
 #define l_mid ((i)+((j)*pitch)+((size_z-NGHZ-1)*stride))
-
+#else
+#define l_mid ((i)+((j)*pitch)+((size_z/2)*stride))
+#endif
 #endif
 
 //CHECK NANS (redefine FARGO_SAFE by uncommenting the following lines if needed)
@@ -497,6 +504,7 @@
 // #define FARGO_SAFE( call) {			\
 //printf ("*** Executing %s\n", #call);		\
 // call;						\
+// }
 // DumpAllFields (nbdump--);\
 //}
 

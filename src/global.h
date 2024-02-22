@@ -148,6 +148,7 @@ Field *Energy=NULL;
 Field *Pressure=NULL;
 
 Field *Total_Density=NULL;
+Field *Hidden=NULL;
 
 Field *QL=NULL;
 Field *QR=NULL;
@@ -236,6 +237,7 @@ Buffer Bfcur; //|
 //CPU GLOBAL LIGHT ARRAYS
 
 real Dx;
+real Dx_min;
 real *Xmin=NULL;
 real *Ymin=NULL;
 real *Zmin=NULL;
@@ -440,7 +442,7 @@ void (*ChangeFrame)(int,Field*,Field2D*);
 void (*Potential)();
 void (*CorrectVtheta)(real);
 void (*cfl)(void);
-void (*_ComputeForce)(real,real,real,real,real,char*);
+void (*_ComputeForce)(real,real,real,real,real);
 void (*copy_velocities)(int);
 void (*VanLeerX_PPA_a)(Field*);
 void (*VanLeerX_PPA_b)(Field*);
@@ -456,6 +458,7 @@ void (*mon_torq)();
 void (*mon_reynolds)();
 void (*mon_maxwell)();
 void (*mon_bxflux)();
+void (*Correct_Hidden)();
 void (*comm)();
 void (*Reset_field)(Field*);
 void (*ComputeTotalDensity)();

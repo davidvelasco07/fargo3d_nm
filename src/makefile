@@ -369,7 +369,7 @@ MAINOBJ  = LowTasks.o psys.o main.o param.o var.o usage.o   	    \
 	   mon_dens.o mon_momx.o mon_momy.o mon_momz.o          \
 	   mon_torque.o comm_device.o checkmute_y.o		\
 	   checkmute_z.o mon_reynolds.o mon_maxwell.o           \
-	   mon_bxflux.o                                         \
+	   mon_bxflux.o hidden.o                                        \
 	   postrestarthook.o change_arch.o select_device.o	\
 	   redefoptions.o setuphook1.o				\
            fill_ghostsx.o cfl_fluids_min.o colrate.o 		\
@@ -438,7 +438,7 @@ GPU_OBJBLOCKS =  CompPresIso_gpu.o CompPresAd_gpu.o 		\
 	   mon_momz_gpu.o mon_torque_gpu.o checkmute_y_gpu.o	\
 	   checkmute_z_gpu.o mon_reynolds_gpu.o                 \
 	   mon_maxwell_gpu.o visctensor_sph_gpu.o               \
-	   mon_bxflux_gpu.o                   			\
+	   mon_bxflux_gpu.o hidden_gpu.o                 			\
 	   fargo_ppa_steep_gpu.o setuphook1_gpu.o		\
            fill_ghostsx_gpu.o collisions_gpu.o                  \
            totaldens_gpu.o floor_gpu.o		                \

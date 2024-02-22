@@ -291,12 +291,12 @@ int main(int argc, char *argv[]) {
   
   Adapt_for_JUPITER (ParameterFile);
   OutputSpace();
-  
   Sys = InitPlanetarySystem(PLANETCONFIG);
   ListPlanets();
   if(Corotating)
     OMEGAFRAME = GetPsysInfo(FREQUENCY);
   OMEGAFRAME0 = OMEGAFRAME;
+
   /* We need to keep track of initial azimuthal velocity to correct
 the target velocity in Stockholm's damping prescription. We copy the
 value above *after* rescaling, and after any initial correction to
@@ -306,7 +306,6 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     NESTEDMESHES(CondInit();); //Needed even for restarts: some setups have custom
 		 //definitions (eg potential for setup MRI) or custom
 		 //scaling laws (eg. setup planetesimalsRT).
-
     PARENTGRID(MULTIFLUID( begin_i  = RestartSimulation(NbRestart)));
     if (ThereArePlanets) {
       if(NbRestart>0){
@@ -314,15 +313,15 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
         OMEGAFRAME  = GetfromPlanetFile (NbRestart, 10, 0);
         RestartPlanetarySystem (NbRestart, Sys);
         #ifdef ACCRETION
-        PARENTGRID(MULTIFLUID(RestartAccretion(PhysicalTime)));
+        MULTIFLUID(RestartAccretion(PhysicalTime));
         #endif
       }
       else{
         EmptyPlanetSystemFiles ();
       }
     }
-    //Warning: This is only for the accretion ring setup
-    //PARENTGRID(MULTIFLUID(CorrectVtheta(OMEGAFRAME-1)));
+    //Warning: This is meant for the accretion ring setup
+    if(CORRECTV)PARENTGRID(MULTIFLUID(CorrectVtheta(OMEGAFRAME-1)));
   }
   else {
     if (ThereArePlanets)
@@ -332,10 +331,8 @@ OMEGAFRAME (which is used afterwards to build the initial Vx field. */
     // Note: CondInit () must be called only ONCE (otherwise some
     // custom scaling laws may be applied several times).
   }  
-
   if (StretchOldOutput) StretchOutput(StretchNumber);
   
-
   /* This must be placed ***after*** reading the input files in case of a restart */
   //if ((ArrayNb) && (EarlyOutputRename == NO)) {
   //  i = strlen(OUTPUTDIR);

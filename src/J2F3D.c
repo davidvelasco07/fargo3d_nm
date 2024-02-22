@@ -99,6 +99,7 @@ void Adapt_for_JUPITER(char *filename)
     splitgrid(grid);
     Ngrids++;
     printf("Grid %d level %d N(%d,%d,%d)\n",grid->number,grid->level,grid->ncell[0],grid->ncell[1],grid->ncell[2]);
+    if(grid->level==LevMax) Dx_min = grid->Edges[_X_][1]-grid->Edges[_X_][0];
     grid = grid->next;
   }
   //At this point we have built the CPUgrids
@@ -113,6 +114,8 @@ void Adapt_for_JUPITER(char *filename)
       SelectGrid(item);
       Current_Grid = item;
       item->Total_Density = CreateField("Total_Density", 0, 0, 0, 0);
+      item->Hidden = CreateField("Hidden", 0, 0, 0, 0);
+      item->Hidden->field_cpu = item->hidden;
       CreateFields();
       fluid = item->fluid;
       i=NFluids_per_rank-1;
@@ -250,7 +253,7 @@ void SelectGrid(tGrid_CPU *grid)
     Syk = grid->Syk;
     Szk = grid->Szk;
     InvVj = grid->InvVj;
-
+    
     Dx = (Xmin[NGHX + Nx] - Xmin[NGHX]) / Nx;
 
 #ifdef GPU
@@ -293,9 +296,10 @@ void SelectGrid(tGrid_CPU *grid)
 
 void AdaptFieldsFromJ(tGrid_CPU *grid)
 {
+  SelectGrid(grid);
+  Total_Density = grid->Total_Density;
+  Hidden = grid->Hidden;
   if(grid != Current_Grid){
-    SelectGrid(grid);
-    Total_Density = grid->Total_Density;
     Current_Grid = grid;
     //(Re)alloc work arrays
     FARGO_SAFE(CreateFields());

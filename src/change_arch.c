@@ -84,6 +84,7 @@ void ChangeArch() {
   mon_reynolds = mon_reynolds_cpu;
   mon_maxwell  = mon_maxwell_cpu;
   mon_bxflux   = mon_bxflux_cpu;
+  Correct_Hidden = Correct_Hidden_cpu;
 
   comm = comm_cpu;
 
@@ -487,6 +488,7 @@ void ChangeArch() {
 	  mon_reynolds = mon_reynolds_gpu;
 	  mon_maxwell  = mon_maxwell_gpu;
 	  mon_bxflux   = mon_bxflux_gpu;
+    Correct_Hidden = Correct_Hidden_gpu;
 	  printf("Monitoring runs on the GPU\n");
 	}
       }

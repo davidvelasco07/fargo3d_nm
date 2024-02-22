@@ -51,10 +51,12 @@ void DragForce_a(real dt){}
 
 void DragForce_b(real dt) {
 
+  MPI_Request request_c;
   MPI_Request request_x;
   MPI_Request request_y;
   MPI_Request request_z;
 
+     
 #ifdef DUSTSIZE
   //Wait for Gas Density (QR)
   MPI_Wait(&RequestGasDensity, MPI_STATUS_IGNORE);
@@ -64,15 +66,32 @@ void DragForce_b(real dt) {
 #endif
 #endif
 
-  // Centered drag coefficient pre-factor
-  FARGO_SAFE(DragForce_Coeff()); //store dragcoeff in Qs
-  //-------------------------------------------------------------------------------------
+// Centered drag coefficient pre-factor
+FARGO_SAFE(DragForce_Coeff()); //store dragcoeff in Qs
+//-------------------------------------------------------------------------------------
 
-    
+#ifdef FEEDBACK
+  //Compute local coefficient C_i (DensStar) and obtain global sum C (slope)
+  Reset_field(DensStar);  
+  MULTIFLUID(DragForce_SumC(dt)); 
+#ifdef MPICUDA
+  MPI_Iallreduce(DensStar->field_gpu, Slope->field_gpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_c); // obtain C
+#else
+  INPUT(DensStar);
+  OUTPUT(Slope);
+  MPI_Iallreduce(DensStar->field_cpu, Slope->field_cpu, Nx*(Ny+2*NGHY)*(Nz+2*NGHZ),
+		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_c); // obtain C
+#endif
+#endif
+
 #ifdef X
   Reset_field(Mmx);
+#ifdef FEEDBACK 
+  MULTIFLUID(DragForce_SumCV(dt,0)); 
+#else
   MULTIFLUID( if(Fluidtype == GAS) copy_field(Mmx, Vx_temp) );
-
+#endif
 #ifdef MPICUDA
   MPI_Iallreduce(Mmx->field_gpu, Mpx->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_x); 
@@ -86,7 +105,11 @@ void DragForce_b(real dt) {
   
 #ifdef Y  
   Reset_field(Mmy);
+#ifdef FEEDBACK 
+  MULTIFLUID(DragForce_SumCV(dt,1)); 
+#else
   MULTIFLUID( if(Fluidtype == GAS) copy_field(Mmy, Vy_temp) );
+#endif
 #ifdef MPICUDA
   MPI_Iallreduce(Mmy->field_gpu, Mpy->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_y); 
@@ -99,7 +122,11 @@ void DragForce_b(real dt) {
 #endif
 #ifdef Z  
   Reset_field(Mmz); 
+#ifdef FEEDBACK 
+  MULTIFLUID(DragForce_SumCV(dt,2)); 
+#else
   MULTIFLUID( if(Fluidtype == GAS) copy_field(Mmz, Vz_temp) );
+#endif
 #ifdef MPICUDA
   MPI_Iallreduce(Mmz->field_gpu, Mpz->field_gpu, (Nx+2*NGHX)*(Ny+2*NGHY)*(Nz+2*NGHZ),
 		 MPI_DOUBLE, MPI_SUM, FluidsComm, &request_z); 
@@ -111,6 +138,9 @@ void DragForce_b(real dt) {
 #endif
 #endif
 
+#ifdef FEEDBACK
+  MPI_Wait(&request_c, MPI_STATUS_IGNORE);
+#endif
 
   //Third step: Update the velocities of each fluid
 #ifdef X

@@ -78,6 +78,7 @@ void Potential_cpu() {
   int istar1 = BinaryStar1;
   int istar2 = BinaryStar2;
   int binary_true = ThereIsACentralBinary;
+  real dx = Dx_min;
 //<\EXTERNAL>
   
 //<INTERNAL>
@@ -153,6 +154,10 @@ void Potential_cpu() {
 	      pow(planetdistance/R0,FLARINGINDEX)*
 	      planetdistance*THICKNESSSMOOTHING;
 
+    if(smoothing<.5*dx){
+      smoothing=.5*dx;
+    }
+    
 	  smoothing*=smoothing;
 
 	  dist = ((XC-xplanet[n])*(XC-xplanet[n])+

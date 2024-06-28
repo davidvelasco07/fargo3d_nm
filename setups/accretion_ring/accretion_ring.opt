@@ -1,3 +1,4 @@
+
 # You may enter a description between the BEGIN and END labels.
 # BEGIN
 # END
@@ -14,13 +15,13 @@ FARGO_OPT += -DNFLUIDS=${NFLUIDS}
 FARGO_OPT +=  -DX
 FARGO_OPT +=  -DY
 FARGO_OPT +=  -DZ
-#FARGO_OPT +=  -DNOGHOSTX
 #Coordinate System.
 FARGO_OPT += -DSPHERICAL
+
+#Algorithm
 FARGO_OPT += -DSTANDARD
 
 #Equation of State
-#FARGO_OPT += -DISOTHERMAL
 FARGO_OPT += -DADIABATIC
 
 # Boundaries
@@ -33,9 +34,6 @@ FARGO_OPT += -DALPHAVISCOSITY
 # Potential
 FARGO_OPT += -DPOTENTIAL
 
-# Thermal Diffusion
-#FARGO_OPT += -DTHDIFFUSION
-
 FARGO_OPT += -DFLOOR
 
 #Drag force between species
@@ -44,6 +42,10 @@ FARGO_OPT += -DDUSTDIFFUSION
 FARGO_OPT += -DSTOKESNUMBER
 #FARGO_OPT += -DDUSTSIZE
 
+# Thermal Diffusion
+FARGO_OPT += -DTHDIFFUSION=0
+
+# Planet
 FARGO_OPT += -DACCRETION
 FARGO_OPT += -DPLANET_HEATING=0
 
@@ -53,6 +55,8 @@ FARGO_OPT += -DCOMMADAPT
 FARGO_OPT += -DCOMMGPU
 #FARGO_OPT += -DRELNESTING
 
+# Other things
+FARGO_OPT += -DBM08
 
 #Cuda blocks
 ifeq (${GPU}, 1)

@@ -7,7 +7,7 @@ Alpha			1.0e-4
 SigmaSlope		0.5		Slope of surface
 FlaringIndex	0.0
 Nu              0.0
-
+Gamma           1.4
 
 ### Dust parameters
 Epsilon			0.01	Total dust-to-gas mass ratio
@@ -19,6 +19,10 @@ Delta			1.0e-4  diffusion coefficient (~alpha)
 Tslim			10.0
 ThDiffusivity   4.5E-5  Thermal Diffusion coefficient
 NsubCyc         4       Number of subcycles to use when diffusing heat
+Heating         Yes
+Efficiency      1.0     Efficiency of heat coming from accretion
+FixedLuminosity No
+Luminosity      1.0E-11 Fixed Luminosity rate 
 
 ### Planet parameters
 PlanetConfig		NONE
@@ -38,11 +42,12 @@ Xmin			-3.141592653589793
 Xmax			3.141592653589793
 NFluidColors    1
 
+
 ### Output control parameters
 Ntot			8000	Total number of time steps
 Ninterm	 		20		Time steps between outputs
 DT		    	0.3141592653589793	Time step length. 2PI = 1 orbit
-OutputDir		/scratch/gpfs/dv9346/fargo3d/test
+OutputDir		@outputs/accretion_ring
 
 Field 			gasdens
 PlotLine		field[-1,:,:]

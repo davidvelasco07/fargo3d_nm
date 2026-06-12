@@ -1,8 +1,0 @@
-#!/bin/bash
-#PBS -A MRICOR
-#PBS -l nodes=1:ppn=4:mri
-
-cd /home/frederic/fargo3d/src/trunk
-
-
-mpirun --bind-to none -hostfile $PBS_NODEFILE ./fargo3d -m in/mri.par

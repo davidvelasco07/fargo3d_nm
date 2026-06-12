@@ -1,6 +1,0 @@
-Corresponds to an exploration performed with commit ec5c88ad953
-on branch develop and setup 'explodust'. The explodust job file included
-is the only one to have the 'jobmap' feature which is quite useful.
-Different job files go with different parameter files and correspond
-to exploring various h and planet masses, for given viscosities.
-The relationship with the jobid is found in the condinit.c file.

@@ -4,8 +4,6 @@
 
 This fork adds support for **statically nested meshes** (mesh refinement), on CPU and GPU, including multi-rank runs with CUDA-aware MPI. See [Nested meshes](#nested-meshes) below.
 
-
-![example](https://bytebucket.org/fargo3d/public/raw/81b497fb327e916d1c2ad650fe1177b1bbbcc1de/utils/images/fargo3d.jpg)
 ------------------------
 
 ##### Website: [fargo.in2p3.fr](http://fargo.in2p3.fr)
@@ -13,12 +11,6 @@ This fork adds support for **statically nested meshes** (mesh refinement), on CP
 ##### [Documentation](https://fargo3d.bitbucket.io/)
 
 ------------------------
-
-##### Clone
-
-HTTPS: ```git clone https://bitbucket.org/fargo3d/public.git```
-
-SSH (bitbucket user required): ```git clone git@bitbucket.org:fargo3d/public.git```
 
 ##### Fork & Sync:
 

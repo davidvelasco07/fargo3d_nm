@@ -12,30 +12,6 @@ This fork adds support for **statically nested meshes** (mesh refinement), on CP
 
 ------------------------
 
-##### Fork & Sync:
-
-Follow the bitbucket documentation [here](https://confluence.atlassian.com/bitbucket/forking-a-repository-221449527.html)
-
-##### Working with different versions
-
-Version 2.0: Switch to the commit tagged as ``2.0`` to work with version 2.0.
-
-```
-git checkout -b branch2.0 2.0
-```
-
-Version 1.3: Switch to the commit tagged as ``1.3`` to work with version 1.3.
-
-```
-git checkout -b branch1.3 1.3
-```
-
-##### Contributing to the code
-
-[Pull requests](https://www.atlassian.com/git/tutorials/making-a-pull-request) are available to the branch ``release/public``. 
-
-Bugs can be reported to the [issues section](https://bitbucket.org/fargo3d/public/issues) of the repository or to the [Google group](https://groups.google.com/forum/#!forum/fargo3d).
-
 ### First run
 
 #### Sequential CPU

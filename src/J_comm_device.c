@@ -554,6 +554,11 @@ void ExecComm_gpu(jCommunicator *comm, int levsrc, int levdest, int nvar, int *f
   int n;
   int nbreq = 0;
   int parity, dimc;
+  /* The buffers sent below are filled by kernels (UPLIL, DOWNMEAN,
+     DOWNFLUX) launched asynchronously. We must make sure they have
+     completed before MPI reads the device buffers, otherwise the
+     CUDA-aware sends ship stale/garbage data. */
+  cudaDeviceSynchronize();
   while (comm != NULL)
   {
     if ((comm->dest_level == levdest) && (comm->src_level == levsrc))

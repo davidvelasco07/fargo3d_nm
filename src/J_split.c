@@ -2,7 +2,6 @@
 
 static boolean isprime[MAXPRIME];
 static long prime[MAXPRIME];
-long cpugrid_number;
 static boolean primedone = FALSE;
 
 boolean Buildprime()

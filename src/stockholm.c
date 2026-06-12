@@ -60,10 +60,13 @@ void StockholmBoundary_cpu(real dt) {
   int size_y  = Ny+2*NGHY;
   int size_z  = Nz+2*NGHZ;
   int pitch2d = Pitch2D;
-  real y_min = YMIN;
-  real y_max = YMAX;
-  real z_min = ZMIN;
-  real z_max = ZMAX;
+  // Use the *global* domain bounds, not YMIN/YMAX/ZMIN/ZMAX: those
+  // globals are overwritten by SelectGrid() with the local CPU-patch
+  // corners, which would anchor the damping zones to every MPI seam.
+  real y_min = corner_min0[_Y_];
+  real y_max = corner_max0[_Y_];
+  real z_min = corner_min0[_Z_];
+  real z_max = corner_max0[_Z_];
   real dampingzone = DAMPINGZONE;
   real kbcol = KILLINGBCCOLATITUDE;
   real of    = OMEGAFRAME;

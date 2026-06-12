@@ -1,0 +1,38 @@
+Setup			nmtest
+
+### Tiny 2D (Y,Z) nested-mesh test problem (derived from dynfric).
+### Two refined levels centered on the domain so that patches straddle
+### rank boundaries on a 2x2 (4-rank) decomposition.
+
+Ny			30
+Nz			30
+Ymin			0.0
+Ymax			10.0
+Zmin			-10.0
+Zmax			10.0
+
+### Output control
+DT			0.1
+Ninterm			1
+Ntot			2
+OutputDir		test_out/nmtest_default
+
+### Physics (as dynfric)
+Rho0			1.0
+Cs			1.0
+Gamma			1.4
+WindVel			0.4
+Xbody			0.0
+Ybody			0.0
+Zbody			0.0
+Smoothing		0.01
+MassBody		0.1
+MassTaper		0.0
+NsubCyc			1
+Lumos			0.0
+ThDiffusivity		0.0
+
+### Relative coordinates (RELNESTING): -1..1 spans the domain.
+#GRIDINFO
+-1.0 -0.5   0.0 0.5   1
+-1.0 -0.25 -0.5 0.25  2

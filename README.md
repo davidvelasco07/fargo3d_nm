@@ -16,16 +16,17 @@ nested-mesh communications on GPUs with CUDA-aware MPI:
 - Build scripts ported from Python 2 to Python 3 (`scripts/`).
 - `DELLA` target platform (NVIDIA A100, `sm_80`, CUDA-aware OpenMPI) in
   `src/makefile`.
-- Validation tooling: `scripts/compare_outputs.py` (per-region ghost-cell
-  comparison of split outputs) and `scripts/validate_corners.slurm` (SLURM GPU
-  validation job).
+- A nested-mesh test suite (`test_suite/nm_*.py`, run with `make testnm`)
+  checking decomposition invariance, restarts, posterior refinement, mass
+  budget, 3D corner exchanges, and GPU/CUDA-aware MPI runs on the physical
+  cells of every refinement level.
 
 ## Documentation
 
 See [docs/NESTED_MESHES.md](docs/NESTED_MESHES.md) for how to set up and use
 mesh refinement (the `#GRIDINFO` directive, `RELNESTING`, build options,
 running on CPU/GPU, restart and posterior refinement, output format, and
-validation tools).
+the test suite).
 
 ## Building
 

@@ -1,0 +1,35 @@
+Setup			nmtest3d
+
+### Tiny 3D nested-mesh test problem (derived from td3d).
+### One centered refined level so corner/edge communicators exist in 3D
+### on a multi-rank decomposition.
+
+Nx			20
+Ny			20
+Nz			20
+Xmin			-350.0
+Xmax			350.0
+Ymin			-350.0
+Ymax			350.0
+Zmin			-350.0
+Zmax			350.0
+
+Xbody			0.0
+Ybody			0.0
+Zbody			0.0
+Massbody		0.25
+Smoothing		0.0
+Gamma			1.4
+ThermalDiffusion	0.5
+Lumos			0.0
+WindVel			0.1
+Cs			2.0
+Rho0			1.0
+Ntot			2
+Ninterm			1
+DT			1.0
+OutputDir		test_out/nmtest3d_default
+
+### Relative coordinates (RELNESTING): -1..1 spans the domain.
+#GRIDINFO
+-0.5 -0.5 -0.5 0.5 0.5 0.5 1

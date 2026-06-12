@@ -142,3 +142,8 @@ testlist:
 	@ls test_suite/ | sed -e "s/.py//" | grep -v "~"
 test%:
 	@python ${TESTSDIR}/$*.py
+
+# Nested-mesh suite, CPU tier (GPU tier: sbatch scripts/run_nm_gpu_tests.slurm)
+NMTESTS = nm_serial_vs_mpi nm_periodic nm_restart nm_subpatch nm_conservation nm_3d
+testnm:
+	@for t in ${NMTESTS}; do python ${TESTSDIR}/$$t.py || exit 1; done

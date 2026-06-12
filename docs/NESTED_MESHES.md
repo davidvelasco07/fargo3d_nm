@@ -138,18 +138,20 @@ module load cudatoolkit/12.6 openmpi/cuda-12.6/gcc/4.1.6
 export CUDA=$CUDA_HOME
 ```
 
-`FULLDEBUG=1` builds with `-g` and enables `WRITEGHOSTS`, which includes
-ghost zones in the output files (useful for debugging communications; such
-runs must use the `-k` flag, see below).
+By default outputs contain only the physical (interior) cells of each
+patch. `FULLDEBUG=1` builds with `-g` and additionally enables
+`WRITEGHOSTS`, which folds the ghost zones into the output files — a
+low-level debugging aid only; such runs must use the `-k` flag and their
+outputs cannot be merged or restarted from.
 
 ## Running
 
 ```bash
-# 4 MPI ranks, per-process output files
-mpirun -np 4 ./fargo3d -k setups/dynfric/dynfric.par
+# 4 MPI ranks
+mpirun -np 4 ./fargo3d setups/dynfric/dynfric.par
 
 # Override parameters on the command line
-mpirun -np 4 ./fargo3d -k -o "OutputDir=run1" -o "PeriodicZ=yes" setups/dynfric/dynfric.par
+mpirun -np 4 ./fargo3d -o "OutputDir=run1" -o "PeriodicZ=yes" setups/dynfric/dynfric.par
 ```
 
 Command-line flags most relevant to nested runs (full list: run without
@@ -200,40 +202,89 @@ condition is evaluated globally across levels. Subcycling is enabled
 
 ## Outputs
 
-With `-k` (no merging), each snapshot `N` produces a directory
-`<OutputDir>/outputNNNNN/` containing:
+Each snapshot `N` produces a directory `<OutputDir>/outputNNNNN/`
+containing:
 
 - `DescriptorN.dat` — the patch/CPU layout (levels, sizes, ghost count,
   fields) needed to interpret the data files and to restart.
-- One file per field, per patch:
+- One file per field, per CPU patch:
   `<fluid><field><N>_<patch>_<level>.dat`, e.g. `gasdensity2_9_1.dat` is
   the density of patch 9 (a level-1 patch) at snapshot 2. Velocity files
   contain `NDIM` contiguous components. Files are raw double-precision
-  arrays ordered like the in-memory patch (ghost zones included only in
-  `WRITEGHOSTS` builds).
+  arrays holding the physical (interior) cells of the patch — outputs never
+  contain ghost cells unless the build enables the `WRITEGHOSTS` debug
+  option (`FULLDEBUG=1`), which is meant for low-level debugging only.
+
+Note that nested-mesh outputs are always split per CPU patch, so two runs
+with different rank counts cannot be compared file by file; use
+`scripts/nm_compare.py` (below), which reassembles each refinement level
+onto its full canvas before comparing.
 
 In addition, the run directory contains `nested_meshes.txt` (the parsed
 refinement layout), `variables.par`, `info.log`, and the monitoring time
 series (`mass.dat`, `force.dat`, and the `*_all_levels.dat` variants summed
 over all levels).
 
-## Validation tools
+## Test suite
 
-- [scripts/compare_outputs.py](../scripts/compare_outputs.py) compares two
-  split-output runs (`-k`, ideally `FULLDEBUG=1` so ghosts are dumped) and
-  reports the maximum differences separately for interior cells, edge ghost
-  cells, and corner ghost cells of every patch:
+The nested-mesh test suite works exclusively on physical (interior) cells
+of standard builds — ghost cells are never written or compared. Errors in
+the ghost exchange contaminate interior cells within a couple of timesteps,
+so decomposition-invariance checks on the interiors catch them without any
+debug output options.
+
+### CPU tier
+
+```bash
+make testnm        # runs all CPU-tier tests
+make testlist      # lists every available test (legacy + nm_*)
+```
+
+Run from the repository root with `mpirun` in the `PATH` (override the
+launcher with `NM_MPIRUN` if needed). The tests, in
+[test_suite/](../test_suite/):
+
+| Test | What it checks |
+|------|----------------|
+| `nm_serial_vs_mpi` | 1-rank vs 4-rank 2D run, bit-exact interiors on all levels |
+| `nm_periodic` | same with `PeriodicZ`, the configuration with the highest MPI-tag collision multiplicity |
+| `nm_restart` | restart reproduces an uninterrupted run to machine precision and is bit-exact across decompositions |
+| `nm_subpatch` | posterior refinement (`-r`) adds a patch, the result restarts and keeps evolving |
+| `nm_conservation` | base-level mass budget stays within a calibrated bound and is bit-identical across decompositions |
+| `nm_3d` | 1-rank vs 8-rank 3D run (2x2x2, corner-type rank adjacency), bit-exact |
+
+### GPU tier
+
+```bash
+sbatch scripts/run_nm_gpu_tests.slurm   # or: python3 test_suite/nm_gpu.py on a GPU node
+```
+
+`test_suite/nm_gpu.py` compares a GPU run against a CPU reference (within
+floating-point tolerance), then checks that 4-rank GPU runs — both with
+staged MPI and with CUDA-aware MPI (`MPICUDA=1`) — are bit-identical to the
+1-rank GPU run, and uses the `FARGO_TAGDIAG` diagnostic to confirm the
+tag-collision condition is actually exercised.
+
+### Supporting tools
+
+- [scripts/nm_test.py](../scripts/nm_test.py) — the test framework
+  (cached builds, `mpirun` invocation, comparisons, reporting).
+- [scripts/nm_compare.py](../scripts/nm_compare.py) — standalone comparer:
+  reassembles every refinement level from the per-patch files of two runs
+  and reports per-level/per-field maximum differences. Works across
+  different MPI decompositions:
 
   ```bash
-  python3 scripts/compare_outputs.py REF_DIR TEST_DIR --snap 2
+  python3 scripts/nm_compare.py REF_DIR TEST_DIR --snap 2 [--tol-rel X --tol-abs Y]
   ```
 
-  Exit code 1 signals a corner-ghost mismatch above threshold. This is the
-  tool used to validate GPU/CUDA-aware-MPI runs against a CPU reference.
-
-- [scripts/validate_corners.slurm](../scripts/validate_corners.slurm) is a
-  SLURM job that runs a 4-rank GPU validation of the nested-mesh ghost
-  exchange against a CPU reference and prints a per-region comparison.
+- [scripts/compare_outputs.py](../scripts/compare_outputs.py) — low-level
+  debug tool for `WRITEGHOSTS` builds: reports differences separately for
+  interior, edge-ghost and corner-ghost regions of every patch file
+  (requires `--ngh` since `WRITEGHOSTS` descriptors report a zero ghost
+  width). Used by
+  [scripts/validate_corners.slurm](../scripts/validate_corners.slurm), the
+  original GPU ghost-exchange validation job. Not used by the test suite.
 
 ## Troubleshooting
 

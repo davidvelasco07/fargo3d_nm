@@ -72,6 +72,12 @@ def summarize(ref_dir, test_dir, snap, default_ngh):
     dims, Nghost, ndim = parse_descriptor(desc)
     if default_ngh is not None:
         Nghost = default_ngh
+    if Nghost == 0:
+        # WRITEGHOSTS builds write ngh=0 in the descriptor (the ghosts are
+        # folded into the patch sizes). Without the true width the region
+        # masks would be empty and every ghost diff vacuously zero.
+        sys.exit("ERROR: descriptor reports Nghost=0; pass the real ghost "
+                 "width explicitly with --ngh (3 for standard builds).")
 
     fields = {"gasdensity": 1, "gasvelocity": ndim}
     agg = {}  # field -> {region -> max rel}

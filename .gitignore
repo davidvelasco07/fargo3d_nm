@@ -44,5 +44,6 @@ out?
 # Build/validation artifacts
 fargo3d_*
 val/
+test_out/
 diag*.out
 diag*.err

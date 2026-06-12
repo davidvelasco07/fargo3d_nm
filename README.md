@@ -20,6 +20,13 @@ nested-mesh communications on GPUs with CUDA-aware MPI:
   comparison of split outputs) and `scripts/validate_corners.slurm` (SLURM GPU
   validation job).
 
+## Documentation
+
+See [docs/NESTED_MESHES.md](docs/NESTED_MESHES.md) for how to set up and use
+mesh refinement (the `#GRIDINFO` directive, `RELNESTING`, build options,
+running on CPU/GPU, restart and posterior refinement, output format, and
+validation tools).
+
 ## Building
 
 Example build of a nested-mesh setup with GPU and CUDA-aware MPI:

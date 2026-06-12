@@ -707,7 +707,7 @@ void WriteOutputs(int type, int timestep) {
     __WriteField(Vz, timestep);
 #endif
 #endif
-
+//__WriteField(ThermalDiff, timestep);
 if (type == ALL){ //We recover the .par variables' value
     WRITEDENSITY = writedensity;
     WRITEENERGY = writeenergy;

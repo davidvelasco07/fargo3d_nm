@@ -18,17 +18,14 @@ Sq			    3.5		slope of distribution
 Delta			1.0e-4  diffusion coefficient (~alpha)
 Tslim			10.0
 ThDiffusivity   4.5E-5  Thermal Diffusion coefficient
-Luminosity      1.0E-11
-NsubCyc         4       Number of subcycles to use when diffusing heat
-Heating         Yes
-Efficiency      1.0     Efficiency of heat coming from accretion
-FixedLuminosity No
+NsubCyc         2       Number of subcycles to use when diffusing heat
 
 ### Planet parameters
-PlanetConfig		NONE
+PlanetConfig		planets/earth.cfg
 ThicknessSmoothing 	0.1	Smoothing parameters in disk thickness
 OmegaFrame          1.0
-Frame               F
+Frame               C
+CorrectV            Yes
 
 ### Mesh parameters
 Nx		        800    Azimuthal number of zones 
@@ -42,19 +39,17 @@ Xmin			-3.141592653589793
 Xmax			3.141592653589793
 NFluidColors    1
 
-
 ### Output control parameters
 Ntot			8000	Total number of time steps
 Ninterm	 		20		Time steps between outputs
 DT		    	0.3141592653589793	Time step length. 2PI = 1 orbit
-OutputDir		@outputs/accretion_ring_full
+OutputDir		/scratch/gpfs/dv9346/fargo3d/test
 
 Field 			gasdens
 PlotLine		field[-1,:,:]
 
 #GRIDINFO
 #xmin ymin zmin xmax ymax zmax level
-#-2 .6 1.5 2 1.4 1.5707963267948966 1
-#-0.25 -0.5 0.0 0.25 0.5 1.0 1
-#-0.125 -0.25 0.5 0.125 0.25 1.0 2
-#-0.0625 -0.125 0.75 0.0625 0.125 1.0 3
+#-0.4 0.78 1.4507963267948965 0.4 1.18 1.570796267948965 1
+#-0.2 0.88 1.5107963267948965 0.2 1.08 1.570796267948965 2
+#-0.1 0.93 1.5407963267948965 0.1 1.03 1.570796267948965 3

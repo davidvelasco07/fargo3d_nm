@@ -1,0 +1,60 @@
+Setup			p3dthd
+
+### Disk parameters
+
+AspectRatio         0.05         Thickness over Radius in the disc
+Sigma0  	        6.05e-4		Surface Density at r=1
+Nu			        0.0		    Uniform kinematic viscosity
+SigmaSlope		    0.5		Slope of surface
+FlaringIndex	    0.0
+Gamma			    1.4
+
+### Thermal effects
+ThDiffusivity       4.5e-5
+Nsubcyc			    2
+
+### Planet parameters
+
+PlanetConfig        planets/zero.cfg
+ThicknessSmoothing  0.01		Smoothing parameters in disk thickness
+Eccentricity		0.0
+HeatingRate		    1.9497987079093993e-12
+Efficiency          1.0
+FixedLuminosity     Yes
+Heating             Yes
+
+### Numerical method parameters
+
+Disk			    No
+OmegaFrame     		1.0
+Frame			    C
+IndirectTerm		No
+CorrectV            Yes
+
+### Mesh parameters
+Nx			        200 	Azimuthal number of zones
+Ny                  100		Radial number of zones
+Nz			        20		Number of zones in colatitude
+Ymin		        0.6		Inner boundary radius
+Ymax		        1.4		Outer boundary radius
+Zmin		        1.4507963267948966
+Zmax		        1.5707963267948966
+Xmin		        -1.5707963267948966
+Xmax			    1.5707963267948966
+
+
+### Output control parameters
+
+Ntot			    6		Total number of time steps
+Ninterm	 		    3		Time steps between outputs
+DT			        0.0628318530718	Time step length
+OutputDir		    @outputs/verify_cudacomm
+
+
+Field 			    gasdens
+PlotLine		    field[-1,:,:]
+
+#GRIDINFO
+#xmin ymin zmin xmax ymax zmax level (absolute coordinates, RELNESTING off)
+-0.5 0.8 1.5207963267948966 0.5 1.2 1.5707963267948966 1
+-0.25 0.9 1.5457963267948966 0.25 1.1 1.5707963267948966 2

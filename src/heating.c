@@ -21,8 +21,8 @@ void compute_planetheating(real dt) {
     heatrate=0;
     for(i=0;i<NFLUIDS;i++)heatrate += Lum[i][n];
     #endif
-    //if(FIXEDLUMINOSITY)
-    //  heatrate = LUMINOSITY;
+    if(FIXEDLUMINOSITY)
+      heatrate = LUMINOSITY;
     FARGO_SAFE(PlanetHeating(xp[n],yp[n],zp[n],heatrate*dt*EFFICIENCY));
   }
 }

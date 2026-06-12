@@ -29,7 +29,7 @@ void _init_stockholm() {
 
   char outputname[MAXLINELENGTH];
  
-  if ((Restart == YES) || (Restart_Full == YES) && NO ) {
+  if (((Restart == YES) || (Restart_Full == YES)) && TimeStep > 0 ) {
     sprintf(outputname,"%s0_2d.dat",Density->name);
     error_density = Read2D(Density0, outputname, OUTPUTDIR, GHOSTINC);
 #ifdef X

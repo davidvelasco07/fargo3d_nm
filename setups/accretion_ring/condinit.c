@@ -93,6 +93,7 @@ void _CondInit(int id)
         {
           v3[l] = sin(zmin(k)) * stokes[id - 1] * omega * (r * cos(zmin(k))) * 0;
           v2[l] = -cos(zmin(k)) * stokes[id - 1] * omega * (r * cos(zmin(k))) * 0;
+          v2[l] += (drand48()-.5)*0.005*pow(ymed(j),-0.5);
         }
 
         if (FLARINGINDEX == 0.0)

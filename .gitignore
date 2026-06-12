@@ -1,7 +1,9 @@
 *TEST/*
 bin/*
 outputs/*
+accretion_ring_full/*
 fargo3d
+fargo3d_*
 arch/*
 scripts/bound_*.code
 src/rescale.c

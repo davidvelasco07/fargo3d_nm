@@ -1,0 +1,20 @@
+Setup			td1d
+
+### Mesh parameters
+
+Nz			1
+Ny			1
+Nx			100
+Xmin			0.0
+Xmax			10.0
+
+Ntot			100
+Ninterm	 		1
+DT			3
+OutputDir		@outputs/td1d
+
+Gamma			1.4
+ThermalDiffusion	0.085
+# Plot options
+Field			gasdens
+Autocolor		No

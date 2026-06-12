@@ -1,0 +1,35 @@
+# You may enter a description between the BEGIN and END labels.
+# BEGIN
+# The "sod1d" setup corresponds to the standard Sod's shock tube test 
+# In order to run it, do:
+# make SETUP=sod1d
+# fargo3d in/sod1d.par
+# The default initial conditions is those of Stone & Norman 1992 ApJSS, 80, 753.
+# END
+#-------------------------------------------------------------------------------
+# From the list below, activate/deactivate the options that apply to your run.
+#-------------------------------------------------------------------------------
+
+#Dimension(s) of Simulation.
+FARGO_OPT +=-DX
+#FARGO_OPT+=-DY
+#FARGO_OPT+=-DZ
+
+#Equation of State
+
+FARGO_OPT+=-DISOTHERMAL
+
+#Coordinate System.
+FARGO_OPT +=  -DCARTESIAN
+
+#Transport Algorithm
+FARGO_OPT += -DSTANDARD
+
+FARGO_OPT += -DPPA_STEEPENER
+
+#Cuda blocks
+ifeq (${GPU}, 1)
+FARGO_OPT += -DBLOCK_X=64
+FARGO_OPT += -DBLOCK_Y=1
+FARGO_OPT += -DBLOCK_Z=1
+endif

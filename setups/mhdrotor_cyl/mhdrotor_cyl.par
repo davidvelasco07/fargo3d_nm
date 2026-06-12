@@ -1,0 +1,31 @@
+### Run only this parameter file is FARGO3D was build using the setup 'mhdrotor_cyl'
+
+### Mesh parameters
+
+Nx			1024
+Ny                	256
+Nz			1
+Xmin			0.0
+Xmax			6.283185307179586
+Ymin			0.01
+Ymax			0.5
+Zmin			0.0
+Zmax			1.0
+
+Periodic_Z		Yes
+
+###Setup Parameters
+
+Gamma			1.4
+p			1.0
+v0			2.0
+r1			0.1
+r2			0.115
+
+### Output control parameters
+Ntot			200		Total number of time steps
+Ninterm	 		1		Time steps between outputs
+DT			0.001
+OutputDir		@outputs/mhdrotor_cyl
+
+field			gasdens

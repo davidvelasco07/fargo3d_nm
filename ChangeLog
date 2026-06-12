@@ -1,0 +1,103 @@
+fargo3d-1.2:
+
+	Fixed a bug that could lead to random crashes on 2D and 1D runs
+	with MHD on GPUs.
+
+	Fixed a bug introduced in version 1.1 with the +S command line
+	switch.
+
+	Implemented alpha viscosity in cylindrical and spherical setups.
+
+	Implemented polytropic equation of state.
+
+	Implemented GPU reductions based on warp shuffle for >= 3.5
+	architectures. Requires build option WARPSHUFFLE.
+
+	Merging output files from different processes is now the
+	default. The execution flag -m is kept for backward
+	compatibility. In order to keep the different files separated, use
+	the -k flag.
+
+fargo3d-1.1:
+
+	Implemented geometrical source terms on the magnetic tension in
+	curvilinear coordinates.
+
+	Implemented magnetic pressure gradient in spherical coordinates (was
+	missing).
+
+	Implemented geometrical source terms on the curl of magnetic field (current,
+	used when physical resistivity is present).
+
+	Implemented new variable NSNAP (see manual), which allows to select
+	the fields written to the disk in order to oversample some of them
+	(e.g., for animations).
+
+	Solved a race condition that could arise during compilation.
+
+	Corrected misprints and updated manual.
+
+
+fargo3d-1.0:
+
+	Corrected a bug that gave incorrect domains with multiple
+	processes and a log scaling of zones radii.
+
+	Corrected a bug that led to random crashes upon run start when
+	using multiple GPUs.
+
+	Corrected a miscentering of wave damping boundary conditions on Vz
+	in file stockholm.c.
+
+	Corrected a bug that led to wrong wave damping conditions when the
+	frame had a variable angular velocity (typically when tracking a
+	migrating planet). The change of angular velocity is now fully
+	taken into account in stockholm.c
+
+	Corrected a bug that yielded incorrect change of azimuthal
+	velocity when the frame had a time varying angular velocity, in
+	spherical coordinates (in file correct_vtheta.c)
+
+	Resolved an issue with the tracking of the guiding center of a
+	planet with an inclined orbit.
+
+	The resistivity arrays are now filled prior to evaluating the
+	maximum time step allowed by that CFL condition.
+
+	When a calculation includes one or several planets, the files
+	orbit[i].dat, planet[i].dat and bigplanet[i].dat are now written,
+	as in the former FARGO code. Their content is however different
+	(see manual).
+
+	Added the possibility to remove the azimuthally averaged surface
+	density prior to the torque evaluation (see Baruteau & Masset
+	2008, ApJ, 678, 483). The user simply needs to add the BM08 flag
+	in the opt file (FARGO_OPT += -DBM08).
+
+	Added some new command line switches (-o, to manually overwrite
+	some variables of the parameter file, +S, to stretch azimuthally a
+	simulation initially ran with low resolution in azimuth, -# and
+	+#, to run arrays of calculations). See the manual for more
+	details.
+
+	Added new setups (p3diso, p3disof which correspond to 3D spherical
+	setups with an isothermal EOS of a Keplerian disk with an embedded
+	planet; the former assumes equatorial symmetry and simulates the
+	half the disk above the equatorial plane, whereas the latter
+	considers the full disk).
+
+	Added new tests to the test_suite
+
+	Added more flexibility to spawn runs on clusters of GPUs (+D flag)
+
+	Added history files in $HOME/.fargo3drc
+
+	Modified the documentation
+
+	Cosmetic changes (possibility to define the first planet's mass in
+	the parameter file with PLANETMASS, possibility to rescale all
+	radii -planets and mesh- with one optional parameter,
+	ORBITALRADIUS).
+
+fargo3d-0.9 : initial release
+

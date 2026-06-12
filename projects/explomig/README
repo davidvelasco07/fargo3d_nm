@@ -1,0 +1,19 @@
+Explorations performed with commit 19b96094a on branch develop.
+The job files are self contained and refer directly to parameter
+files of setups/ ; note : the git version is 'clean', not 'dirty'
+Build info:
+
+
+Current sticky build options:
+
+PROFILING=0
+SETUP=fargo
+RESCALE=0
+MPICUDA=1
+FARGO_DISPLAY=NONE
+FULLDEBUG=0
+UNITS=0
+GPU=1
+DEBUG=0
+PARALLEL=1
+BIGMEM=1

@@ -1,0 +1,23 @@
+Setup			standingshock
+
+### Mesh parameters
+
+Nx			1
+Ny			1
+Nz			1000
+Zmin			0.0
+Zmax			1.0
+
+Ntot			1000
+Ninterm	 		1
+DT			0.05
+OutputDir		@outputs/standingshock
+
+
+Gamma			1.4
+PressureRatio		2.0
+
+Field			gasdens
+Autocolor		no
+vmin			0.95
+vmax			1.7

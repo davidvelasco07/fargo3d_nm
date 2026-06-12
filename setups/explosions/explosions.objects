@@ -1,0 +1,2 @@
+MAINOBJ += edamp.o
+GPU_OBJ += edamp_gpu.o

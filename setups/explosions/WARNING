@@ -1,0 +1,1 @@
+This is the example of 'explosions' detailed in the manual. It is not provided in the public distribution. Do not forget to add the prototypes of Edamp_cpu and Edamp_gup in prototypes.h, and the function pointer Edamp in global.h

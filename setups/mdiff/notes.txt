@@ -1,0 +1,37 @@
+This SETUP could be unstable if algogas() is modified:
+------------------------------------------------------
+
+Changes:
+========
+
+
+1) In transport:
+
+//  FARGO_SAFE(NewVelocity_x());
+//  FARGO_SAFE(NewVelocity_y());
+//  FARGO_SAFE(NewVelocity_z());
+
+2) In algogas:
+
+// THIS COPIES Vx_temp INTO Vx
+//FARGO_SAFE(copy_velocities(VTEMP2V));
+
+3) Lorentz Force is avoided with PASSIVEMHD in mdiff.opt
+
+4) Magnetic pressure is not computed in substep1().
+
+5) The viscosity is neglected because we want to solve the induction equation only (with a static velocity field).
+
+6) Resistivity returns only a constant value given by Eta. Maybe should be better to give the Magnetic Reynolds number as a parameter.
+
+7) The velocity model is plotted using streams.py
+
+
+To improve
+==========
+
+1) The mdiff.units file is empty!
+
+2) Reflecting boundaries for the magnetic field? Not important...
+
+3) The cfl criterion independent of BETA?

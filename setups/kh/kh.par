@@ -1,0 +1,30 @@
+Setup			kh
+
+### Mesh parameters
+
+Nx			128
+Ny			128
+Nz			1
+Xmin			0.0
+Xmax			1.0
+Ymin			0.0
+Ymax			1.0
+Zmin			0.0
+Zmax			1.0
+PeriodicY		no
+
+Rho1			1.0
+Rho2			2.0
+V1			0.5
+V2			-0.5
+Amplitude		0.01
+SmoothingParameter	0.025
+
+Ntot			200
+Ninterm	 		1
+DT			0.05
+OutputDir		@outputs/kh
+
+PlotLine		field
+cmap			gray
+Field			gasdens

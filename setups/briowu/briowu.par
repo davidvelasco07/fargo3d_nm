@@ -1,0 +1,23 @@
+Setup			briowu
+
+### Mesh parameters
+
+Nx			1
+Ny			1
+Nz			800
+Zmin			0.0
+Zmax			800.0
+
+Ntot			80
+Ninterm	 		80
+DT			1.00
+OutputDir		@outputs/briowu
+
+Gamma			2.0
+
+PeriodicY		Yes
+#PeriodicZ		Yes
+
+# Plot options
+Field			gasdens
+Autocolor		No

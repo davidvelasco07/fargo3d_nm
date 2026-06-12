@@ -1,0 +1,51 @@
+#Boundaries configuration file for td3d test problem
+#          Thermal diffusion in a 3D box
+#----------------------------------------------------
+
+Density:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWDENSITY
+	Zmax: INFLOWDENSITY
+
+Energy:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWENERGY
+	Zmax: INFLOWENERGY
+
+Vx:
+	Xmin: ANTISYMMETRIC
+	Xmax: ANTISYMMETRIC
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Vy:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+	Ymin: ANTISYMMETRIC
+	Ymax: ANTISYMMETRIC
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Vz:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWVELOCITY
+	Zmax: INFLOWVELOCITY
+
+Label:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWLABEL
+	Zmax: INFLOWLABEL

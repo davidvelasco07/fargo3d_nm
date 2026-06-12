@@ -1,0 +1,32 @@
+SetUp			cursheet
+
+### Mesh parameters
+
+Nx			1
+Ny                	128
+Nz			128
+Ymin			0.0
+Ymax			1.0
+Zmin			0.0
+Zmax			1.0
+
+PeriodicY		yes
+PeriodicZ		yes
+
+Eta			0.0
+Amplitude		0.05
+Beta			0.1
+Nu			0.0
+
+
+Spacing			Default
+
+### Output control parameters
+Ntot			1000		Total number of time steps
+Ninterm	 		5		Time steps between outputs
+DT			0.05		
+OutputDir		@outputs/cursheet
+
+cmap			cubehelix
+PlotLine		field[:,:,0]
+

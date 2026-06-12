@@ -1,0 +1,15 @@
+#Boundaries configuration file for sod1d test problem
+#             REFLECTING 1D BOX in X
+#----------------------------------------------------
+
+Density:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+
+Energy:
+	Xmin: SYMMETRIC
+	Xmax: SYMMETRIC
+
+Vx:
+	Xmin:	ANTISYMMETRIC
+	Xmax:   ANTISYMMETRIC

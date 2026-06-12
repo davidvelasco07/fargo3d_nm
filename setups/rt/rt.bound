@@ -1,0 +1,19 @@
+#Boundaries configuration file for sod2d test problem
+#             REFLECTING 2D BOX in YZ
+#----------------------------------------------------
+
+Density:
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+
+Energy:
+	Ymin: ENERGY_RT_LEFT
+	Ymax: ENERGY_RT_RIGHT
+
+Vx:
+	Ymin:	SYMMETRIC
+	Ymax:   SYMMETRIC
+
+Vy:
+	Ymin:	ANTISYMMETRIC
+	Ymax:   ANTISYMMETRIC

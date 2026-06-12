@@ -1,0 +1,35 @@
+# You may enter a description between the BEGIN and END labels.
+# BEGIN
+# The "mhdrotor" setup in cartesian coordinates. Tests of Balsara & Spicer (1999).
+# END
+#-------------------------------------------------------------------------------
+# From the list below, activate/deactivate the options that apply to your run.
+#-------------------------------------------------------------------------------
+
+#Dimension(s) of Simulation.
+FARGO_OPT+=-DX
+FARGO_OPT+=-DY
+FARGO_OPT+=-DZ
+
+#MHD
+FARGO_OPT += -DMHD
+FARGO_OPT += -DSTRICTSYM
+
+#Equation of State
+FARGO_OPT+=-DADIABATIC
+
+#Coordinate System.
+FARGO_OPT +=  -DCARTESIAN
+
+#Transport Algorithm
+FARGO_OPT += -DSTANDARD
+
+#Slopes
+FARGO_OPT += -DVANLEER
+
+#Cuda blocks
+ifeq (${GPU}, 1)
+FARGO_OPT += -DBLOCK_X=1
+FARGO_OPT += -DBLOCK_Y=16
+FARGO_OPT += -DBLOCK_Z=16
+endif

@@ -1,0 +1,34 @@
+#!/bin/bash
+## This script is run by a crontab every day at 4:00am
+RECIPIENTS="masset@icf.unam.mx,pbllambay@gmail.com,david.velasco@icf.unam.mx"
+SENDER="FARGO3D Nightly Built <masset@fis.unam.mx>"
+sed -e 's|FAILED|<b><font color="red">FAILED</font></b>|' -e "s/$/<br>/" tests.log >ntests.log
+sed -e 's|PASSED|<b><font color="green">PASSED</font></b>|' ntests.log >tests.log
+/bin/rm -f ntests.log
+sed -e 's|FAILED|<b><font color="red">FAILED</font></b>|' -e "s/$/<br>/" backward.log >nbackward.log
+sed -e 's|SUCCESS|<b><font color="green">SUCCESS</font></b>|' nbackward.log >backward.log
+/bin/rm -f message
+cat tests.log >> message
+echo "<br><hr><br><br><b>Backward compatibility runs:</b><br><br>" >> message
+cat backward.log >> message
+if grep -q FAILED message
+then
+    EMAIL=$SENDER mutt -e 'set content_type=text/html' -s 'FAILED - Nightly build summary - FAILED' $RECIPIENTS < message
+    EMAIL=$SENDER mutt -s 'Nightly build detail' $RECIPIENTS < detail.log
+    EMAIL=$SENDER mutt -s 'Backward runs detail' $RECIPIENTS < detail_back.log
+else
+    EMAIL=$SENDER mutt -e 'set content_type=text/html' -s 'SUCCESS - Nightly build summary' $RECIPIENTS < message
+fi
+sleep 120
+/bin/rm -f tests.log
+/bin/rm -f ntests.log
+/bin/rm -f detail.log
+/bin/rm -f backward.log
+/bin/rm -f nbackward.log
+/bin/rm -f detail_back.log
+/bin/rm -f message
+echo "No file has been successfully transferred from nightly build machine (tesla) to mail server. FAILED." > tests.log
+/bin/cp tests.log detail.log
+/bin/cp tests.log backward.log
+/bin/cp tests.log detail_back.log
+

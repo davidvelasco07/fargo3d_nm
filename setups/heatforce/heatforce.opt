@@ -1,0 +1,46 @@
+# You may enter a description between the BEGIN and END labels.
+# BEGIN
+#
+# END
+#-------------------------------------------------------------------------------
+# From the list below, activate/deactivate the options that apply to your run.
+#-------------------------------------------------------------------------------
+MONITOR_SCALAR = FORCE
+
+#Dimension(s) of Simulation.
+FARGO_OPT+=-DX
+FARGO_OPT+=-DY
+FARGO_OPT+=-DZ
+#FARGO_OPT+=-DWRITEGHOSTS
+
+#Nested Meshes
+FARGO_OPT+=-DRELNESTING
+FARGO_OPT+=-DNONMONOTONIC
+FARGO_OPT+=-DCOMM=INTERNAL
+#FARGO_OPT+=-DFASTCOMMGPU
+
+#Equation of State
+
+FARGO_OPT+=-DADIABATIC
+#0-Constant 1-Rho-1 2-T3/Rho2
+FARGO_OPT+=-DTHDIFFUSION=2
+FARGO_OPT+=-DPOTENTIAL
+#FARGO_OPT+=-DVISCOSITY
+#0-Point 1-Sphere 2-Exponential 3-Poisson
+FARGO_OPT+=-DLUMINOUS_SRC=2
+FARGO_OPT+=-DSUBCYC_SPEEDUP
+
+FARGO_OPT+=-DLABELED=EXT
+
+#Coordinate System.
+FARGO_OPT +=  -DCARTESIAN
+
+#Transport Algorithm
+FARGO_OPT += -DSTANDARD
+
+#Cuda blocks
+ifeq (${GPU}, 1)
+FARGO_OPT += -DBLOCK_X=1
+FARGO_OPT += -DBLOCK_Y=16
+FARGO_OPT += -DBLOCK_Z=16
+endif

@@ -1,0 +1,60 @@
+###################
+Setup planetesimals
+###################
+
+
+### Disk parameters
+
+AspectRatio     	0.05            Thickness over Radius in the disc
+Sigma0			6.0e-4		Surface Density at r=1
+Nu			5.0e-6		Uniform kinematic viscosity
+SigmaSlope		0.0		Slope of the surface density
+FlaringIndex		0.0
+VerticalDamping		0.0
+Noise			0.0
+
+### Planet parameters
+
+PlanetConfig		planets/earth.cfg
+ThicknessSmoothing 	0.4
+RocheSmoothing 		0.0
+Eccentricity		0.0
+Inclination		0.0
+ExcludeHill		no
+IndirectTerm		Yes
+
+AccretionRate		0.0
+Opacity			8.888e6		#Equivalent to 1 cm^2/g
+#Opacity			8.888e30
+DoublingTime		1.0e6
+RhoSolid		5.0e6 (solar masses per AU^3... equivalent to 3.0 g/cm^3)
+
+### Numerical method parameters
+
+Gamma			1.4
+
+### Mesh parameters
+
+Nx			200		Azimuthal number of zones
+Ny               	100		Radial number of zones
+Xmin			-3.141592654	
+Xmax			3.141592654
+Ymin			0.6		Inner boundary radius
+Ymax			1.5		Outer boundary radius
+PeriodicY		no		Do not change it
+OmegaFrame     		1.0
+Frame			F
+
+### Output control parameters
+
+Ntot			1000		Total number of time steps
+Ninterm	 		1		Time steps between outputs
+DT			0.314159265359	Time step length. 2PI = 1 orbit
+OutputDir		@outputs/pl3
+
+#Plotting parameters
+
+cmap			cubehelix
+funcarchfile		std/func_arch.cfg
+log			yes
+

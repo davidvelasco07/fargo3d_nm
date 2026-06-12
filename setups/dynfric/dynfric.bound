@@ -1,0 +1,26 @@
+#Boundaries configuration file for fargo.bound
+#----------------------------------------------
+
+Density:
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWDENSITY
+	Zmax: INFLOWDENSITY
+
+Vy:
+	Ymin: ANTISYMMETRIC
+	Ymax: ANTISYMMETRIC
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Vz:
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWVELOCITY
+	Zmax: INFLOWVELOCITY
+
+Energy:
+	Ymin: SYMMETRIC
+	Ymax: SYMMETRIC
+	Zmin: INFLOWENERGY
+	Zmax: INFLOWENERGY

@@ -1,0 +1,28 @@
+### Mesh parameters
+
+Nx			101
+Ny			300
+Xmin			-0.25
+Xmax			0.25
+Ymin			-0.75
+Ymax			0.75
+#Ymin			-0.375
+#Ymax			0.375
+
+RHO1			1.0
+RHO2			2.0
+
+Nu			1.0e-4
+Ylast			0.0
+
+GRAVITY			-0.1
+
+### Output control parameters
+
+Ntot			10000		Total number of time steps
+Ninterm	 		20		Time steps between outputs
+DT			0.01
+OutputDir		@rt
+
+
+Setup			rt

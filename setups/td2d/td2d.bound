@@ -1,0 +1,43 @@
+#Boundaries configuration file for sod2d test problem
+#             REFLECTING 2D BOX in XY
+#----------------------------------------------------
+
+#Density:
+#	Ymin: SYMMETRIC
+#	Ymax: SYMMETRIC
+#	Xmin: SYMMETRIC
+#	Xmax: SYMMETRIC
+
+#Energy:
+#	Ymin: SYMMETRIC
+#	Ymax: SYMMETRIC
+#	Xmin: SYMMETRIC
+#	Xmax: SYMMETRIC
+
+#Vy:
+#	Ymin:	ANTISYMMETRIC
+#	Ymax:   ANTISYMMETRIC
+#	Xmin:   SYMMETRIC
+#	Xmax:   SYMMETRIC
+
+#Vx:
+#	Ymin:	SYMMETRIC
+#	Ymax:   SYMMETRIC
+#	Xmin:	ANTISYMMETRIC
+#	Xmax:   ANTISYMMETRIC
+
+Density:
+	Ymin: EXTRAPOLATE_LEFT    #KEPLERIAN2DDENS
+	Ymax: EXTRAPOLATE_RIGHT    #KEPLERIAN2DDENS
+
+Energy:
+	Ymin: EXTRAPOLATE_LEFT    #KEPLERIAN2DDENS
+	Ymax: EXTRAPOLATE_RIGHT    #KEPLERIAN2DDEN
+
+Vx:
+	Ymin:	KEPLERIAN2DVAZIM
+	Ymax:   KEPLERIAN2DVAZIM
+
+Vy:
+	Ymin:	ANTISYMMETRIC
+	Ymax:   ANTISYMMETRIC

@@ -1,0 +1,23 @@
+Setup			adv1d
+
+### Mesh parameters
+
+Nx			100
+Ny			1
+Nz			1
+
+Xmin			0.0
+Xmax			1.0
+
+Rho0			0.5     Density floor
+CS			0.0     SoundSpeed
+V0			1.0     Background velocity
+
+Ntot			10
+Ninterm	 		1
+DT			0.1
+OutputDir		@outputs/adv1d
+
+# Plot options
+Field			gasdens
+Autocolor		No

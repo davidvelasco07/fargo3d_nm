@@ -1,0 +1,16 @@
+### Mesh parameters
+
+Nx			256
+Ny			256
+Xmin			0.0
+Xmax			10.0
+Ymin			0.0
+Ymax			10.0
+
+Ntot			100
+Ninterm	 		1
+DT			0.5
+OutputDir		@outputs/wave2d
+PeriodicX		Yes
+
+Setup			wave2d

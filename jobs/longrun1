@@ -1,0 +1,27 @@
+#!/bin/bash
+### This script is meant to distribute the load on different GPUs
+### within the same node, for sequential GPU runs. The "local rank"
+### number within a node is provided by the "exec_host" line of the
+### output of qstat -f, which is parsed to provide the device
+### number. The jobs are launched only on a subset of the nodes (those
+### which have the "mri" label). This script cannot be used as such for
+### an MPI-CUDA run with size > 1. More parsing of the exec_host line
+### would then be required.
+
+#PBS -A MRICOR
+#PBS -l nodes=1:ppn=1:mri
+
+cd /home/frederic/fargo3d/src/trunk
+
+device=$(echo $PBS_JOBID | tr "." "\n" | head -n 1 | xargs qstat -f | grep exec_host| tr "/" "\n"|tail -n 1)
+
+host=$(echo $PBS_JOBID | tr "." "\n" | head -n 1 | xargs qstat -f | grep exec_host| tr " " "\n"|tail -n 1)
+
+touch jobmap1
+
+echo `date` "Seed " $PBS_ARRAYID " was started on " $host " device " $device " with JOBID=" $PBS_JOBID >> jobmap1
+
+
+mpirun --bind-to none -np 1 ./fargo3d_mri_noplanet -# $PBS_ARRAYID -p -D $device -m -S 0 in/mrishort.par
+
+mpirun --bind-to none -np 1 ./fargo3d_mricor_planet +# $PBS_ARRAYID -p -D $device -S 1 in/mricor.par

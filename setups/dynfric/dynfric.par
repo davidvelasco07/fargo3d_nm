@@ -1,0 +1,39 @@
+Setup			dynfric
+
+Ny			30
+Nz			30
+Ymin			0.0		Inner boundary radius
+Ymax			10.0		Outer boundary radius
+Zmin			-10.0
+Zmax			10.0
+
+### Output control parameters
+
+DT			0.1
+Ninterm	 		1		Number of DTs between scalar fields outputs
+Ntot			2		Total number of DTs
+
+OutputDir		mean4
+
+Rho0			1.0
+Cs			1.0
+Gamma			1.4
+WindVel			0.4
+
+Xbody			0.0
+Ybody			0.0
+Zbody			0.0
+Smoothing		0.01
+MassBody		0.1
+MassTaper		0.0
+NsubCyc			1
+Lumos			0.0
+ThDiffusivity		0.0
+
+
+#GRIDINFO
+-1.0 -0.5 0.0 0.5 1
+-1.0 -0.25 -0.5 0.25 2
+-1.0 -0.125 -0.75 0.125 3
+#-1.0 -0.0625 -0.875 0.0625 4
+#-1.0 -0.03125 -0.9375 0.03125 5

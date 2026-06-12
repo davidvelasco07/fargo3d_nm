@@ -1,0 +1,27 @@
+Setup			sedov
+
+### Mesh parameters
+
+Nx			64
+Ny			64
+Nz			64
+Xmin			0.0
+Xmax			1.0
+Ymin			0.0
+Ymax			1.0
+Zmin			0.0
+Zmax			1.0
+PeriodicY		yes
+PeriodicZ		yes
+
+Radius			0.15
+E0			1.0e6
+
+Ntot			200
+Ninterm	 		1
+DT			0.005
+OutputDir		@outputs/sedov
+
+PlotLine		field.mean(axis=0)
+CMap			hot
+Field			gasdens

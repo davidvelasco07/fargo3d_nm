@@ -1,0 +1,31 @@
+Setup			blob
+
+Nx			800
+Ny			200
+Xmin			0.0
+Xmax			4.0
+Ymin			0.0
+Ymax			1.0
+
+Nu			0.0
+Rho1			1.0
+Rho2			2.0
+Cs			1.0
+V1			2.0		#Outside
+V2			-2.0    		#Inside
+Gamma			1.666666667
+
+Rblob			0.15		#Normalized radius of the blob
+Xblob			2.0  		#Normalized X-position of the blob
+Yblob			0.5  		#Normalized Y-position of the blob
+
+Ntot			1000
+Ninterm	 		1
+DT			0.05
+OutputDir		@outputs/blob
+
+log			yes
+cmap			cubehelix
+colorbar		no
+autocolor		Yes
+

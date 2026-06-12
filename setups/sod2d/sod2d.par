@@ -1,0 +1,20 @@
+Setup			sod2d
+
+### Mesh parameters
+
+Nx			61
+Ny			256
+Nz			256
+Xmin			0.0
+Xmax			10.0
+Ymin			0.0
+Ymax			10.0
+Zmin			0.0
+Zmax			10.0
+
+Ntot			100
+Ninterm	 		1
+DT			0.5
+OutputDir		@outputs/sod2d
+
+Gamma			1.4

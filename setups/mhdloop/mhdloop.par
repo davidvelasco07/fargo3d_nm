@@ -1,0 +1,39 @@
+### The same test as RAMSES paper: http://fr.arxiv.org/pdf/astro-ph/0607230v1
+
+SetUp		     	mhdloop
+
+### Mesh parameters
+
+Nx			1
+Ny                	128
+Nz			64
+Xmin			-1.0
+Xmax			1.0
+Ymin			-1.0
+Ymax			1.0
+Zmin			-0.5
+Zmax			0.5
+
+PeriodicY		yes
+PeriodicZ		yes
+
+Eta			0.0
+A0			1.0e-3
+V0X			0.89442719099991586
+V0Y			0.44721359549995793
+R1 			0.3
+Beta			2.0e+6
+Nu			0.0
+
+Spacing			Default
+
+### Output control parameters
+Ntot			200		Total number of time steps
+Ninterm	 		1		Time steps between outputs
+DT			0.01		
+OutputDir		@outputs/mhdloop_y
+
+cmap			cubehelix
+PlotLine		field[:,:,0]**2
+log			No
+Field			by

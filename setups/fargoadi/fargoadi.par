@@ -1,0 +1,50 @@
+### Disk parameters
+
+AspectRatio     	0.05            Thickness over Radius in the disc
+Sigma0			6.0e-4		Surface Density at r=1
+Nu			0.0		Uniform kinematic viscosity
+SigmaSlope		0.0		Slope of the surface density
+FlaringIndex		0.0
+VerticalDamping		0.0
+Noise			0.0
+
+### Planet parameters
+
+PlanetConfig		planets/jupiter.cfg
+ThicknessSmoothing 	0.6
+RocheSmoothing 		0.0
+Eccentricity		0.0
+Inclination		0.0
+ExcludeHill		no
+IndirectTerm		Yes
+
+### Numerical method parameters
+
+Gamma			1.4
+
+### Mesh parameters
+
+Nx			300		Azimuthal number of zones
+Ny               	150		Radial number of zones
+Xmin			-3.141592654	
+Xmax			3.141592654
+Ymin			0.41		Inner boundary radius
+Ymax			2.49		Outer boundary radius
+PeriodicY		no		Do not change it
+OmegaFrame     		1.0
+Frame			F
+
+### Output control parameters
+
+Ntot			100		Total number of time steps
+Ninterm	 		1		Time steps between outputs
+DT			3.14
+OutputDir		@disk2df/
+
+#Plotting parameters
+
+cmap			cubehelix
+funcarchfile		std/func_arch.cfg
+log			yes
+Setup			fargoadi
+

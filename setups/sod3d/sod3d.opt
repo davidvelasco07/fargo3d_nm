@@ -1,0 +1,37 @@
+# You may enter a description between the BEGIN and END labels.
+# BEGIN
+# The "sod1d_z" setup corresponds to the standard sod shock tube test 
+# in 2D direction and cartesian geometry. You may change the plane of
+# the simulation modifying the sod2d.opt file.
+# In order to run it, do:
+# make SETUP=sod2d
+# fargo3d par/sod2d.par
+# END
+#-------------------------------------------------------------------------------
+# From the list below, activate/deactivate the options that apply to your run.
+#-------------------------------------------------------------------------------
+
+#Dimension(s) of Simulation.
+FARGO_OPT+=-DX
+FARGO_OPT+=-DY
+FARGO_OPT+=-DZ
+
+#Equation of State
+
+FARGO_OPT+=-DADIABATIC
+
+#Coordinate System.
+FARGO_OPT +=  -DCARTESIAN
+
+#Transport Algorithm
+FARGO_OPT += -DSTANDARD
+
+
+
+
+#Cuda blocks
+ifeq (${GPU}, 1)
+FARGO_OPT += -DBLOCK_X=1
+FARGO_OPT += -DBLOCK_Y=16
+FARGO_OPT += -DBLOCK_Z=16
+endif

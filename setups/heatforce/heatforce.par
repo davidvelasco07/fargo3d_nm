@@ -1,0 +1,38 @@
+Setup			heatforce
+
+### Mesh parameters
+
+Nx			100
+Ny			100
+Nz			100
+Xmin			-350.0
+Xmax			350.0
+Ymin			-350.0
+Ymax			350.0
+Zmin			-350.0
+Zmax			350.0
+
+Xbody			0.0
+Ybody			0.0
+Zbody			0.0
+Massbody		0.25
+Smoothing		0.0
+Gamma			1.4
+ThDiffusivity		0.1
+Lumos			0.0
+WindVel			0.1
+Cs			2.0
+Rho0			1.0
+Nsubcyc			3
+
+Ntot			101
+Ninterm	 		10
+DT			10.0
+OutputDir		/state/partition1/david/outputs/heatforce
+
+#GRIDINFO
+#-175.0 -175.0 -175.0 175.0 175.0 175.0 1
+#-87.5 -87.5 -87.5 87.5 87.5 87.5 2
+#-43.75 -43.75 -43.75 43.75 43.75 43.75 3
+#-21.875 -21.875 -21.875 21.875 21.875 21.875 4
+#-10.9375 -10.9375 -10.9375 10.9375 10.9375 10.9375 5

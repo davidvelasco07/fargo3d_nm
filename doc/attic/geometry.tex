@@ -1,0 +1,165 @@
+\documentclass{article}
+\title{Useful geometric properties of the meshes}
+\author{Developpers}
+\begin{document}
+\maketitle
+\section{Introduction} {\tt Dx} is always defined and is the step $\Delta x$ in the $x$-direction.  Also defined are the 1D arrays {\tt InvDiffYmed[]} and {\tt InvDiffZmed[]}.  Note that these are defined for each zone, even the extreme ones, where the value is forced to that of the neighbor.
+
+\section{Surfaces}
+
+We define the relationships:
+
+\begin{eqnarray}
+  \label{eq:1}
+  S_x(j,k) &=& s_x^j(j)s_x^k(k)\\
+  S_y(j,k) &=& s_y^j(j)s_y^k(k)\\
+  S_z(j,k) &=& s_z^j(j)s_z^k(k)
+\end{eqnarray}
+and we have, for the different geometries (cartesian, cylindrical and spherical):
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+    factor & cartesian & cylindrical & spherical \\
+    \hline
+    \phantom{$\displaystyle\int$}$s_x^j(j)$ & $Y_{\rm max}-Y_{\rm min}$ & $Y_{\rm max}-Y_{\rm min}$ & $\frac 12(Y_{\rm max}^2-Y_{\rm min}^2)$\\
+   \hline
+   \phantom{$\displaystyle\int$}$s_x^k(k)$ & $Z_{\rm max}-Z_{\rm min}$ & $Z_{\rm max}-Z_{\rm min}$ & $Z_{\rm max}-Z_{\rm min}$\\
+   \hline
+   \phantom{$\displaystyle\int$}$s_y^j(j)$ & $1$ & $Y_{\rm min}\Delta x$ & $Y_{\rm min}^2\Delta x$\\
+  \hline
+  \phantom{$\displaystyle\int$}$s_y^k(k)$ & $\Delta x(Z_{\rm max}-Z_{\rm min})$ & $Z_{\rm max}-Z_{\rm min}$ & $\cos(Z_{\rm min})-\cos(Z_{\rm max})$\\
+   \hline
+   \phantom{$\displaystyle\int$}$s_z^j(j)$ & $\Delta x(Y_{\rm max}-Y_{\rm min})$ & $\frac 12\Delta x(Y_{\rm max}^2-Y_{\rm min}^2)$ & $\frac 12\Delta x(Y_{\rm max}^2-Y_{\rm min}^2)$ \\
+  \hline
+  \phantom{$\displaystyle\int$}$s_z^k(k)$ & $1$ & $1$ & $\sin(Z_{\rm min})$\\
+ \hline
+  \end{tabular}
+\end{table}
+For this table we infer the following values for the surfaces:
+\begin{description}
+\item[Cartesian case] 
+  \begin{eqnarray}
+    \label{eq:2}
+    S_x(j,k) &=& (Y_{\rm max}-Y_{\rm min})(Z_{\rm max}-Z_{\rm min})\\
+    S_y(j,k) &=& \Delta x (Z_{\rm max}-Z_{\rm min})\\
+    S_z(j,k) &=& \Delta x (Y_{\rm max}-Y_{\rm min})
+  \end{eqnarray}
+\item[Cylindrical case] 
+  \begin{eqnarray}
+    \label{eq:3}
+    S_x(j,k) &=& (Y_{\rm max}-Y_{\rm min})(Z_{\rm max}-Z_{\rm min})\\
+    S_y(j,k) &=& \Delta x Y_{\rm min}(Z_{\rm max}-Z_{\rm min})\\
+    S_z(j,k) &=& \frac 12\Delta x(Y_{\rm max}^2-Y_{\rm min}^2)
+  \end{eqnarray}
+\item[Spherical case] 
+  \begin{eqnarray}
+    \label{eq:4}
+    S_x(j,k) &=& \frac 12(Y_{\rm max}^2-Y_{\rm min}^2)(Z_{\rm max}-Z_{\rm min})\\
+    S_y(j,k) &=& \Delta xY_{\rm min}^2[\cos(Z_{\rm min})-\cos(Z_{\rm max})]\\
+    S_z(j,k) &=& \frac 12\Delta x(Y_{\rm max}^2-Y_{\rm min}^2)\sin(Z_{\rm min})
+  \end{eqnarray}
+\end{description}
+We recast the two last sets using standard coordinates ($R,\phi,Z$ and $r,\phi,\theta$):
+\begin{description}
+\item[Cylindrical case] 
+  \begin{eqnarray}
+    \label{eq:3}
+    S_\phi(j,k) &=& (R_{\rm max}-R_{\rm min})(Z_{\rm max}-Z_{\rm min})\\
+    S_R(j,k) &=& \Delta \phi R_{\rm min}(Z_{\rm max}-Z_{\rm min})\\
+    S_Z(j,k) &=& \frac 12\Delta\phi(R_{\rm max}^2-R_{\rm min}^2)
+  \end{eqnarray}
+\item[Spherical case] 
+  \begin{eqnarray}
+    \label{eq:4}
+    S_\phi(j,k) &=& \frac 12(r_{\rm max}^2-r_{\rm min}^2)(\theta_{\rm max}-\theta_{\rm min})\\
+    S_r(j,k) &=& \Delta \phi r_{\rm min}^2[\cos(\theta_{\rm min})-\cos(\theta_{\rm max})]\\
+    S_\theta(j,k) &=& \frac 12\Delta \phi (r_{\rm max}^2-r_{\rm min}^2)\sin(\theta_{\rm min})
+  \end{eqnarray}
+\end{description}
+
+\section{Volumes}
+
+We use the following relationship:
+
+\begin{equation}
+  \label{eq:5}
+  V^{-1}=\frac{V_j(j)^{-1}}{s_y^k(k)},
+\end{equation}
+where $V$ is the cell volume, and where we have:
+
+\begin{description}
+\item[Cartesian case] 
+  \begin{equation}
+    \label{eq:6}
+    V_j(j)^{-1}=\frac{1}{s_x^j(j)}=\frac{1}{Y_{\rm max}-Y_{\rm min}}.
+  \end{equation}
+\item[Cylindrical case] 
+  \begin{equation}
+    \label{eq:7}
+    V_j(j)^{-1}=\frac{1}{s_z^j(j)}=\frac{2}{(Y_{\rm max}^2-Y_{\rm min}^2)\Delta\phi}
+  \end{equation}
+\item[Spherical case] 
+  \begin{equation}
+    \label{eq:8}
+    V_j(j)^{-1}=\frac{3}{\Delta x(Y_{\rm max}^3-Y_{\rm min}^3)}.
+  \end{equation}
+\end{description}
+We infer from these equations the inverse of the volumes in the three geometries:
+\begin{description}
+\item[Cartesian case] 
+  \begin{equation}
+    \label{eq:9}
+    V^{-1}=\frac{1}{\Delta x(Y_{\rm max}-Y_{\rm min})(Z_{\rm max}-Z_{\rm min})}
+  \end{equation}
+\item[Cylindrical case] 
+  \begin{equation}
+    \label{eq:10}
+    V^{-1}=\frac{2}{\Delta x(Y_{\rm max}^2-Y_{\rm min}^2)(Z_{\rm max}-Z_{\rm min})}
+  \end{equation}
+\item[Spherical case] 
+  \begin{equation}
+    \label{eq:11}
+    V^{-1}=\frac{3}{\Delta x(Y_{\rm max}^3-Y_{\rm min}^3)[\cos(Z_{\rm min})-\cos(Z_{\rm max})]}
+  \end{equation}
+\end{description}
+We recast the volumes of the last two cases with conventional notation:
+\begin{description}
+\item[Cylindrical case] 
+  \begin{equation}
+    \label{eq:12}
+    V=\frac 12\Delta \phi(R_{\rm max}^2-R_{\rm min}^2)(Z_{\rm max}-Z_{\rm min})
+  \end{equation}
+\item[Spherical case] 
+  \begin{equation}
+    \label{eq:13}
+    V=\frac 13\Delta\phi(R_{\rm max}^3-R_{\rm min}^3)[\cos(\theta_{\rm min})-\cos(\theta_{\rm max})]
+  \end{equation}
+\end{description}
+\section{Lengths}
+We call $\delta L_\xi$ the infinitesimal length associated to a variation $\delta\xi$ of the coordinate $\xi$. The cartesian case is trivial:
+\begin{equation}
+  \label{eq:14}
+  \delta L_{X,Y,Z} = \delta {X,Y,Z}
+\end{equation}
+\begin{description}
+\item[Cylindrical case] 
+  \begin{eqnarray}
+   \label{eq:15}
+   \delta L_X &=& \Delta x Y_{\rm med}(j)\\
+   \delta L_y &=& Y_{\rm max}(j)-Y_{\rm min}(j)\\
+   \delta L_z &=& Z_{\rm max}(k)-Z_{\rm min}(k)
+\end{eqnarray}
+\item[Spherical case] 
+  \begin{eqnarray}
+   \label{eq:16}
+   \delta L_X &=& \Delta x Y_{\rm med}(j)\sin[Z_{\rm med}(k)]\\
+   \delta L_y &=& Y_{\rm max}(j)-Y_{\rm min}(j)\\
+   \delta L_z &=& [Z_{\rm max}(k)-Z_{\rm min}(k)]Y_{\rm med}(j)
+\end{eqnarray}
+\end{description}
+These arc lengths are implemented in the global variables (CPU) or macrocommands (GPU)
+named {\verb?zone_size_x(j,k), zone_size_y(j,k), zone_size_z(j,k)?}.
+
+\end{document}

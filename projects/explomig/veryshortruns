@@ -1,0 +1,23 @@
+#!/bin/bash
+### This job file is meant to spawn an MPI-CUDA job over several GPUs, possibly on different nodes. The idea is to parse the output of qstat to know which logical "cores" have been attached to the job, and to use the numbers provided as device numbers. This script is compatible with the 1-GPU script written earlier (jobseq), that is to say that no GPU will be oversubscribed if both scripts are used simultaneously.
+#PBS -A test
+#PBS -l nodes=1:ppn=1
+
+cd /home/frederic/explomig/fargo3d
+
+# You may choose whatever 'device file' you want, but it must be readable by all processes (hence it must not be written to /state/partition1), and it is a good idea to link it to the JOBID in order not to interfere with the device file of another job. The following two lines should simply be cut and pasted in any GPU job batch file.
+DEVFILE=$HOME/.gpu_$PBS_JOBID
+
+deltar=$(echo "($PBS_ARRAYID -1) * 0.001 - 0.01" | bc)
+rstart=$(echo "1.0 - $deltar" | bc)
+rend=$(echo "1.0 + $deltar" | bc)
+
+
+qstat -f -1 $PBS_JOBID | grep exec_host | tr "=" "\n" | tail -n 1|tr "+" "\n" | tr -d " " | sed -e 's|/|.local/|'> $DEVFILE
+
+#In the above line, we append ".local" to the host names, since the 'gethostname' function of C yields this suffix (we use this function in the early device selection of FARGO3D).
+
+#Note two important points below:
+#- The use of --bind-to none (mandatory even for CPU jobs)
+#- The use of the option +D $DEVFILE of fargo3d
+mpirun --bind-to none -hostfile $PBS_NODEFILE ./fargo3d +D $DEVFILE -o "SemiMajorAxis $rstart ReleaseRadius $rend ReleaseDate 628.318541 PlanetConfig planets/SuperEarth.cfg nu=0.0 nx=512 ny=256 ymin=0.5 ymax=1.5 ntot=1001 ninterm=1000 OutputDir:/state/partition1/frederic/explomig/set1/run" -# $PBS_ARRAYID setups/fargo/fargo.par

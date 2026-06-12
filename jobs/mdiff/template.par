@@ -1,0 +1,34 @@
+Setup			mdiff
+
+### Setup parameters
+
+Beta			100.0
+Eta			5.0e-4
+A			-1.0
+B			-0.3183098861837907
+
+### Mesh parameters
+
+Nx			1
+Ny			1024
+Nz			256
+Ymin			-10.0
+Ymax			10.0
+Zmin			-1.0
+Zmax			1.0
+
+### Boundaries
+
+PeriodicY		Yes
+PeriodicZ		No
+
+### Output parameters
+
+Ntot			4000
+Ninterm	 		2000
+DT			0.1
+OutputDir		@outputs/mdiff
+
+### Plot parameters
+
+Field			by

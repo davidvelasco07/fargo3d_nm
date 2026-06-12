@@ -1,0 +1,122 @@
+#!/bin/sh 
+
+NAME = fargo3d-1.2
+
+all:
+	make mrproper
+## We move outputs out of the way. We do not empty it: it may contain important data.
+	mkdir -p outputs #The script returns an error if this directory does not exist
+	mv outputs temp_outputs
+## We make an empty 'outputs' dir:
+	mkdir outputs
+## And we include it, together with many other directories
+	tar cf $(NAME).tar src/ std/ doc/ scripts/ test_suite/ utils/ outputs/ license.txt
+## And we restore the former 'outputs' directory
+	rmdir outputs
+	mv temp_outputs outputs
+## Below we select which planetary files we want to include.
+	tar rf $(NAME).tar planets/MobileEarth.cfg
+	tar rf $(NAME).tar planets/MobileSaturn.cfg
+	tar rf $(NAME).tar planets/MobileJupiter.cfg
+	tar rf $(NAME).tar planets/earth.cfg
+	tar rf $(NAME).tar planets/jupiter.cfg
+	tar rf $(NAME).tar planets/saturn.cfg
+	tar rf $(NAME).tar planets/neptune.cfg
+	tar rf $(NAME).tar planets/SuperEarth.cfg
+	tar rf $(NAME).tar planets/Kepler38.cfg
+	tar rf $(NAME).tar planets/zero.cfg
+	mkdir -p in	
+## We copy all .par files of setups to subdirectory in/.
+	find setups -iname '*.par' | xargs -I% cp % in/
+##
+## In the line below choose the setups that you wish to include in the public release
+##
+	for i in binary fargo otvortex sod1d mri p3diso p3disof; do\
+	 echo "Including setup" $$i;	\
+	 tar rf $(NAME).tar setups/$$i; \
+	 tar rf $(NAME).tar in/$$i.par;\
+	done
+	tar rf $(NAME).tar Makefile README matplotlibrc
+
+## Below we make a temporary directory to rearchive all files, so that
+## the public archive expands in a directory with name $(NAME)...
+
+## Archive expansion
+	mkdir -p temp_for_archive/$(NAME)
+	mv $(NAME).tar temp_for_archive/$(NAME)/
+	cd temp_for_archive/$(NAME); tar xf $(NAME).tar; rm -f $(NAME).tar
+
+## We do not want to include 'blocks' files.
+	find temp_for_archive/ -type f -name "*.blocks" -exec rm -f {} \;
+	find temp_for_archive/ -type f -name "*~" -exec rm -f {} \;
+## We keep only a few utils files
+	rm -fr temp_for_archive/$(NAME)/utils/bash
+	rm -fr temp_for_archive/$(NAME)/utils/idl
+	rm -fr temp_for_archive/$(NAME)/utils/c
+	rm -fr temp_for_archive/$(NAME)/utils/fortran/sod*f
+	rm -fr temp_for_archive/$(NAME)/utils/python/[b-p]*.py*
+	rm -fr temp_for_archive/$(NAME)/utils/python/[s-z]*.py*
+	rm -fr temp_for_archive/$(NAME)/utils/python/pyfargo3d
+## We do not want any .lastflag* file either
+	rm -f temp_for_archive/$(NAME)/std/.lastflag*
+	rm -f temp_for_archive/$(NAME)/scripts/varparser.py
+	rm -f temp_for_archive/$(NAME)/scripts/nightlybuilds.py
+	rm -f temp_for_archive/$(NAME)/scripts/var.py
+	rm -f temp_for_archive/$(NAME)/scripts/*.pyc
+	rm -f temp_for_archive/$(NAME)/src/rescale.c
+	rm -fr temp_for_archive/$(NAME)/doc
+	rm -fr temp_for_archive/$(NAME)/Release
+	rm -fr temp_for_archive/$(NAME)/test_suite/restart2.py
+	rm -fr temp_for_archive/$(NAME)/test_suite/*RT*.py
+	rm -fr temp_for_archive/$(NAME)/test_suite/*complex*.py
+	rm -fr temp_for_archive/$(NAME)/test_suite/*gapirr*.py
+	rm -fr temp_for_archive/$(NAME)/test_suite/ghosts*.py
+	## Remove RT & IRR & remap files from source
+	rm -f temp_for_archive/$(NAME)/src/RT*
+	rm -f temp_for_archive/$(NAME)/src/PlanetHeating.c
+	rm -f temp_for_archive/$(NAME)/src/fill_ghostsx_erad.c
+	rm -f temp_for_archive/$(NAME)/src/remap*
+	rm -f temp_for_archive/$(NAME)/src/get_new_borders.c
+	## Remove RT & IRR & remap files from makefile
+	cd temp_for_archive/$(NAME)/src; sed -e '325,330d;332,341d;349,351d;384,398d;422,437d' makefile > foo; rm -f makefile; mv foo makefile
+	cd temp_for_archive/$(NAME)/src; sed -e 's/fill_ghostsx_erad\.o//' makefile > foo; rm -f makefile; mv foo makefile
+	cd temp_for_archive/$(NAME)/src; sed -e 's/fill_ghostsx_erad_gpu\.o//' makefile > foo; rm -f makefile; mv foo makefile
+	## Remove RT & IRR & remap instructions from change_arch.c
+	cd temp_for_archive/$(NAME)/src; sed -e '102,132d;416d;429,472d;74d;481,487d' <change_arch.c> newca.c; rm -f change_arch.c; mv newca.c change_arch.c
+	## Remove RT related  & remap invocations from algogas.c
+	cd temp_for_archive/$(NAME)/src; sed -e '228,230d;217,220d;133,135d' <algogas.c> newag.c; rm -f algogas.c; mv newag.c algogas.c
+	## Remove RT & IRR related instructions from func_arch.cfg
+	cd temp_for_archive/$(NAME)/std; sed -e '49,100d' func_arch.cfg > foo; rm -f func_arch.cfg; mv foo func_arch.cfg
+	## Remove RT tests from comm.c & comm_device.c
+	cd temp_for_archive/$(NAME)/src; sed -e '255,262 d' comm.c > foo; rm -f comm.c; mv foo comm.c
+	cd temp_for_archive/$(NAME)/src; sed -e '294,301 d' comm_device.c > foo; rm -f comm_device.c; mv foo comm_device.c
+	## Remove RT & IRR stuff from LowTasks.c
+	cd temp_for_archive/$(NAME)/src; sed -e '31,33d;610,657d;809,811d' LowTasks.c > foo; rm -f LowTasks.c; mv foo LowTasks.c
+	## Remove RT & IRR & WriteY stuff from output.c
+	cd temp_for_archive/$(NAME)/src; sed -e '193,226d;515,516d;497,504d' output.c > foo; rm -f output.c; mv foo output.c
+	## Remove RT & IRR stuff from stretch.c
+	cd temp_for_archive/$(NAME)/src; sed -e '70,72 d' stretch.c > foo; rm -f stretch.c; mv foo stretch.c
+	## Remove RT & IRR stuff from define.h
+	cd temp_for_archive/$(NAME)/src; sed -e '95,97 d' define.h > foo; rm -f define.h; mv foo define.h
+	## Remove RT & IRR stuff from global.h
+	cd temp_for_archive/$(NAME)/src; sed -e '358,1000d;349d;169d;141,160d' global.h > foo; rm -f global.h; mv foo global.h
+	## Remove RT & IRR stuff from prototypes.h
+	cd temp_for_archive/$(NAME)/src; sed -e '21,26d;422,454d;562d;601,629d' prototypes.h > foo; rm -f prototypes.h; mv foo prototypes.h
+      	## Remove RT & IRR stuff from stockholm.c
+	cd temp_for_archive/$(NAME)/src; sed -e '182,186d;167d;169d' stockholm.c > foo; rm -f stockholm.c; mv foo stockholm.c
+      	## Remove REMAP stuff from main.c
+	cd temp_for_archive/$(NAME)/src; sed -e '296,299d' main.c > foo; rm -f main.c; mv foo main.c
+## Legacy 'template.par' for former FARGO users who hastily do their first run...
+	cd temp_for_archive/$(NAME)/in; echo "#Legacy file of former FARGO code: this file has same content as 'fargo.par'" > template.par; cat fargo.par >> template.par
+
+## Re-archiving
+	cd temp_for_archive; tar cf $(NAME).tar $(NAME)/; mv $(NAME).tar ..
+	rm -fr temp_for_archive
+## And compression
+	gzip -9 $(NAME).tar
+	echo ""
+	echo "Created archive $(NAME).tar.gz"
+
+clean:
+	 rm -fr temp_for_archive
+	 rm -f *.tar.gz

@@ -1,0 +1,47 @@
+#Boundaries configuration file for sod1d test problem
+#             REFLECTING 1D BOX in Z
+#----------------------------------------------------
+
+Density:
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Energy:
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Vz:
+	Zmin:	ANTISYMMETRIC
+	Zmax:   ANTISYMMETRIC
+
+Vy:
+	Zmin:	SYMMETRIC
+	Zmax:   SYMMETRIC
+
+Vx:
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Bx:
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+By:
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC
+
+Bz:
+	Zmin: ANTISYMMETRIC
+	Zmax: ANTISYMMETRIC
+
+Emfx:
+	Zmin: ANTISYMMETRIC
+	Zmax: ANTISYMMETRIC
+
+Emfy:
+	Zmin: ANTISYMMETRIC
+	Zmax: ANTISYMMETRIC
+
+Emfz:
+	Zmin: SYMMETRIC
+	Zmax: SYMMETRIC

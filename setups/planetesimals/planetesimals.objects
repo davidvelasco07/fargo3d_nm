@@ -1,0 +1,2 @@
+MAINOBJ	+= thermal_diff_a.o thermal_diff_b.o energy_release.o energy_release_b.o
+#GPUOBJ += thermal_diff_a_gpu.o thermal_diff_b_gpu.o energy_release_b_gpu.o

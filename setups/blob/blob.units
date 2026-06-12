@@ -1,0 +1,8 @@
+XBLOB *= R0
+YBLOB *= R0
+RBLOB *= R0
+RHO1  *= MSTAR/(R0*R0)
+RHO2  *= MSTAR/(R0*R0)
+V1    *= sqrt(G*MSTAR/R0)
+V2    *= sqrt(G*MSTAR/R0)
+

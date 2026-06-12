@@ -1,0 +1,6 @@
+This setup is here for one purpose only: provide a quick
+comparison with Stone & Norman's advection tests as in
+the 1st ZEUS paper (1992ApJS__80__753S), figure 8.
+To switch between van Leer and PPA, edit transport.c
+IN THIS DIRECTORY and seek the comment README.
+To activate/deactivate the PPA_STEEPENER, edit the opt file.
